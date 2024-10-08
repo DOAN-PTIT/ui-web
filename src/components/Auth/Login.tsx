@@ -7,15 +7,22 @@ import customerImage from "@/assets/customer-image.jpg";
 import Image from "next/image";
 import "@/styles/login.css";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const { Password } = Input;
 function LoginComponent() {
+  const route = useRouter()
+  const shopId = 12
+  const handleSubmitForm = () => {
+    route.push(`shop/${shopId}`)
+  }
+
   return (
     <main className="login__container p-10 m-10">
       <Row className="border rounded-md h-[80vh]" align="middle">
         <Col span={10} className="p-10">
           <h1 className="text-center font-bold text-2xl mb-4">Đăng nhập</h1>
-          <Form className="" layout="vertical">
+          <Form className="" layout="vertical" onFinish={handleSubmitForm}>
             <Form.Item
               label="Tên đang nhập"
               name={"username"}
