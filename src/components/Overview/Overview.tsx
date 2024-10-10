@@ -6,15 +6,13 @@ import {
   EditOutlined,
   DeleteOutlined,
   LoginOutlined,
-  SyncOutlined,
-  LogoutOutlined,
-  SettingOutlined,
+  SyncOutlined
 } from "@ant-design/icons";
-import { Avatar, Button, Card, Dropdown, Layout, Space, Tooltip } from "antd";
-import type { MenuProps } from "antd";
+import { Avatar, Button, Card, Layout, Space, Tooltip } from "antd";
 import { useRouter } from "next/navigation";
+import HeaderAction from "../HeaderAction/HeaderAction";
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 const shops = [
   {
     id: 1,
@@ -27,41 +25,16 @@ const shops = [
     description: "Shop 1 description",
   },
 ];
-const listItem = [
-  {
-    key: "1",
-    title: "Cai dat tai khoan",
-    icon: <SettingOutlined />,
-  },
-  {
-    key: "2",
-    title: "Dang xuat",
-    icon: <LogoutOutlined />,
-  },
-];
-const items: MenuProps["items"] = listItem.map((item) => ({
-  key: item.key,
-  label: (
-    <div className="flex items-center justify-between">
-      {item.icon}
-      <p className="ml-3">{item.title}</p>
-    </div>
-  ),
-}));
+
 function Overview() {
     const route = useRouter()
     const handleClickAccess = (shopId: number) => {
-        route.push(`/shop/${shopId}`)
+        route.push(`/shop/${shopId}/dashbroad`)
     }
 
   return (
     <Layout className="w-full min-h-screen">
-      <Header className="flex justify-between items-center bg-slate-200">
-        <div className="text-lg font-bold">Danh sach cua hang</div>
-        <Dropdown menu={{ items }}>
-          <Avatar className="cursor-pointer" icon={<UserOutlined />} />
-        </Dropdown>
-      </Header>
+      <HeaderAction isShowSearch={false} title="Danh sach cua hang" />
       <Content className="p-8">
         <Space className="w-full justify-end" align="center">
           <Button type="primary" icon={<SyncOutlined />}>
