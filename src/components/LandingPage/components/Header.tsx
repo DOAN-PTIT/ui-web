@@ -1,17 +1,19 @@
 "use client";
 import { Button, Layout, Typography } from 'antd';
+import Image from 'next/image';
+
 import Link from 'next/link';
-import React from 'react';
-
+import img from '/src/assets/favicon.png';
 const { Header } = Layout;
-
-export default function LandingHeader()  {
+// const url = `src/assets/favicon.png`
+export default function LandingHeader() {
     return (
-        <Header className='bg-slate-50 block items-center justify-between p-0 mx-[10px] lg:mx-[150px] md:mx-[100px] sm:flex sm:h-[92px]'>
+        <Header className='bg-slate-50 block items-center justify-between p-0 mx-[10px] mt-[10px] lg:mx-[150px] md:mx-[100px] sm:flex sm:h-[92px]'>
             <div className='flex items-center '>
                 <div className="logo">
                     <Link href={'/'}>
-                        <Typography className='font-bold text-4xl items-center text-cyan-500' >G</Typography>
+                        {/* <Avatar src='src/assets/favicon.ico' className=' text-4xl items-center text-cyan-500' /> */}
+                        <Image className='w-10' src={img} alt="avatar" />
                     </Link>
                 </div>
                 <div className='flex'>
