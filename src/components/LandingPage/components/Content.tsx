@@ -55,6 +55,9 @@ export default function LandingContent() {
                     </div>
                 </div>
             </div>
+            <div className='bg-cover bg-center relative bg-white'>
+                <div className='flex sm:flex h-[720px] items-center justify-between ml-[10px] sm:h-[720px] lg:ml-[150px] md:ml-[100px] sm:items-center sm:justify-between'>aaaaaaaaa</div>
+            </div>
         </Content>
     );
 }
