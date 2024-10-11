@@ -13,6 +13,7 @@ export default function LandingHeader() {
     return (
         <Header className='bg-slate-50 block items-center justify-between 
         p-0 mx-[10px] mb-8 mt-3 sm:mx-0 sm:mb-0 sm:mt-0 lg:mx-[150px] md:mx-[100px] sm:flex sm:h-[92px]'>
+            
             <div className='flex items-center '>
                 <div className="logo">
                     <Link href={'/'}>
