@@ -12,13 +12,12 @@ export default function LandingContent() {
 
     return (
         <Content>
-            <div className='bg-cover bg-center relative'>
-                <Image className='h-[700px] sm:h-auto object-cover w-full' src={Background} alt="" />
-                <div className='absolute top-0 flex sm:flex h-[720px] items-center justify-between ml-[10px] sm:h-[720px] lg:ml-[150px] md:ml-[100px] sm:items-center sm:justify-between'>
-                    <div className='block mr-[110px] w-[100px] lg:w-[542px] md:w-[400px] sm:w-[200px]'>
-                        <div className='flex item-center'>
+            <div className='bg-cover bg-center relative max-w-[76rem] mx-auto sm:w-[1300px]'>
+                <Image className='h-[754px] object-cover w-auto' src={Background} alt="" />
+                <div className=' absolute h-[1054px] top-0 sm:flex items-center justify-between sm:h-[720px]'>
+                    <div className='sm:w-[706px] mr'>
+                        <div className='flex item-center mx:3'>
                             <a className='mr-1 text-[16px] font-[500] text-[#6a6a6a]'>Một sản phẩm của </a>
-
                             <a className='text-[18px] font-[600] text-[#464646]'>PTIT TEAM</a>
                         </div>
                         <div className='flex item-center'>
@@ -27,7 +26,7 @@ export default function LandingContent() {
                             </a>
                         </div>
                         <div className='flex item-center'>
-                            <a className="mr-1 mb-4 text-[64px] leading-[5rem] font-[650] text-black hover:text-black">
+                            <a className="mr-1 mb-4 text-[64px] sm:leading-[5rem] font-[650] text-black hover:text-black">
                                 Phần mềm <br /> quản lý bán hàng
                             </a>
 
@@ -46,18 +45,18 @@ export default function LandingContent() {
                             </Link>
                         </div>
                     </div>
-                    <div className='block w-[100px] lg:w-[906px] md:w-[400px] sm:w-[200px] overflow-hidden'>
+                    <div className='w-[380px] sm:w-[906px] sm:overflow-hidden'>
                         <Image
                             src={ImageEx}
                             alt=''
-                            className='w-full h-full object-cover' // Cập nhật để cắt phần tràn của ảnh
+                            className='h-full object-cover' // Cập nhật để cắt phần tràn của ảnh
                         />
                     </div>
                 </div>
             </div>
-            <div className='bg-cover bg-center relative bg-white'>
+            {/* <div className='bg-cover bg-center relative bg-white'>
                 <div className='flex sm:flex h-[720px] items-center justify-between ml-[10px] sm:h-[720px] lg:ml-[150px] md:ml-[100px] sm:items-center sm:justify-between'>aaaaaaaaa</div>
-            </div>
+            </div> */}
         </Content>
     );
 }
