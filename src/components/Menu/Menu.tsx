@@ -10,54 +10,63 @@ import {
   LeftCircleOutlined,
   UserOutlined,
   ContainerOutlined,
+  ShoppingCartOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 
 const { Sider } = Layout;
 const listItem = [
   {
-    key: 'dashbroad',
+    key: "dashbroad",
     label: "Tong quan",
-    icon: <PieChartOutlined />
+    icon: <PieChartOutlined />,
   },
   {
-    key: 'order',
+    key: "sale",
+    label: "Ban hang",
+    icon: <ShoppingCartOutlined />,
+  },
+  {
+    key: "order",
     label: "Hoa Don",
     icon: <ReconciliationOutlined />,
   },
   {
-    key: 'customer',
+    key: "customer",
     label: "Khach hang",
     icon: <AuditOutlined />,
   },
   {
-    key: 'product',
+    key: "product",
     label: "San pham",
-    icon: <ContainerOutlined />
+    icon: <ContainerOutlined />,
   },
   {
-    key: 'settings',
+    key: "settings",
     label: "Cau hinh",
     icon: <SettingOutlined />,
   },
   {
-    key: 'home',
+    key: "home",
     label: "Quay lai",
-    icon: <LeftCircleOutlined />
-  }
+    icon: <LeftCircleOutlined />,
+  },
 ];
 function Menu() {
-  const route = useRouter()
-  const params = useParams()
+  const route = useRouter();
+  const params = useParams();
+  const pathName = usePathname().split("/");
 
   const items: MenuProps["items"] = listItem.map((item) => ({
     key: item.key,
     label: item.label,
     icon: item.icon,
     onClick: () => {
-      return item.key === "home" ? route.push("/shop/overview") : route.push(`/shop/${params.id[0]}/${item.key}`)
-    }
+      return item.key === "home"
+        ? route.push("/shop/overview")
+        : route.push(`/shop/${params.id[0]}/${item.key}`);
+    },
   }));
 
   return (
@@ -69,7 +78,14 @@ function Menu() {
         </div>
       )}
       <Divider />
-      <AntdMenu items={params.id ? items : []} theme="dark" mode="inline" />
+      <AntdMenu
+        defaultOpenKeys={['dashbroad']}
+        defaultSelectedKeys={['dashbroad']}
+        selectedKeys={[pathName[3]]}
+        items={params.id ? items : []}
+        theme="dark"
+        mode="inline"
+      />
     </Sider>
   );
 }
