@@ -70,20 +70,20 @@ function Overview() {
                   </div>
                 }
                 actions={[
-                  <Tooltip key="edit" title="Cap nhat cua hang">
+                  <Tooltip key="edit" title="Cập nhật cửa hàng">
                     <EditOutlined />
                   </Tooltip>,
-                  <Tooltip key="delete" title="Xoa cua hang">
+                  <Tooltip key="delete" title="Xóa cửa hàng">
                     <DeleteOutlined />
                   </Tooltip>,
-                  <Tooltip key="leave" title="Roi khoi cua hang">
+                  <Tooltip key="leave" title="Rời khỏi cửa hàng">
                     <LoginOutlined />
                   </Tooltip>,
                 ]}
               >
                 <div className="text-center">
                   <p className="opacity-80 mb-4">{shop.description}</p>
-                  <Button onClick={() => handleClickAccess(shop.id)} icon={<LoginOutlined />}>Truy cap</Button>
+                  <Button onClick={() => handleClickAccess(shop.id)} icon={<LoginOutlined />}>Truy cập</Button>
                 </div>
               </Card>
             );
