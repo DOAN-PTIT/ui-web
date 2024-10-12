@@ -1,7 +1,7 @@
 import { Layout } from "antd"
-import Content from "./components/Content"
-import Header from "./components/Header"
-import Footer from "./components/Footer"
+import Content from "./layout/Content"
+import Header from "./layout/Header"
+import Footer from "./layout/Footer"
 
 function Welcome() {
     return (

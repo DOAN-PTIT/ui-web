@@ -11,6 +11,8 @@ import {
 import { Avatar, Button, Card, Layout, Space, Tooltip } from "antd";
 import { useRouter } from "next/navigation";
 import HeaderAction from "../HeaderAction/HeaderAction";
+import { useState } from "react";
+import AddModel from "./components/ModelAdd";
 
 const { Content } = Layout;
 const shops = [
@@ -27,22 +29,33 @@ const shops = [
 ];
 
 function Overview() {
-    const route = useRouter()
-    const handleClickAccess = (shopId: number) => {
-        route.push(`/shop/${shopId}/dashbroad`)
-    }
+  const [openModal,setOpenModal] = useState(false);
+  const route = useRouter()
+  const handleClickAccess = (shopId: number) => {
+    route.push(`/shop/${shopId}/dashbroad`)
+  }
+  const handleOpenModel = () => {
+    setOpenModal(true)
+  }
+  const handleOk = () => {
+    setOpenModal(false);
+  };
 
+  const handleCancel = () => {
+    setOpenModal(false);
+  };
   return (
     <Layout className="w-full min-h-screen">
-      <HeaderAction isShowSearch={false} title="Danh sach cua hang" />
+      <HeaderAction isShowSearch={false} title="Danh sách cửa hàng" />
       <Content className="p-8">
         <Space className="w-full justify-end" align="center">
           <Button type="primary" icon={<SyncOutlined />}>
-            Tai lai
+            Tải lại
           </Button>
-          <Button type="primary" icon={<PlusCircleOutlined />}>
-            Them cua hang
+          <Button type="primary" onClick={handleOpenModel} icon={<PlusCircleOutlined />}>
+            Thêm cửa hàng
           </Button>
+          <AddModel open={openModal} onOk={handleOk} onCancel={handleCancel} />
         </Space>
         <Space className="gap-10 mt-10 justify-center w-full">
           {shops.map((shop) => {

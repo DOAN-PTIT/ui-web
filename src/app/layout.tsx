@@ -9,7 +9,7 @@ const inter = Inter({
 
 
 export const metadata: Metadata = {
-  title: "Shop Manager",
+  title: "Goshop GOS",
 };
 
 export default function RootLayout({
