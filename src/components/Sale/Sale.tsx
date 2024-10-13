@@ -16,34 +16,36 @@ function Sale() {
   return (
     <Layout className="h-screen">
       <HeaderAction isShowSearch={false} title="Tao hoa don" />
-      <Content className="overflow-auto flex p-5 gap-5">
-        <Col span={16}>
-          <Row>
-            <FormBoxProduct />
-          </Row>
-          <Row>
-            <Col span={12}>
-              <FormBoxPayment />
-            </Col>
-            <Col span={12}>
-              <FormBoxNote />
-            </Col>
-          </Row>
-        </Col>
-        <Col span={8}>
-          <Row>
-            <FormBoxOrderInfo />
-          </Row>
-          <Row>
-            <FormBoxCustomer />
-          </Row>
-          <Row>
-            <FormBoxReceive />
-          </Row>
-        </Col>
+      <Content className="overflow-auto overflow-x-hidden flex p-5 gap-5 w-full">
+        <Row justify='space-between' className="w-full">
+          <Col span={15}>
+            <Row>
+              <FormBoxProduct />
+            </Row>
+            <Row justify="space-between" className="mt-4">
+              <Col span={11}>
+                <FormBoxPayment />
+              </Col>
+              <Col span={11}>
+                <FormBoxNote />
+              </Col>
+            </Row>
+          </Col>
+          <Col span={8} className="flex flex-col gap-4">
+            <Row>
+              <FormBoxOrderInfo />
+            </Row>
+            <Row>
+              <FormBoxCustomer />
+            </Row>
+            <Row>
+              <FormBoxReceive />
+            </Row>
+          </Col>
+        </Row>
       </Content>
       <Footer className="bg-white flex justify-between items-center shadow-2xl rounded-tr-2xl rounded-tl-2xl">
-        <div>Can thanh toan: {totalPrice}</div>
+        <div className="text-xl font-medium">Can thanh toan: {totalPrice}</div>
         <Button icon={<SaveOutlined />} type="primary">
           Luu
         </Button>
