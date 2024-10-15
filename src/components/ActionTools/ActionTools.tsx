@@ -9,8 +9,8 @@ function ActionTools() {
   return (
     <Space className="mb-5">
       <Button icon={<PlusOutlined />} type="primary" />
-      <Button icon={<SyncOutlined />}>Tai lai</Button>
-      <Button icon={<DownloadOutlined />}>Xuat Excel</Button>
+      <Button icon={<SyncOutlined />}>Tải lại</Button>
+      <Button icon={<DownloadOutlined />}>Xuất Excel</Button>
     </Space>
   );
 }

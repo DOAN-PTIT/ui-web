@@ -3,46 +3,51 @@ import {
   SettingOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Avatar, Dropdown, Input, Layout } from "antd";
+import { Avatar, Dropdown, Input, Layout, Menu } from "antd";
 import type { MenuProps } from "antd";
+import { useRouter } from "next/navigation";
 
-
-const listItem = [
-  {
-    key: "1",
-    title: "Cai dat tai khoan",
-    icon: <SettingOutlined />,
-  },
-  {
-    key: "2",
-    title: "Dang xuat",
-    icon: <LogoutOutlined />,
-  },
-];
-const items: MenuProps["items"] = listItem.map((item) => ({
-  key: item.key,
-  label: (
-    <div className="flex items-center justify-between">
-      {item.icon}
-      <p className="ml-3">{item.title}</p>
-    </div>
-  ),
-}));
 interface HeaderActionProps {
-title: string,
+  title: string;
   isShowSearch: boolean;
-  inputPlaholder?: string
+  inputPlaholder?: string;
 }
 
 function HeaderAction(props: HeaderActionProps) {
   const { isShowSearch, title, inputPlaholder } = props;
+  const router = useRouter();
+  // Define the list items with onClick actions
+  const items: MenuProps["items"] = [
+    {
+      key: "1",
+      label: (
+        <div className="flex items-center justify-between">
+          <SettingOutlined />
+          <p className="ml-3">Thiết lập tài khoản</p>
+        </div>
+      ),
+      onClick: () => router.push(`/setting-account`), // Navigate on click
+    },
+    {
+      key: "2",
+      label: (
+        <div className="flex items-center justify-between">
+          <LogoutOutlined />
+          <p className="ml-3">Đăng xuất</p>
+        </div>
+      ),
+      onClick: () => console.log("Logging out"), // Handle logout logic
+    },
+  ];
+
   return (
     <Layout.Header className="flex bg-slate-100 justify-between items-center">
       <div className="flex items-center w-1/2">
         <p className="w-1/3 text-xl font-bold">{title}</p>
         {isShowSearch && <Input placeholder={inputPlaholder} />}
       </div>
-      <Dropdown menu={{ items }}>
+
+      <Dropdown overlay={<Menu items={items} />} trigger={['click']}>
         <Avatar className="cursor-pointer" icon={<UserOutlined />} />
       </Dropdown>
     </Layout.Header>
