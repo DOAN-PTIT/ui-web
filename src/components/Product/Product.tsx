@@ -4,6 +4,8 @@ import { Layout, Table } from "antd";
 import HeaderAction from "../HeaderAction/HeaderAction";
 import ActionTools from "../ActionTools/ActionTools";
 import type { TableProps } from "antd";
+import { useState } from "react";
+import CreateProduct from "../FormBox/Product/CreateProduct";
 
 interface ProductType {
   id: string;
@@ -16,13 +18,15 @@ interface ProductType {
 }
 
 function Product() {
+  const [modalVisiable, setModalVisiable] = useState(false);
+
   const columns: TableProps<ProductType>["columns"] = [
     {
       key: "ID",
       dataIndex: "id",
       title: "ID",
       fixed: "left",
-      width: 120
+      width: 120,
     },
     {
       key: "PRODUCT NAME",
@@ -68,8 +72,8 @@ function Product() {
         isShowSearch={true}
         inputPlaholder="Tim kiem san pham"
       />
-      <Layout.Content className="p-5 h-screen">
-        <ActionTools />
+      <Layout.Content className="p-5 h-screen overflow-hidden">
+        <ActionTools callBack={() => setModalVisiable(true)} />
         <Table
           columns={columns}
           dataSource={getData()}
@@ -79,12 +83,18 @@ function Product() {
             defaultCurrent: 1,
             defaultPageSize: 30,
             pageSizeOptions: [10, 20, 30, 50, 100],
-            size: 'small'
+            size: "small",
           }}
-          scroll={{x: 2500, y: 500}}
+          scroll={{ x: 2500, y: 500 }}
           size="small"
         />
       </Layout.Content>
+      <CreateProduct
+        open={modalVisiable}
+        callBack={() => {
+          setModalVisiable(false);
+        }}
+      />
     </Layout>
   );
 }

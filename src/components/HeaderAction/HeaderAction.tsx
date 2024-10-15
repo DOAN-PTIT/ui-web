@@ -6,7 +6,6 @@ import {
 import { Avatar, Dropdown, Input, Layout } from "antd";
 import type { MenuProps } from "antd";
 
-
 const listItem = [
   {
     key: "1",
@@ -29,9 +28,9 @@ const items: MenuProps["items"] = listItem.map((item) => ({
   ),
 }));
 interface HeaderActionProps {
-title: string,
+  title: string;
   isShowSearch: boolean;
-  inputPlaholder?: string
+  inputPlaholder?: string;
 }
 
 function HeaderAction(props: HeaderActionProps) {

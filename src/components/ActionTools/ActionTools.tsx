@@ -5,10 +5,15 @@ import {
 } from "@ant-design/icons";
 import { Button, Space } from "antd";
 
-function ActionTools() {
+interface ActionToolsProps {
+  callBack: () => void
+}
+
+function ActionTools(props: ActionToolsProps) {
+  const {callBack} = props
   return (
     <Space className="mb-5">
-      <Button icon={<PlusOutlined />} type="primary" />
+      <Button icon={<PlusOutlined />} type="primary" onClick={callBack} />
       <Button icon={<SyncOutlined />}>Tai lai</Button>
       <Button icon={<DownloadOutlined />}>Xuat Excel</Button>
     </Space>
