@@ -2,7 +2,7 @@
 
 import { Divider, Layout } from "antd"
 import Image from 'next/image';
-import Img from '/src/assets/favicon.png'
+import Img from '@/assets/favicon.png'
 import Link from "next/link";
 import { EnvironmentOutlined, PhoneOutlined } from "@ant-design/icons";
 

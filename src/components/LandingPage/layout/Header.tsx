@@ -3,7 +3,7 @@ import { Button, Layout, Typography } from 'antd';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
-import Img from '/src/assets/favicon.png'
+import Img from '@/assets/favicon.png'
 const { Header } = Layout;
 
 export default function LandingHeader() {

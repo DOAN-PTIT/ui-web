@@ -41,9 +41,9 @@ function HeaderAction(props: HeaderActionProps) {
   ];
 
   return (
-    <Layout.Header className="flex bg-slate-100 justify-between items-center">
+    <Layout.Header className="flex items-center justify-between px-4 h-12 bg-slate-100">
       <div className="flex items-center w-1/2">
-        <p className="w-1/3 text-xl font-bold">{title}</p>
+        <div className="w-1/3 text-xl font-bold">{title}</div>
         {isShowSearch && <Input placeholder={inputPlaholder} />}
       </div>
 
