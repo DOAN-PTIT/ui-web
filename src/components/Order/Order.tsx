@@ -4,6 +4,7 @@ import { Col, Layout, Row, Table } from "antd";
 import ActionTools from "../ActionTools/ActionTools";
 import HeaderAction from "../HeaderAction/HeaderAction";
 import type { TableProps } from "antd";
+import { useRouter } from "next/navigation";
 
 interface ColumnType {
   id: string;
@@ -20,6 +21,8 @@ interface ColumnType {
 
 const { Content } = Layout;
 function Order() {
+  const route = useRouter()
+
   const columns: TableProps<ColumnType>["columns"] = [
     {
       key: "ID",
@@ -105,7 +108,7 @@ function Order() {
         inputPlaholder="Tim kien don hang"
       />
       <Content className="content p-5">
-        <ActionTools />
+        <ActionTools callBack={() => route.push("sale")} />
         <Table
           columns={columns}
           rootClassName={"order__table__container"}
