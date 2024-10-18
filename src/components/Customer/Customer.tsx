@@ -1,9 +1,17 @@
 "use client";
 
-import { Layout, Table } from "antd";
+import { Layout, Modal, Table, Input, Divider, DatePicker } from "antd";
 import HeaderAction from "../HeaderAction/HeaderAction";
 import ActionTools from "../ActionTools/ActionTools";
 import type { TableProps } from "antd";
+import { useState } from "react";
+import {
+  CalendarOutlined,
+  ContainerOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 
 interface CustomerType {
   id: string;
@@ -19,13 +27,14 @@ interface CustomerType {
 }
 
 function Customer() {
+  const [modalVisiable, setModalVisiable] = useState(false);
   const columns: TableProps<CustomerType>["columns"] = [
     {
       key: "ID",
       dataIndex: "id",
       title: "ID",
       fixed: "left",
-      width: 180
+      width: 180,
     },
     {
       key: "CUSTOMER NAME",
@@ -76,6 +85,10 @@ function Customer() {
     },
   ];
 
+  const callBack = () => {
+    setModalVisiable(true);
+  };
+
   const getData: () => TableProps<CustomerType>["dataSource"] = () => {
     return [];
   };
@@ -87,7 +100,7 @@ function Customer() {
         inputPlaholder="Tim kiem khach hang"
       />
       <Layout.Content className="p-5 h-screen">
-        <ActionTools />
+        <ActionTools callBack={callBack} />
         <Table
           columns={columns}
           dataSource={getData()}
@@ -103,6 +116,48 @@ function Customer() {
           size="small"
         />
       </Layout.Content>
+      <Modal
+        title={
+          <div>
+            Them khach hang
+            <Divider />
+          </div>
+        }
+        open={modalVisiable}
+        onCancel={() => setModalVisiable(false)}
+      >
+        <div className="mt-5">
+          <div className="flex">
+            <UserOutlined className="mr-5" />
+            <Input name="name" placeholder="Ten khach hang" />
+          </div>
+          <Divider />
+          <div className="flex">
+            <MailOutlined className="mr-5" />
+            <Input name="email" placeholder="Email" />
+          </div>
+          <Divider />
+          <div className="flex">
+            <PhoneOutlined className="mr-5" />
+            <Input name="phone_number" placeholder="So dien thoai" />
+          </div>
+          <Divider />
+          <div className="flex">
+            <CalendarOutlined className="mr-5" />
+            <DatePicker
+              name="date_of_birth"
+              className="w-full"
+              placeholder="Ngay sinh"
+            />
+          </div>
+          <Divider />
+          <div className="flex">
+            <ContainerOutlined className="mr-5" />
+            <Input name="address" placeholder="Dia chi" />
+          </div>
+          <Divider />
+        </div>
+      </Modal>
     </Layout>
   );
 }
