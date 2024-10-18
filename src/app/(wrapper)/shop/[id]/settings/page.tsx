@@ -1,3 +1,5 @@
+import Settings from "@/components/Settings/Settings";
+
 export default function SettingsPage() {
-    return <div>settings Pages</div>
+    return <Settings/>
 }

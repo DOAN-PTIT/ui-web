@@ -3,8 +3,8 @@ import { SendOutlined } from '@ant-design/icons';
 import { Button, Layout } from 'antd';
 import Image from 'next/image';
 import Link from 'next/link';
-import Background from '/src/assets/background.png';
-import ImageEx from '/src/assets/dashboard1.png'
+import Background from '@/assets/background.png';
+import ImageEx from '@/assets/dashboard1.png'
 
 const { Content } = Layout;
 

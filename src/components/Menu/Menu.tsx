@@ -19,37 +19,37 @@ const { Sider } = Layout;
 const listItem = [
   {
     key: "dashbroad",
-    label: "Tong quan",
+    label: "Tổng quan",
     icon: <PieChartOutlined />,
   },
   {
     key: "sale",
-    label: "Ban hang",
+    label: "Bán hàng",
     icon: <ShoppingCartOutlined />,
   },
   {
     key: "order",
-    label: "Hoa Don",
+    label: "Hóa đơn",
     icon: <ReconciliationOutlined />,
   },
   {
     key: "customer",
-    label: "Khach hang",
+    label: "Khách hàng",
     icon: <AuditOutlined />,
   },
   {
     key: "product",
-    label: "San pham",
+    label: "Sản phẩm",
     icon: <ContainerOutlined />,
   },
   {
     key: "settings",
-    label: "Cau hinh",
+    label: "Cấu hình",
     icon: <SettingOutlined />,
   },
   {
     key: "home",
-    label: "Quay lai",
+    label: "Quay lại",
     icon: <LeftCircleOutlined />,
   },
 ];

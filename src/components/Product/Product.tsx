@@ -135,9 +135,9 @@ function Product() {
   return (
     <Layout>
       <HeaderAction
-        title="San pham"
+        title="Sản phẩm"
         isShowSearch={true}
-        inputPlaholder="Tim kiem san pham"
+        inputPlaholder="Tìm kiếm sản phẩm"
       />
       <Layout.Content className="p-5 h-screen">
         <ActionTools callBack={callBack} />
