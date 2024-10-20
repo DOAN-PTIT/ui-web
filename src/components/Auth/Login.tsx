@@ -1,6 +1,8 @@
 "use client";
 
-import { Button, Carousel, Col, Form, Input, Row } from "antd";
+import React from "react";
+import { Button, Carousel, Col, Form, Input, Row, notification } from "antd";
+import type { NotificationArgsProps } from 'antd';
 import reportImage from "@/assets/report-image.jpg";
 import orderImage from "@/assets/order-image.jpg";
 import customerImage from "@/assets/customer-image.jpg";
@@ -8,17 +10,57 @@ import Image from "next/image";
 import "@/styles/login.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { getHostName } from "@/utils/tools";
+
+interface ParamsLogin {
+  email: string,
+  password: string
+}
+type NotificationPlacement = NotificationArgsProps['placement'];
 
 const { Password } = Input;
 function LoginComponent() {
+  const [params, setParams] = useState<ParamsLogin>({email: "", password: ""})
+  const [api, contextHolder] = notification.useNotification();
+  const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+
+  }, [])
   const route = useRouter()
-  const shopId = 12
-  const handleSubmitForm = () => {
-    route.push(`shop/${shopId}`)
+  const handleSubmitForm = async () => {
+    setIsLoading(true)
+    const url = `${getHostName()}/auth/email/login`
+    return await axios.post(url, params)
+    .then(res => {
+      const token = res.data.accessToken
+      localStorage.setItem('token', token)
+      route.push('/shop/overview')
+    })
+    .catch(error => {
+      // const res = error.message.join(", ")
+      const res = error.response.data.message.join("\n ")
+      console.log(error);
+      openNotification(res)
+    })
+    .finally(() => {
+      setIsLoading(false)
+    })
   }
+
+  const openNotification = (message: NotificationPlacement) => {
+    api.error({
+      message: "Login Unsuccess",
+      description: message
+    });
+  };
+
 
   return (
     <main className="login__container p-10 m-10">
+      {contextHolder}
       <Row className="border rounded-md h-[80vh]" align="middle">
         <Col span={10} className="p-10">
           <h1 className="text-center font-bold text-2xl mb-4">Đăng nhập</h1>
@@ -33,7 +75,7 @@ function LoginComponent() {
                 },
               ]}
             >
-              <Input placeholder="Tên đang nhập" name="username" />
+              <Input placeholder="Tên đang nhập" name="username" onChange={(e) => setParams({...params, email: e.target.value})} />
             </Form.Item>
             <Form.Item
               label="Mật khẩu"
@@ -45,10 +87,10 @@ function LoginComponent() {
                 },
               ]}
             >
-              <Password placeholder="Mật khẩu" name="password" />
+              <Password placeholder="Mật khẩu" name="password" onChange={(e) => setParams({...params, password: e.target.value})} />
             </Form.Item>
             <Form.Item className="text-center">
-              <Button htmlType="submit" type="primary">Đăng nhập</Button>
+              <Button htmlType="submit" type="primary" loading={isLoading}>Đăng nhập</Button>
             </Form.Item>
             <Form.Item className="text-center">
               <span>
