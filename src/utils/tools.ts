@@ -115,3 +115,7 @@ export const convertVN = (
     return str.replace(/[^a-zA-Z0-9/, ]/g, "");
   }
 };
+
+export const getHostName = () => {
+  return 'http://localhost:8000'
+}
