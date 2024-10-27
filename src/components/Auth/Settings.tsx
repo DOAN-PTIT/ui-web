@@ -13,7 +13,6 @@ import HeaderAction from "../HeaderAction/HeaderAction";
 import PassModel from './components/ModelPass';
 const { Content, Sider } = Layout;
 
-
 function Settings() {
     const [collapsed, setCollapsed] = useState(true);
     const [openModal, setOpenModal] = useState(false);
