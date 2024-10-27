@@ -103,9 +103,9 @@ function Order() {
   return (
     <Layout className={"h-screen order__container"}>
       <HeaderAction
-        title="Don hang"
+        title="Đơn hàng"
         isShowSearch={true}
-        inputPlaholder="Tim kien don hang"
+        inputPlaholder="Tìm kiếm đơn hàng"
       />
       <Content className="content p-5">
         <ActionTools callBack={() => route.push("sale")} />
