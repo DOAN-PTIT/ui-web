@@ -1,8 +1,17 @@
 "use client";
 
 import React from "react";
-import { Button, Carousel, Col, Form, Input, Row, notification } from "antd";
-import type { NotificationArgsProps } from 'antd';
+import {
+  Button,
+  Carousel,
+  Col,
+  Divider,
+  Form,
+  Input,
+  Row,
+  notification,
+} from "antd";
+import type { NotificationArgsProps } from "antd";
 import reportImage from "@/assets/report-image.jpg";
 import orderImage from "@/assets/order-image.jpg";
 import customerImage from "@/assets/customer-image.jpg";
@@ -13,50 +22,56 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { getHostName } from "@/utils/tools";
+import { FacebookOutlined } from "@ant-design/icons";
 
 interface ParamsLogin {
-  email: string,
-  password: string
+  email: string;
+  password: string;
 }
-type NotificationPlacement = NotificationArgsProps['placement'];
+type NotificationPlacement = NotificationArgsProps["placement"];
 
 const { Password } = Input;
 function LoginComponent() {
-  const [params, setParams] = useState<ParamsLogin>({email: "", password: ""})
+  const [params, setParams] = useState<ParamsLogin>({
+    email: "",
+    password: "",
+  });
   const [api, contextHolder] = notification.useNotification();
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-
-  }, [])
-  const route = useRouter()
+  useEffect(() => {}, []);
+  const route = useRouter();
   const handleSubmitForm = async () => {
-    setIsLoading(true)
-    const url = `${getHostName()}/auth/email/login`
-    return await axios.post(url, params)
-    .then(res => {
-      const token = res.data.accessToken
-      localStorage.setItem('token', token)
-      route.push('/shop/overview')
-    })
-    .catch(error => {
-      // const res = error.message.join(", ")
-      const res = error.response.data.message.join("\n ")
-      console.log(error);
-      openNotification(res)
-    })
-    .finally(() => {
-      setIsLoading(false)
-    })
-  }
+    setIsLoading(true);
+    const url = `${getHostName()}/auth/email/login`;
+    return await axios
+      .post(url, params)
+      .then((res) => {
+        const token = res.data.accessToken;
+        localStorage.setItem("token", token);
+        route.push("/shop/overview");
+      })
+      .catch((error) => {
+        const res = error.response.data.message.join("\n ");
+        console.log(error);
+        openNotification(res);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   const openNotification = (message: NotificationPlacement) => {
     api.error({
       message: "Login Unsuccess",
-      description: message
+      description: message,
     });
   };
 
+  const handleLoginWithFacebook = () => {
+    const fb_url = "http://localhost:8000/social/facebook"
+    document.location = fb_url;
+  };
 
   return (
     <main className="login__container p-10 m-10">
@@ -75,7 +90,13 @@ function LoginComponent() {
                 },
               ]}
             >
-              <Input placeholder="Tên đang nhập" name="username" onChange={(e) => setParams({...params, email: e.target.value})} />
+              <Input
+                placeholder="Tên đang nhập"
+                name="username"
+                onChange={(e) =>
+                  setParams({ ...params, email: e.target.value })
+                }
+              />
             </Form.Item>
             <Form.Item
               label="Mật khẩu"
@@ -87,10 +108,18 @@ function LoginComponent() {
                 },
               ]}
             >
-              <Password placeholder="Mật khẩu" name="password" onChange={(e) => setParams({...params, password: e.target.value})} />
+              <Password
+                placeholder="Mật khẩu"
+                name="password"
+                onChange={(e) =>
+                  setParams({ ...params, password: e.target.value })
+                }
+              />
             </Form.Item>
             <Form.Item className="text-center">
-              <Button htmlType="submit" type="primary" loading={isLoading}>Đăng nhập</Button>
+              <Button htmlType="submit" type="primary" loading={isLoading}>
+                Đăng nhập
+              </Button>
             </Form.Item>
             <Form.Item className="text-center">
               <span>
@@ -101,6 +130,16 @@ function LoginComponent() {
               </span>
             </Form.Item>
           </Form>
+          <Divider />
+          <div className="text-center">
+            <Button
+              onClick={handleLoginWithFacebook}
+              icon={<FacebookOutlined />}
+              type="primary"
+            >
+              Dang nhap bang Facebook
+            </Button>
+          </div>
         </Col>
         <Col span={14} className="h-full text-center">
           <Carousel
