@@ -12,6 +12,8 @@ import {
 } from "antd";
 import { useState } from "react";
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
+import { RcFile } from 'antd/es/upload/interface';
+
 interface AddModelProps {
   open: boolean;
   onOk: (param: { name: string; avatar: any }) => Promise<void>;
@@ -39,10 +41,10 @@ function AddModel({ open, onOk, onCancel }: AddModelProps) {
   const [loading, setLoading] = useState(false);
   const [param, setParam] = useState<{
     name: string;
-    avatar: any;
+    avatar: RcFile | null;
   }>({
     name: "",
-    avatar: "",
+    avatar: null,
   });
 
   const handleChange: UploadProps["onChange"] = (info) => {
@@ -50,14 +52,20 @@ function AddModel({ open, onOk, onCancel }: AddModelProps) {
       setLoading(true);
       return;
     }
+
     if (info.file.status === "done") {
-      // Get this url from response in real world.
-      getBase64(info.file.originFileObj as FileType, (url) => {
-        setLoading(false);
-        setParam((preState) => ({ ...preState, avatar: url }));
-      });
+      setLoading(false);
+      // Lưu file gốc (originFileObj) vào avatar
+      // NOTE: K cần gửi base64, chỉ gửi file ảnh gốc
+      setParam((prevState) => ({
+        ...prevState,
+        avatar: info.file.originFileObj as RcFile, // Lưu file thay vì base64
+      }));
     }
   };
+
+  // set avatarUrl
+  const avatarUrl = param.avatar ? URL.createObjectURL(param.avatar) : "";
 
   const uploadButton = (
     <button style={{ border: 0, background: "none" }} type="button">
@@ -99,7 +107,7 @@ function AddModel({ open, onOk, onCancel }: AddModelProps) {
           >
             {param.avatar ? (
               <Image
-                src={param.avatar}
+                src={avatarUrl}
                 alt="avatar"
                 style={{ width: "100%" }}
               />
