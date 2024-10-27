@@ -69,8 +69,7 @@ function LoginComponent() {
   };
 
   const handleLoginWithFacebook = () => {
-    const redirect_uri = "http://localhost:8000/social/facebook/redirect";
-    const fb_url = `https://www.facebook.com/v3.2/dialog/oauth?response_type=code&redirect_uri=${redirect_uri}&scope=public_profile%2Cemail%2Cpages_manage_metadata%2Cpages_read_engagement%2Cpages_show_list%2Cpages_read_user_content%2Cpages_manage_posts%2Cpages_manage_engagement%2Cpages_messaging%2Cpage_events%2Cpages_show_list%2Cads_management%2Ccatalog_management%2Cleads_retrieval%2Cbusiness_management&client_id=857187493287495`;
+    const fb_url = "http://localhost:8000/social/facebook"
     document.location = fb_url;
   };
 
