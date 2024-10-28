@@ -2,8 +2,12 @@
 
 import { Button, Divider, Input, Modal, Radio, RadioChangeEvent, Select, Space, Switch } from "antd"
 import { useState } from "react";
-
-export default function ModalAddCustomer({ open, onOk, onCancel }) {
+interface Props {
+    open: any;
+    onOk: any;
+    onCancel: any;
+}
+export default function ModalAddCustomer({ open, onOk, onCancel }: Props) {
     const [value, setValue] = useState(1);
     const options = [
         {

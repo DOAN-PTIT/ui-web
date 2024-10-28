@@ -7,7 +7,7 @@ interface TitleProps {
 
 export default function TitleH({ title, className }: TitleProps) {
     return (
-        <div className={clsx("text-sm font-medium", className)}>
+        <div className={clsx("font-medium", className)}>
             {title}
         </div>
     );

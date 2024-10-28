@@ -41,11 +41,10 @@ function SignUpComponent() {
         formData,
         { headers: { "Content-Type": "application/json" } }
       );
-
       message.success(response.data.message || "Đăng ký thành công");
       router.push("/login");
     } catch (error: any) {
-      const res = error.response.data.message.join("\n ");
+      const res = error.response.data.message.join("\n");
       console.log(error);
       openNotification(res);
     }

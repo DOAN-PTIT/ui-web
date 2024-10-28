@@ -52,7 +52,7 @@ function LoginComponent() {
         route.push("/shop/overview");
       })
       .catch((error) => {
-        const res = error.response.data.message.join("\n ");
+        const res = error.response.data.message.join("\n");
         console.log(error);
         openNotification(res);
       })
