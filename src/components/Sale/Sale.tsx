@@ -15,8 +15,8 @@ function Sale() {
   const totalPrice = 0;
   return (
     <Layout className="h-screen">
-      <HeaderAction isShowSearch={false} title="Tao hoa don" />
-      <Content className="overflow-auto overflow-x-hidden flex p-5 gap-5 w-full">
+      <HeaderAction isShowSearch={false} title="Tạo hóa đơn" />
+      <Content className="bg-white rounded-xl overflow-auto overflow-x-hidden flex p-5 gap-5 w-full">
         <Row justify='space-between' className="w-full">
           <Col span={15}>
             <Row>
@@ -44,7 +44,7 @@ function Sale() {
           </Col>
         </Row>
       </Content>
-      <Footer className="bg-white flex justify-between items-center shadow-2xl rounded-tr-2xl rounded-tl-2xl">
+      <Footer className="bg-white flex justify-between items-center mt-4 shadow-2xl rounded-tr-2xl rounded-tl-2xl">
         <div className="text-xl font-medium">Can thanh toan: {totalPrice}</div>
         <Button icon={<SaveOutlined />} type="primary">
           Luu

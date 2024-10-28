@@ -70,20 +70,21 @@ function Menu() {
   }));
 
   return (
-    <Sider className="h-screen overflow-auto fixed bottom-0 top-0">
+    <Sider className="h-screen bg-[#f2f4f7] overflow-auto fixed bottom-0 top-0">
       {params.id && (
-        <div className="flex items-center gap-3 flex-col mt-5">
+        <div className="flex items-center  gap-3 flex-col mt-5">
           <Avatar icon={<UserOutlined />} size={64} />
-          <h1 className="text-white text-xl font-bold">Shop test</h1>
+          <h1 className="text-[#101828] text-xl font-bold">Shop test</h1>
         </div>
       )}
       <Divider />
       <AntdMenu
+        className="bg-[#f2f4f7] text-[#101828]"
         defaultOpenKeys={['dashbroad']}
         defaultSelectedKeys={['dashbroad']}
         selectedKeys={[pathName[3]]}
         items={params.id ? items : []}
-        theme="dark"
+        theme="light"
         mode="inline"
       />
     </Sider>

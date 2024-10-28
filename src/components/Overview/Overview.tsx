@@ -115,33 +115,36 @@ function Overview() {
   const handleClickAccess = (shopId: number) => {
     route.push(`/shop/${shopId}/dashbroad`);
   };
+
   const handleOpenModel = () => {
     setOpenModal(true);
   };
+
   const handleOk = async (param: { name: string; avatar: any }) => {
-    const url = `${getHostName()}/shop/create-shop`;
+    const createShopFormData = new FormData();
+    createShopFormData.append('name', param.name);      
+    createShopFormData.append('avatar', param.avatar);
+    
+    const url = `${getHostName()}/user/create-shop`;
+
+    // Log ra để kiểm tra
+    console.log(createShopFormData)
+
     return await axios
-      .post(
-        url,
-        {
-          shop: {
-            name: param.name,
-          },
-          avatar: param.avatar,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      )
-      .then((res) => console.log(res))
-      .catch((error) => console.log(error));
+    .post(url, createShopFormData, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        // 'Content-Type': 'multipart/form-data',
+      },
+    })
+    .then((res) => console.log(res))
+    .catch((error) => console.log(error));
   };
 
   const handleCancel = () => {
     setOpenModal(false);
   };
+
   return (
     <Layout className="w-full min-h-screen">
       <HeaderAction isShowSearch={false} title="Danh sách cửa hàng" />

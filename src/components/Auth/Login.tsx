@@ -63,7 +63,7 @@ function LoginComponent() {
 
   const openNotification = (message: NotificationPlacement) => {
     api.error({
-      message: "Login Unsuccess",
+      message: "Unsuccess",
       description: message,
     });
   };
@@ -81,17 +81,17 @@ function LoginComponent() {
           <h1 className="text-center font-bold text-2xl mb-4">Đăng nhập</h1>
           <Form className="" layout="vertical" onFinish={handleSubmitForm}>
             <Form.Item
-              label="Tên đang nhập"
+              label="Tên đăng nhập"
               name={"username"}
               rules={[
                 {
                   required: true,
-                  message: "Tai khoan khong duoc de trong",
+                  message: "Tài khoản không được để trống",
                 },
               ]}
             >
               <Input
-                placeholder="Tên đang nhập"
+                placeholder="Tên đăng nhập"
                 name="username"
                 onChange={(e) =>
                   setParams({ ...params, email: e.target.value })
@@ -104,7 +104,7 @@ function LoginComponent() {
               rules={[
                 {
                   required: true,
-                  message: "mat khau khong duoc de trong",
+                  message: "Mật khẩu trông được để trống",
                 },
               ]}
             >
@@ -137,7 +137,7 @@ function LoginComponent() {
               icon={<FacebookOutlined />}
               type="primary"
             >
-              Dang nhap bang Facebook
+              Đăng nhập bằng Facebook
             </Button>
           </div>
         </Col>
