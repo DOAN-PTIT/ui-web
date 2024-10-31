@@ -66,7 +66,15 @@ function Overview() {
 
   const route = useRouter();
 
-  const accessToken = useSearchParams().values().next().value;
+  let accessToken: any
+  if (useSearchParams().values().next().value) {
+    accessToken = useSearchParams().values().next().value
+  } else {
+    if (typeof window !== 'undefined') {
+      accessToken = localStorage.getItem('token')
+    }
+  }
+
   const getUserInfo = async () => {
     const url = `${getHostName()}/user/profile`;
     return await axios
@@ -93,6 +101,7 @@ function Overview() {
           setListFBPages(res.data.data);
           setOpenIntegration(true);
         }
+        console.log(res.data.data)
       })
       .catch((error) => console.log(error))
       .finally(() => setIsLoadingFbPage(false));
