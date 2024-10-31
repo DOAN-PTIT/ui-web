@@ -1,4 +1,5 @@
-"use client"
+"use client";
+import { getHostName } from "@/utils/tools";
 import {
   LogoutOutlined,
   SettingOutlined,
@@ -6,6 +7,7 @@ import {
 } from "@ant-design/icons";
 import { Avatar, Dropdown, Input, Layout, Menu } from "antd";
 import type { MenuProps } from "antd";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 
 interface HeaderActionProps {
@@ -17,7 +19,34 @@ interface HeaderActionProps {
 function HeaderAction(props: HeaderActionProps) {
   const { isShowSearch, title, inputPlaholder } = props;
   const router = useRouter();
-  // Define the list items with onClick actions
+
+  async function logout(): Promise<void> {
+    try {
+      const accessToken = localStorage.getItem('token');
+      if (!accessToken) {
+        console.log('Người dùng chưa đăng nhập.');
+        return;
+      }
+      // console.log('URL API:', `${getHostName}/auth/logout`);
+      const response = await axios.post(`${getHostName()}/auth/logout`,{}, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.status === 200) {
+        localStorage.removeItem('token');
+        console.log('Đăng xuất thành công.');
+        router.push('/login');
+      } else {
+        console.error('Đăng xuất thất bại:', response.statusText);
+      }
+    } catch (error: any) {
+      console.error('Lỗi khi gọi API đăng xuất:', error.response?.data || error.message);
+    }
+  }
+
   const items: MenuProps["items"] = [
     {
       key: "1",
@@ -27,7 +56,7 @@ function HeaderAction(props: HeaderActionProps) {
           <p className="ml-3">Thiết lập tài khoản</p>
         </div>
       ),
-      onClick: () => router.push(`/setting-account`), // Navigate on click
+      onClick: () => router.push(`/setting-account`),
     },
     {
       key: "2",
@@ -37,7 +66,7 @@ function HeaderAction(props: HeaderActionProps) {
           <p className="ml-3">Đăng xuất</p>
         </div>
       ),
-      onClick: () => console.log("Logging out"), // Handle logout logic
+      onClick: () => logout(),
     },
   ];
 
