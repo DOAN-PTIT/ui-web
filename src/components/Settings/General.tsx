@@ -1,11 +1,11 @@
 "use client"
 
-import { Avatar, Breadcrumb, Button, Divider, Input, Layout, Select, Space, Upload } from "antd"
-import HeaderAction from "../HeaderAction/HeaderAction"
-import TitleLabel from "../Custom/TitleLabel"
-import TitleH from "../Custom/TitleH"
-import { useState } from "react"
 import { UploadOutlined } from "@ant-design/icons"
+import { Avatar, Breadcrumb, Button, Input, Layout, Select, Space, Upload } from "antd"
+import { useState } from "react"
+import TitleH from "../Custom/TitleH"
+import TitleLabel from "../Custom/TitleLabel"
+import HeaderAction from "../HeaderAction/HeaderAction"
 const { Content } = Layout
 export default function Genaral() {
     const options = [
@@ -38,7 +38,7 @@ export default function Genaral() {
         return false; // Chặn submit form mặc định của Upload component
     };
     return (
-        <Layout>
+        <Layout className="px-4">
             <HeaderAction
                 title="Cấu hình"
                 isShowSearch={true}
@@ -48,9 +48,9 @@ export default function Genaral() {
                 <Breadcrumb.Item href="/shop/1/settings">Cửa hàng </Breadcrumb.Item>
                 <Breadcrumb.Item className="mt-3 text-sm text-[#0050b3] font-medium">Cài đặt chung</Breadcrumb.Item>
             </Breadcrumb>
-            <Content className="bg-white rounded-xl overflow-auto overflow-x-hidden flex p-5 gap-5 w-full h-full">
+            <Content className="bg-white rounded-lg overflow-auto overflow-x-hidden p-5 gap-5">
                 <div className="grid grid-cols-2 w-full">
-                    <div className="col-span-1 rounded-lg p-5 mb-2 sm:grid-cols-1 lg:grid-cols-1 bg-white flex justify-center">
+                    <div className="col-span-1 p-5 mb-2 sm:grid-cols-1 lg:grid-cols-1 bg-white flex justify-center">
                         <div className="">
                             <Avatar
                                 className="w-[280px] h-[280px] mr-4 rounded-full object-cover"

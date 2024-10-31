@@ -10,12 +10,12 @@ function Settings() {
     const router = useRouter()
   
     return (
-        <Layout>
+        <Layout className="px-4">
             <HeaderAction
                 title="Cấu hình"
                 isShowSearch={true}
                 inputPlaholder="Tìm kiếm cấu hình" />
-            <Content className="bg-white rounded-xl overflow-auto overflow-x-hidden flex p-5 gap-5 w-full">
+            <Content className="bg-white rounded-lg overflow-auto overflow-x-hidden flex p-5 gap-5 w-full">
                 <div className="w-full h-full p-5">
                     <div className="text-xl font-bold w-full">Cấu hình chung</div>
                     <div className="grid grid-cols-3 gap-4 mt-4">
@@ -37,7 +37,7 @@ function Settings() {
                                 </div>
                                 <div className="text-[#101828] text-base font-semibold">Nhân viên</div>
                             </div>
-                            <Link href={'/shop/1/settings/customer'}>
+                            <Link href={'/shop/1/settings/personnel'}>
                                 <div onClick={() => router.push('/general')} className="mt-3 text-sm text-[#0050b3] font-medium">Danh sách nhân viên</div>
                             </Link>
                         </div>
@@ -48,7 +48,7 @@ function Settings() {
                                 </div>
                                 <div className="text-[#101828] text-base font-semibold">Khách hàng</div>
                             </div>
-                            <Link href={'/shop/1/settings/personnel'}>
+                            <Link href={'/shop/1/settings/customer'}>
                                 <div className="mt-3 text-sm text-[#0050b3] font-medium">Cài đặt khách hàng</div>
                             </Link>
                         </div>

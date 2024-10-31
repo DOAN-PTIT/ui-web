@@ -1,5 +1,5 @@
-import Settings from "@/components/Settings/Settings";
+import Personnel from "@/components/Settings/Personnel";
 
 export default function SettingsPage() {
-    return <Settings />
+    return <Personnel />
 }
