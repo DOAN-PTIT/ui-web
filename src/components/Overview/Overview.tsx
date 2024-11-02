@@ -25,6 +25,7 @@ import { useEffect, useState } from "react";
 import AddModel from "./components/ModelAdd";
 import axios from "axios";
 import { getHostName } from "@/utils/tools";
+import apiClient from "@/service/auth";
 
 const { Content } = Layout;
 const shops = [
@@ -50,7 +51,14 @@ interface FBShopProps {
     };
   };
 }
-
+export interface ListShop {
+  avatar: string;
+  createdAt: string; 
+  description: string;
+  id: number;
+  name: string;
+  updatedAt: string; 
+}
 function Overview() {
   const [profile, setProfile] = useState<{ access_token: string }>();
   const [listFBPages, setListFBPages] = useState<FBShopProps[]>([]);
@@ -58,7 +66,7 @@ function Overview() {
   const [isLoadingFbPage, setIsLoadingFbPage] = useState(false);
   const [openIntegration, setOpenIntegration] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [dataListShop,setDataListShop] = useState<ListShop[]>()
   useEffect(() => {
     getUserInfo();
     getListShop();
@@ -71,7 +79,7 @@ function Overview() {
     accessToken = useSearchParams().values().next().value
   } else {
     if (typeof window !== 'undefined') {
-      accessToken = localStorage.getItem('token')
+      accessToken = localStorage.getItem('accessToken')
     }
   }
 
@@ -109,14 +117,14 @@ function Overview() {
 
   const getListShop = async () => {
     setIsLoading(true);
-    const url = `${getHostName()}/shop/list-shop`;
-    return await axios
+    const url = `/shop/list-shop`;
+    return await apiClient
       .get(url, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       })
-      .then((res) => console.log(res))
+      .then((res) => setDataListShop(res.data))
       .catch((error) => console.log(error))
       .finally(() => setIsLoading(false));
   };
@@ -134,12 +142,12 @@ function Overview() {
     createShopFormData.append('name', param.name);      
     createShopFormData.append('avatar', param.avatar);
     
-    const url = `${getHostName()}/user/create-shop`;
+    const url = `/user/create-shop`;
 
     // Log ra để kiểm tra
     console.log(createShopFormData)
 
-    return await axios
+    return await apiClient
     .post(url, createShopFormData, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -155,7 +163,7 @@ function Overview() {
   };
 
   return (
-    <Layout className="w-full min-h-screen">
+    <Layout className="w-full min-h-screen px-4">
       <HeaderAction isShowSearch={false} title="Danh sách cửa hàng" />
       <Content className="p-8">
         <Space className="w-full justify-end" align="center">
@@ -180,7 +188,7 @@ function Overview() {
           <AddModel open={openModal} onOk={handleOk} onCancel={handleCancel} />
         </Space>
         <Space className="gap-10 mt-10 justify-center w-full">
-          {shops.map((shop) => {
+          {dataListShop?.map((shop) => {
             return (
               <Card
                 key={shop.id}

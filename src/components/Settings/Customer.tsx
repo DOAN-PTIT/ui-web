@@ -32,7 +32,7 @@ export default function Customer() {
                 <Breadcrumb.Item href="/shop/1/settings">Khách hàng</Breadcrumb.Item>
                 <Breadcrumb.Item className="mt-3 text-sm text-[#0050b3] font-medium">Cài đặt khách hàng</Breadcrumb.Item>
             </Breadcrumb>
-            <Content className="overflow-auto overflow-x-hidden flex gap-5 ">
+            <Content className="overflow-auto overflow-x-hidden flex gap-5 h-screen">
                 <div className="flex w-full gap-4 p-4 rounded-md bg-white">
                     <div className="font-medium w-1/4">Cấu hình khách hàng</div>
                     <div className="w-3/4">

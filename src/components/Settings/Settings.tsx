@@ -15,7 +15,7 @@ function Settings() {
                 title="Cấu hình"
                 isShowSearch={true}
                 inputPlaholder="Tìm kiếm cấu hình" />
-            <Content className="bg-white rounded-lg overflow-auto overflow-x-hidden flex p-5 gap-5 w-full">
+            <Content className="bg-white rounded-lg overflow-auto overflow-x-hidden flex p-5 gap-5 w-full h-screen">
                 <div className="w-full h-full p-5">
                     <div className="text-xl font-bold w-full">Cấu hình chung</div>
                     <div className="grid grid-cols-3 gap-4 mt-4">
