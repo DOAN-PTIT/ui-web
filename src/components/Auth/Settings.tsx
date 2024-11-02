@@ -1,21 +1,32 @@
 "use client";
 
 import { default as Img, default as Logo } from '@/assets/favicon.png'; // Ensure this path is correct
+import apiClient from '@/service/auth';
 import { FacebookLogo, LinkSimple } from '@phosphor-icons/react';
 import { Avatar, Button, Divider, Input, Layout, Select } from "antd"; // Optional: You can also use Ant Design's Image if needed
 import Image from 'next/image'; // Next.js Image for optimized image loading
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TitleA from "../Custom/TitleA";
 import TitleH from "../Custom/TitleH";
 import TitleLabel from '../Custom/TitleLabel';
 import HeaderAction from "../HeaderAction/HeaderAction";
 import PassModel from './components/ModelPass';
 const { Content, Sider } = Layout;
-
+interface Profile {
+    access_token: string 
+    date_of_birth: string  // Nếu bạn có định dạng ngày tháng cụ thể, có thể thay đổi kiểu dữ liệu
+    email: string;
+    fb_id: string 
+    id: number;
+    name: string;
+    phone_number: string 
+    role: string;
+}
 function Settings() {
     const [collapsed, setCollapsed] = useState(true);
     const [openModal, setOpenModal] = useState(false);
+    const [dataProfile, setDataProfile] = useState<Profile>();
     const handleOpenModel = () => {
         setOpenModal(true)
     }
@@ -36,6 +47,32 @@ function Settings() {
             label: 'Anh',
         },
     ];
+    const optionsTime = [
+        {
+            value: '(GMT +7:00) Bangkok, Hanoi, Jakarta',
+            label: '(GMT +7:00) Bangkok, Hanoi, Jakarta',
+        },
+
+    ];
+
+    async function fetchProfile() {
+        const accessToken = localStorage.getItem('accessToken')
+        try {
+            const res = await apiClient.get("/user/profile",{
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                }
+            })
+            console.log(res.data)
+            setDataProfile(res.data)
+        } catch (error) {
+            console.log(error)
+        }
+
+    }
+    useEffect(()=> {
+        fetchProfile()
+    },[])
     return (
         <Layout className="bg-[#f2f4f7] min-h-screen">
             <Sider
@@ -66,23 +103,26 @@ function Settings() {
             </Sider>
 
             <Content className="bg-[#f2f4f7]">
-                <HeaderAction
-                    title="Thiết lập tài khoản"
-                    isShowSearch={false}
+                <div className='px-4'>
+                    <HeaderAction
+                        title="Thiết lập tài khoản"
+                        isShowSearch={false}
 
-                />
+                    />
+                </div>
+                
 
                 <div className="rounded-xl bg-[#eaecf0]">
-                    <div className="flex items-center mx-5 mt-4" />
-                    
+                    <div className="flex items-center mx-5" />
+
                     <div className="items-start lg:grid grid-cols-3 gap-4 mx-5 mt-4">
 
                         <div className="col-span-1 rounded-lg p-5 mb-2 sm:grid-cols-1 lg:grid-cols-3 bg-white">
                             <div className="flex">
                                 <Avatar className='w-[80px] h-[80px] mr-4' src='' alt='Ảnh đại diện' />
                                 <div>
-                                    <div className='text-base font-medium'>Truong Napan</div>
-                                    <TitleLabel title='truongnapan@gmail.com' />
+                                    <div className='text-base font-medium'>{dataProfile?.name}</div>
+                                    <TitleLabel title={dataProfile?.email} />
                                     <Button className='p-1' value="small">Thay đổi ảnh đại diện</Button>
 
                                 </div>
@@ -93,7 +133,7 @@ function Settings() {
                                 <TitleLabel title='Ngôn ngữ:' />
                                 <Select className='w-full mb-4' defaultValue="Tiếng việt" options={options} />
                                 <TitleLabel title='Múi giờ:' />
-                                <Select className='w-full' defaultValue="Tiếng việt" options={options} />
+                                <Select className='w-full' defaultValue="(GMT +7:00) Bangkok, Hanoi, Jakarta" options={optionsTime} />
                                 <Button className='w-full mt-4' type="primary" danger>Đăng xuất khỏi các thiết bị khác</Button>
 
                             </div>
@@ -105,27 +145,27 @@ function Settings() {
                                     <TitleA title='Các thông tin sử dụng để đăng nhập vào Goshop GOS' />
                                 </div>
                                 <div className='col-span-full lg:col-span-6'>
-                                    <div className='grid grid-cols-10 gap-4 mb-4'>
-                                        <div className='col-span-5'>
-                                            <TitleLabel title='Họ:' />
-                                            <Input placeholder="Nhập họ" />
-                                        </div>
-                                        <div className='col-span-5'>
+                                    <div className='mb-4'>
+                                        {/* <div className='col-span-5'> */}
+                                        <TitleLabel title='Họ và tên:' />
+                                        <Input placeholder="Nhập họ và tên đầy đủ" value={dataProfile?.name}/>
+                                        {/* </div> */}
+                                        {/* <div className='col-span-5'>
                                             <TitleLabel title='Tên:' />
                                             <Input placeholder="Nhập tên" />
-                                        </div>
+                                        </div> */}
                                     </div>
                                     <div className='mb-4'>
-                                        <TitleLabel title='Tên đăng nhập' />
-                                        <Input placeholder="Nhập tên đăng nhập" />
+                                        <TitleLabel title='Đăng nhập bằng Email' />
+                                        <Input placeholder="Nhập Email" value={dataProfile?.name} />
                                     </div>
                                     <div className='mb-4'>
                                         <TitleLabel title='Số điện thoại:' />
-                                        <Input placeholder="Nhập họ" />
+                                        <Input placeholder="Nhập SĐT" value={dataProfile?.phone_number}/>
                                     </div>
                                     <div className='mb-4'>
                                         <TitleLabel title='Email:' />
-                                        <Input placeholder="Nhập email" />
+                                        <Input placeholder="Nhập email" value={dataProfile?.email}/>
                                     </div>
                                     <div className='flex justify-end'>
                                         <Button type="primary">Lưu thay đổi</Button>

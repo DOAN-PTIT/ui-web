@@ -48,7 +48,7 @@ export default function Genaral() {
                 <Breadcrumb.Item href="/shop/1/settings">Cửa hàng </Breadcrumb.Item>
                 <Breadcrumb.Item className="mt-3 text-sm text-[#0050b3] font-medium">Cài đặt chung</Breadcrumb.Item>
             </Breadcrumb>
-            <Content className="bg-white rounded-lg overflow-auto overflow-x-hidden p-5 gap-5">
+            <Content className="bg-white rounded-lg overflow-auto overflow-x-hidden p-5 gap-5 h-screen">
                 <div className="grid grid-cols-2 w-full">
                     <div className="col-span-1 p-5 mb-2 sm:grid-cols-1 lg:grid-cols-1 bg-white flex justify-center">
                         <div className="">

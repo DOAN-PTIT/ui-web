@@ -1,4 +1,5 @@
 "use client";
+import apiClient from "@/service/auth";
 import { getHostName } from "@/utils/tools";
 import {
   LogoutOutlined,
@@ -22,21 +23,32 @@ function HeaderAction(props: HeaderActionProps) {
 
   async function logout(): Promise<void> {
     try {
-      const accessToken = localStorage.getItem('token');
+      const accessToken = localStorage.getItem('accessToken');
       if (!accessToken) {
         console.log('Người dùng chưa đăng nhập.');
         return;
       }
-      // console.log('URL API:', `${getHostName}/auth/logout`);
-      const response = await axios.post(`${getHostName()}/auth/logout`,{}, {
+
+   
+      const expirationTime = localStorage.getItem('tokenExpiration');
+      if (expirationTime && Date.now() >= parseInt(expirationTime)) {
+        console.log("Token đã hết hạn, không thể đăng xuất.");
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('tokenExpiration');
+        router.push('/login');
+        return;
+      }
+
+    
+      const response = await apiClient.post(`/auth/logout`, null, {
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
 
       if (response.status === 200) {
-        localStorage.removeItem('token');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('tokenExpiration');
         console.log('Đăng xuất thành công.');
         router.push('/login');
       } else {
@@ -46,6 +58,7 @@ function HeaderAction(props: HeaderActionProps) {
       console.error('Lỗi khi gọi API đăng xuất:', error.response?.data || error.message);
     }
   }
+
 
   const items: MenuProps["items"] = [
     {
