@@ -23,7 +23,12 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { getHostName } from "@/utils/tools";
 import { FacebookOutlined } from "@ant-design/icons";
-
+import apiClient from "@/service/auth";
+function saveTokenWithExpiration(token: string, expiresIn = 1800) { // Default is 30 minutes (1800 seconds)
+  const expirationTime = Date.now() + expiresIn * 1000;
+  localStorage.setItem("accessToken", token);
+  localStorage.setItem("tokenExpiration", expirationTime.toString());
+}
 interface ParamsLogin {
   email: string;
   password: string;
@@ -43,15 +48,18 @@ function LoginComponent() {
   const route = useRouter();
   const handleSubmitForm = async () => {
     setIsLoading(true);
-    const url = `${getHostName()}/auth/email/login`;
-    return await axios
+    const url = `/auth/email/login`; 
+
+    return await apiClient
       .post(url, params)
       .then((res) => {
         const token = res.data.accessToken;
-        localStorage.setItem("token", token);
+        const refreshToken = res.data.refreshToken; 
+        saveTokenWithExpiration(token); 
+        localStorage.setItem("refreshToken", refreshToken); 
         route.push("/shop/overview");
       })
-      .catch((error) => {
+      .catch((error:any) => {
         const res = error.response.data.message.join("\n ");
         console.log(error);
         openNotification(res);

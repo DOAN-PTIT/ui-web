@@ -66,7 +66,7 @@ export default function Genaral() {
                 <Breadcrumb.Item href="/shop/1/settings">Nhân viên</Breadcrumb.Item>
                 <Breadcrumb.Item className="mt-3 text-sm text-[#0050b3] font-medium">Danh sách nhân viên</Breadcrumb.Item>
             </Breadcrumb>
-            <Content className="overflow-auto overflow-x-hidden flex gap-5 ">
+            <Content className="overflow-auto overflow-x-hidden flex gap-5 h-screen">
                 <div className="grid grid-cols-10 w-full gap-4">
                     <div className="col-span-3 rounded-lg bg-white min-h-screen">
                         <div className="p-4 text-base font-semibold">Danh sách nhân viên</div>
