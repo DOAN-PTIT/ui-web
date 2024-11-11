@@ -12,9 +12,9 @@ export default function LandingContent() {
 
     return (
         <Content>
-            <div className='bg-cover bg-center relative max-w-[76rem] mx-auto sm:w-[1300px]'>
-                <Image className='h-[754px] object-cover w-auto' src={Background} alt="" />
-                <div className=' absolute h-[1054px] top-0 sm:flex items-center justify-between sm:h-[720px]'>
+            <Image className='h-[754px] object-cover w-auto' src={Background} alt="" />
+            <div className='bg-cover bg-center max-w-[76rem] mx-auto  sm:w-[1300px]'>
+                <div className=' absolute h-[1054px] top-24 sm:flex items-center justify-between sm:h-[720px]'>
                     <div className='sm:w-[706px] mr'>
                         <div className='flex item-center mx:3'>
                             <a className='mr-1 text-[16px] font-[500] text-[#6a6a6a]'>Một sản phẩm của </a>
