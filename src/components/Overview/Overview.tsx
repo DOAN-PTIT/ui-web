@@ -1,5 +1,6 @@
 "use client";
 
+import _ from "lodash";
 import {
   UserOutlined,
   PlusCircleOutlined,
@@ -28,18 +29,6 @@ import { getHostName } from "@/utils/tools";
 import apiClient from "@/service/auth";
 
 const { Content } = Layout;
-const shops = [
-  {
-    id: 1,
-    name: "Shop 1",
-    description: "Shop 1 description",
-  },
-  {
-    id: 2,
-    name: "Shop 1",
-    description: "Shop 1 description",
-  },
-];
 
 interface FBShopProps {
   name: string;
@@ -66,17 +55,21 @@ function Overview() {
   const [isLoadingFbPage, setIsLoadingFbPage] = useState(false);
   const [openIntegration, setOpenIntegration] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [dataListShop,setDataListShop] = useState<ListShop[]>()
+  const [dataListShop,setDataListShop] = useState<ListShop[]>([])
   useEffect(() => {
     getUserInfo();
     getListShop();
   }, []);
 
   const route = useRouter();
+  const searchParams = useSearchParams()
 
   let accessToken: any
   if (useSearchParams().values().next().value) {
-    accessToken = useSearchParams().values().next().value
+    accessToken = searchParams.get('access_token')
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('accessToken', accessToken)
+    }
   } else {
     if (typeof window !== 'undefined') {
       accessToken = localStorage.getItem('accessToken')
@@ -106,10 +99,11 @@ function Overview() {
       .get(url)
       .then((res) => {
         if (res.status == 200) {
-          setListFBPages(res.data.data);
+          let data = res.data.data;
+          data = _.differenceBy(data, dataListShop || [], 'name')
+          setListFBPages(data);
           setOpenIntegration(true);
         }
-        console.log(res.data.data)
       })
       .catch((error) => console.log(error))
       .finally(() => setIsLoadingFbPage(false));
@@ -144,9 +138,6 @@ function Overview() {
     
     const url = `/user/create-shop`;
 
-    // Log ra để kiểm tra
-    console.log(createShopFormData)
-
     return await apiClient
     .post(url, createShopFormData, {
       headers: {
@@ -157,6 +148,17 @@ function Overview() {
     .then((res) => console.log(res))
     .catch((error) => console.log(error));
   };
+
+  const handleCreateShopFb = async (param: {name: string, avatar: string}) => {
+    const url = `${getHostName()}/user/integrate-fb-shop`;
+
+    return await axios.post(url, param, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      }
+    }).then(res => console.log(res))
+    .catch(error => console.log(error))
+  }
 
   const handleCancel = () => {
     setOpenModal(false);
@@ -238,6 +240,7 @@ function Overview() {
                   <Card
                     key={page.id}
                     className="w-[300px] h-[150px]] hover:border-sky-500 transition-all ease-out cursor-pointer"
+                    onClick={() => handleCreateShopFb({name: page.name, avatar: page.picture.data.url})}
                   >
                     <div className="p-1 text-center">
                       <Image
