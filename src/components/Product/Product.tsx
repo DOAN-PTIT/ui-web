@@ -157,7 +157,7 @@ function Product() {
         />
       </Layout.Content>
       <Modal
-        title="Thiet lap san pham"
+        title="Thiết lập sản phẩm"
         open={modalVisiable}
         width={1200}
         styles={{

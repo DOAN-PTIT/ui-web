@@ -195,7 +195,7 @@ function Overview() {
                 className="w-[300px] min-h-[250px]"
                 title={
                   <div className="p-5 text-center">
-                    <Avatar icon={<UserOutlined />} size={80} />
+                    <Avatar src={shop.avatar} icon={<UserOutlined />} size={80} />
                     <h1 className="mt-4">{shop.name}</h1>
                   </div>
                 }
