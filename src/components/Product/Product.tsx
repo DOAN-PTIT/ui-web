@@ -19,15 +19,16 @@ import { DeleteOutlined } from "@ant-design/icons";
 import { AppDispatch, RootState } from "@/store";
 import { createProduct, getListProduct } from "@/action/product.action";
 import { connect } from "react-redux";
+import { formatNumber } from "@/utils/tools";
 
 interface ProductType {
   id: string;
-  productName: string;
-  totalAmount: number;
-  salePrice: number;
-  importedPrice: number;
+  name: string;
+  totalAmount: any;
+  salePrice: any;
+  importedPrice: any;
   note: string;
-  totalVariation: number;
+  totalVariation: any;
 }
 
 interface VariationProps {
@@ -38,21 +39,24 @@ interface VariationProps {
   amount: number;
 }
 
-interface ProductProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> {}
+interface ProductProps
+  extends ReturnType<typeof mapStateToProps>,
+    ReturnType<typeof mapDispatchToProps> {}
 
 function Product(props: ProductProps) {
+  const { getListProduct, listProduct } = props;
+
   const [modalVisiable, setModalVisiable] = useState(false);
   const [createProductParams, setCreateProductParams] = useState<any>({});
-  
+
   let shopId: any;
   if (typeof window !== "undefined") {
     shopId = localStorage.getItem("shopId");
   }
 
   useEffect(() => {
-    const { getListProduct } = props
-    getListProduct({shopId, page: 1});
-  }, [])
+    getListProduct({ shopId, page: 1 });
+  }, []);
 
   const columns: TableProps<ProductType>["columns"] = [
     {
@@ -64,7 +68,7 @@ function Product(props: ProductProps) {
     },
     {
       key: "PRODUCT NAME",
-      dataIndex: "productImage",
+      dataIndex: "name",
       title: "Ten san pham",
       fixed: "left",
     },
@@ -101,14 +105,14 @@ function Product(props: ProductProps) {
       dataIndex: "id",
       title: "Ma mau",
       width: 120,
-      fixed: "left"
+      fixed: "left",
     },
     {
       key: "IMAGE",
       dataIndex: "image",
       title: "Hinh anh",
       width: 120,
-      fixed: "left"
+      fixed: "left",
     },
     {
       key: "BARCODE",
@@ -133,32 +137,52 @@ function Product(props: ProductProps) {
     width: 60,
     fixed: "right",
     render: () => {
-      return <Button icon={<DeleteOutlined />} danger style={{border: "none", boxShadow: "none", background: "none"}} />;
+      return (
+        <Button
+          icon={<DeleteOutlined />}
+          danger
+          style={{ border: "none", boxShadow: "none", background: "none" }}
+        />
+      );
     },
   });
 
   const getData: () => TableProps<ProductType>["dataSource"] = () => {
-    return [];
+    return listProduct?.products
+      ? listProduct?.products.map((product) => ({
+          id: product.product_code || product.id,
+          name: product.name,
+          totalAmount: 0,
+          salePrice: formatNumber(1231289, "VND"),
+          importedPrice: formatNumber(3213912, "VND"),
+          note: product.description,
+          totalVariation: 0,
+        }))
+      : [];
   };
 
-  const getDataVariation: () => TableProps<VariationProps>["dataSource"] = () => {
-    return []
-  }
+  const getDataVariation: () => TableProps<VariationProps>["dataSource"] =
+    () => {
+      return [];
+    };
 
   const callBack = () => {
     setModalVisiable(true);
   };
 
   const handleCreateProduct = () => {
-    const { createProduct } = props
-    
-    console.log(createProductParams);
-    createProduct({...createProductParams, shopId});
-  }
+    const { createProduct } = props;
+    createProduct({ ...createProductParams, shopId });
+  };
+
+  const reloadCallBack = async () => {
+    const { getListProduct } = props;
+    return await getListProduct({ shopId, page: 1 });
+  };
 
   const onInputChange = (key: string, value: any) => {
-    setCreateProductParams((prev: any) => ({ ...prev, [key]: value}));
-  }
+    setCreateProductParams((prev: any) => ({ ...prev, [key]: value }));
+  };
 
   return (
     <Layout>
@@ -168,12 +192,15 @@ function Product(props: ProductProps) {
         inputPlaholder="Tìm kiếm sản phẩm"
       />
       <Layout.Content className="p-5 h-screen">
-        <ActionTools callBack={callBack} />
+        <ActionTools
+          callBack={callBack}
+          reloadCallBack={reloadCallBack}
+        />
         <Table
           columns={columns}
           dataSource={getData()}
           pagination={{
-            total: 100,
+            total: props.totalPage ? props.totalPage : 0,
             pageSize: 30,
             defaultCurrent: 1,
             defaultPageSize: 30,
@@ -182,6 +209,7 @@ function Product(props: ProductProps) {
           }}
           scroll={{ x: 2500, y: 500 }}
           size="small"
+          loading={props.isLoading}
         />
       </Layout.Content>
       <Modal
@@ -202,28 +230,58 @@ function Product(props: ProductProps) {
             <Col span={12} className="bg-white rounded-lg shadow-sm">
               <Form layout="vertical" className="p-6">
                 <Form.Item name="custom_id" label="Ma san pham" required>
-                  <Input placeholder="Ma san pham" name="custom_id" onChange={(e) => onInputChange("product_code", e.target.value)} />
+                  <Input
+                    placeholder="Ma san pham"
+                    name="custom_id"
+                    onChange={(e) =>
+                      onInputChange("product_code", e.target.value)
+                    }
+                  />
                 </Form.Item>
                 <Form.Item name="product_name" label="Ten san pham" required>
-                  <Input placeholder="Ten san pham" name="product_name" onChange={(e) => onInputChange("name", e.target.value)} />
+                  <Input
+                    placeholder="Ten san pham"
+                    name="product_name"
+                    onChange={(e) => onInputChange("name", e.target.value)}
+                  />
                 </Form.Item>
                 <Form.Item name="product_note" label="Ghi chu">
-                  <Input.TextArea placeholder="Ghi chu" name="product_note" onChange={(e) => onInputChange("description", e.target.value)} />
+                  <Input.TextArea
+                    placeholder="Ghi chu"
+                    name="product_note"
+                    onChange={(e) =>
+                      onInputChange("description", e.target.value)
+                    }
+                  />
                 </Form.Item>
               </Form>
             </Col>
             <Col span={11} className="bg-white rounded-lg h-fit shadow-sm">
               <Form layout="vertical" className="p-6">
                 <Form.Item name="product_tag" label="The">
-                  <Select options={[]} placeholder="The" onChange={(value) => onInputChange("product_tag", value)} />
+                  <Select
+                    options={[]}
+                    placeholder="The"
+                    onChange={(value) => onInputChange("product_tag", value)}
+                  />
                 </Form.Item>
                 <Form.Item label="Nha cung cap">
-                  <Select options={[]} placeholder="Nha cung cap" onChange={(value) => onInputChange("supplier", value)} />
+                  <Select
+                    options={[]}
+                    placeholder="Nha cung cap"
+                    onChange={(value) => onInputChange("supplier", value)}
+                  />
                 </Form.Item>
               </Form>
             </Col>
           </Row>
-          <Table pagination={{size: 'small'}} scroll={{x: 1200, y: 800}} className="shadow-sm" columns={columnsVariation} dataSource={getDataVariation()} />
+          <Table
+            pagination={{ size: "small" }}
+            scroll={{ x: 1200, y: 800 }}
+            className="shadow-sm"
+            columns={columnsVariation}
+            dataSource={getDataVariation()}
+          />
         </Layout>
       </Modal>
     </Layout>
@@ -231,14 +289,19 @@ function Product(props: ProductProps) {
 }
 
 const mapStateToProps = (state: RootState) => {
-  return {}
-}
+  return {
+    isLoading: state.productReducer.isLoading,
+    listProduct: state.productReducer.listProduct,
+    totalPage: state.productReducer.listProduct.totalCount
+  };
+};
 
 const mapDispatchToProps = (dispatch: AppDispatch) => {
   return {
     createProduct: (data: any) => dispatch(createProduct(data)),
-    getListProduct: (data: any) => dispatch(getListProduct(data))
-  }
-}
+    getListProduct: (data: { shopId: any; page: number }) =>
+      dispatch(getListProduct(data)),
+  };
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Product);

@@ -23,8 +23,12 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use(async (config) => {
-    let accessToken = localStorage.getItem("accesToken");
-    const refreshToken = localStorage.getItem("refreshToken");
+    let accessToken = null;
+    let refreshToken = null
+    if (typeof window !== "undefined") {
+        accessToken = localStorage.getItem("accessToken");
+        refreshToken = localStorage.getItem("refreshToken");
+    }
 
     if (accessToken) {
         if (isTokenExpired() && refreshToken) {
