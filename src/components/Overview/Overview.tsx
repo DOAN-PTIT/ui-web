@@ -124,6 +124,7 @@ function Overview() {
   };
 
   const handleClickAccess = (shopId: number) => {
+    localStorage.setItem('shopId', shopId.toString())
     route.push(`/shop/${shopId}/dashbroad`);
   };
 
