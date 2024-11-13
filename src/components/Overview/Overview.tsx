@@ -42,11 +42,11 @@ interface FBShopProps {
 }
 export interface ListShop {
   avatar: string;
-  createdAt: string; 
+  createdAt: string;
   description: string;
   id: number;
   name: string;
-  updatedAt: string; 
+  updatedAt: string;
 }
 function Overview() {
   const [profile, setProfile] = useState<{ access_token: string }>();
@@ -55,7 +55,7 @@ function Overview() {
   const [isLoadingFbPage, setIsLoadingFbPage] = useState(false);
   const [openIntegration, setOpenIntegration] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [dataListShop,setDataListShop] = useState<ListShop[]>([])
+  const [dataListShop, setDataListShop] = useState<ListShop[]>([])
   useEffect(() => {
     getUserInfo();
     getListShop();
@@ -133,23 +133,23 @@ function Overview() {
 
   const handleOk = async (param: { name: string; avatar: any }) => {
     const createShopFormData = new FormData();
-    createShopFormData.append('name', param.name);      
+    createShopFormData.append('name', param.name);
     createShopFormData.append('avatar', param.avatar);
-    
+
     const url = `/user/create-shop`;
 
     return await apiClient
-    .post(url, createShopFormData, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        // 'Content-Type': 'multipart/form-data',
-      },
-    })
-    .then((res) => console.log(res))
-    .catch((error) => console.log(error));
+      .post(url, createShopFormData, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          // 'Content-Type': 'multipart/form-data',
+        },
+      })
+      .then((res) => console.log(res))
+      .catch((error) => console.log(error));
   };
 
-  const handleCreateShopFb = async (param: {name: string, avatar: string}) => {
+  const handleCreateShopFb = async (param: { name: string, avatar: string }) => {
     const url = `${getHostName()}/user/integrate-fb-shop`;
 
     return await axios.post(url, param, {
@@ -157,7 +157,7 @@ function Overview() {
         Authorization: `Bearer ${accessToken}`,
       }
     }).then(res => console.log(res))
-    .catch(error => console.log(error))
+      .catch(error => console.log(error))
   }
 
   const handleCancel = () => {
@@ -240,7 +240,7 @@ function Overview() {
                   <Card
                     key={page.id}
                     className="w-[300px] h-[150px]] hover:border-sky-500 transition-all ease-out cursor-pointer"
-                    onClick={() => handleCreateShopFb({name: page.name, avatar: page.picture.data.url})}
+                    onClick={() => handleCreateShopFb({ name: page.name, avatar: page.picture.data.url })}
                   >
                     <div className="p-1 text-center">
                       <Image

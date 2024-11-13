@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation"
 const { Content } = Layout
 function Settings() {
     const router = useRouter()
-  
+
     return (
         <Layout className="px-4">
             <HeaderAction
@@ -27,7 +27,7 @@ function Settings() {
                                 <div className="text-[#101828] text-base font-semibold">Cửa hàng</div>
                             </div>
                             <Link href={'/shop/1/settings/general'}>
-                                <div  className="mt-3 text-sm text-[#0050b3] font-medium">Cài đặt chung</div>
+                                <div className="mt-3 text-sm text-[#0050b3] font-medium">Cài đặt chung</div>
                             </Link>
                         </div>
                         <div className="">

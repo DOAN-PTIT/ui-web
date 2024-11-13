@@ -1,6 +1,12 @@
 "use client";
 
-import React from "react";
+import customerImage from "@/assets/customer-image.jpg";
+import orderImage from "@/assets/order-image.jpg";
+import reportImage from "@/assets/report-image.jpg";
+import apiClient from "@/service/auth";
+import "@/styles/login.css";
+import { FacebookOutlined } from "@ant-design/icons";
+import type { NotificationArgsProps } from "antd";
 import {
   Button,
   Carousel,
@@ -11,19 +17,10 @@ import {
   Row,
   notification,
 } from "antd";
-import type { NotificationArgsProps } from "antd";
-import reportImage from "@/assets/report-image.jpg";
-import orderImage from "@/assets/order-image.jpg";
-import customerImage from "@/assets/customer-image.jpg";
 import Image from "next/image";
-import "@/styles/login.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { getHostName } from "@/utils/tools";
-import { FacebookOutlined } from "@ant-design/icons";
-import apiClient from "@/service/auth";
 function saveTokenWithExpiration(token: string, expiresIn = 1800) { // Default is 30 minutes (1800 seconds)
   const expirationTime = Date.now() + expiresIn * 1000;
   localStorage.setItem("accessToken", token);

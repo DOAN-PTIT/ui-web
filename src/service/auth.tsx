@@ -31,9 +31,7 @@ apiClient.interceptors.request.use(async (config) => {
             try {
                 const response = await axios.post(`${getHostName()}/auth/refresh-token`, {
                     token: refreshToken,
-                });
-
-                
+                })
                 accessToken = response.data.accessToken;
                 saveTokenWithExpiration(accessToken, 1800);
                 config.headers.Authorization = `Bearer ${accessToken}`;

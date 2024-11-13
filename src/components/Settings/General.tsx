@@ -2,41 +2,90 @@
 
 import { UploadOutlined } from "@ant-design/icons"
 import { Avatar, Breadcrumb, Button, Input, Layout, Select, Space, Upload } from "antd"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import TitleH from "../Custom/TitleH"
 import TitleLabel from "../Custom/TitleLabel"
 import HeaderAction from "../HeaderAction/HeaderAction"
+import apiClient from "@/service/auth"
 const { Content } = Layout
+interface ShopSettings {
+    id: number;
+    date_format: string;
+    location: string;
+    language: string;
+    time_zone: string;
+    auto_product_code: boolean;
+    source_order: string | null;
+    updatedAt: string;
+    createdAt: string;
+    shop_id: number;
+}
 export default function Genaral() {
     const options = [
         {
-            value: 'Tiếng việt',
+            value: 'vi',
             label: 'Tiếng việt',
         },
         {
-            value: 'Anh',
-            label: 'Anh',
+            value: 'en',
+            label: 'Tiếng Anh',
         },
     ];
-    const optionsAdress = [
-        {
-            value: 'Hà Nội',
-            label: 'Hà Nội',
-        },
-        {
-            value: 'Nghệ An',
-            label: 'Nghệ An',
-        },
-    ];
-    const [imageUrl, setImageUrl] = useState<string | undefined>(""); // State cho ảnh hiện tại
 
-    // Xử lý khi người dùng chọn ảnh mới
+
+    const [imageUrl, setImageUrl] = useState<string | undefined>("");
+
+
     const handleUpload = (file: File) => {
         const reader = new FileReader();
-        reader.onload = () => setImageUrl(reader.result as string); // Đọc nội dung file và lưu vào state
+        reader.onload = () => setImageUrl(reader.result as string);
         reader.readAsDataURL(file);
-        return false; // Chặn submit form mặc định của Upload component
+        return false;
     };
+    const [data, setData] = useState<ShopSettings>()
+    async function GetSetting() {
+        try {
+            const accessToken = localStorage.getItem('accessToken');
+            const res = await apiClient.get(`shop/setting/1`, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                }
+            })
+            console.log(res.data)
+            setData(res.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    const [formData, setFormData] = useState({
+            date_format: '',
+            location: '',
+            language: '',
+            time_zone: '',
+        }
+    )
+    async function handleUpdate() {
+        try {
+            const accessToken = localStorage.getItem('accessToken');
+            const res = await apiClient.post(`shop/setting/${shopId}`, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                }
+            }, {
+                date_format: '',
+                location: '',
+                language: '',
+                time_zone: '',
+            })
+            console.log(res.data)
+            setData(res.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    useEffect(() => {
+        GetSetting()
+    }, [])
     return (
         <Layout className="px-4">
             <HeaderAction
@@ -75,16 +124,18 @@ export default function Genaral() {
                         <div>
                             <TitleH className='mb-4' title='Thông tin cửa hàng' />
                             <TitleLabel title='Tên cửa hàng:' />
-                            <Input className='w-full mb-4' defaultValue="Shop 1" />
+                            <Input className='w-full mb-4' defaultValue="Shop 1" value={data?.id} />
                             <TitleLabel title='Ngôn ngữ:' />
-                            <Select className='w-full mb-4' defaultValue="Tiếng việt" options={options} />
+                            <Select className='w-full mb-4' defaultValue="Tiếng việt" value={data?.language === 'en' ? 'Tiếng Anh' : 'Tiếng Việt'} options={options} />
                             <TitleLabel title='Múi giờ:' />
-                            <Select className='w-full mb-4' defaultValue="Tiếng việt" options={options} />
+                            <Input className='w-full mb-4' defaultValue="Tiếng việt" value={data?.time_zone} />
                             <TitleLabel title='Địa chỉ:' />
-                            <Space.Compact className="w-full">
+                            <Input className='w-full mb-4' defaultValue="Tiếng việt" value={data?.location} />
+
+                            {/* <Space.Compact className="w-full">
                                 <Select defaultValue="Nghệ An" options={optionsAdress} />
                                 <Input defaultValue="Đồng Thành, Yên Thành" />
-                            </Space.Compact>
+                            </Space.Compact> */}
                         </div>
                         <div className="flex justify-end">
                             <Button className='mt-4' type="primary">Lưu thay đổi</Button>

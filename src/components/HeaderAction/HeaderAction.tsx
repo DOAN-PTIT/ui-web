@@ -1,14 +1,12 @@
 "use client";
 import apiClient from "@/service/auth";
-import { getHostName } from "@/utils/tools";
 import {
   LogoutOutlined,
   SettingOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Avatar, Dropdown, Input, Layout, Menu } from "antd";
 import type { MenuProps } from "antd";
-import axios from "axios";
+import { Avatar, Dropdown, Input, Layout, Menu } from "antd";
 import { useRouter } from "next/navigation";
 
 interface HeaderActionProps {
@@ -28,8 +26,6 @@ function HeaderAction(props: HeaderActionProps) {
         console.log('Người dùng chưa đăng nhập.');
         return;
       }
-
-   
       const expirationTime = localStorage.getItem('tokenExpiration');
       if (expirationTime && Date.now() >= parseInt(expirationTime)) {
         console.log("Token đã hết hạn, không thể đăng xuất.");
@@ -38,8 +34,6 @@ function HeaderAction(props: HeaderActionProps) {
         router.push('/login');
         return;
       }
-
-    
       const response = await apiClient.post(`/auth/logout`, null, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
