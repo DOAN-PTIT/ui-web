@@ -41,22 +41,22 @@ function LoginComponent() {
   const [api, contextHolder] = notification.useNotification();
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {}, []);
+  useEffect(() => { }, []);
   const route = useRouter();
   const handleSubmitForm = async () => {
     setIsLoading(true);
-    const url = `/auth/email/login`; 
+    const url = `/auth/email/login`;
 
     return await apiClient
       .post(url, params)
       .then((res) => {
         const token = res.data.accessToken;
-        const refreshToken = res.data.refreshToken; 
-        saveTokenWithExpiration(token); 
-        localStorage.setItem("refreshToken", refreshToken); 
+        const refreshToken = res.data.refreshToken;
+        saveTokenWithExpiration(token);
+        localStorage.setItem("refreshToken", refreshToken);
         route.push("/shop/overview");
       })
-      .catch((error:any) => {
+      .catch((error: any) => {
         const res = error.response.data.message.join("\n ");
         console.log(error);
         openNotification(res);
