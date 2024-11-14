@@ -9,6 +9,7 @@ import {
   LoginOutlined,
   SyncOutlined,
   ThunderboltOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -27,6 +28,7 @@ import AddModel from "./components/ModelAdd";
 import axios from "axios";
 import { getHostName } from "@/utils/tools";
 import apiClient from "@/service/auth";
+import { Input } from "postcss";
 
 const { Content } = Layout;
 
@@ -150,7 +152,7 @@ function Overview() {
     .catch((error) => console.log(error));
   };
 
-  const handleCreateShopFb = async (param: {name: string, avatar: string}) => {
+  const handleCreateShopFb = async (param: {name: string, avatar: string, fb_shop_id: string}) => {
     const url = `${getHostName()}/user/integrate-fb-shop`;
 
     return await axios.post(url, param, {
@@ -241,7 +243,7 @@ function Overview() {
                   <Card
                     key={page.id}
                     className="w-[300px] h-[150px]] hover:border-sky-500 transition-all ease-out cursor-pointer"
-                    onClick={() => handleCreateShopFb({name: page.name, avatar: page.picture.data.url})}
+                    onClick={() => handleCreateShopFb({name: page.name, avatar: page.picture.data.url, fb_shop_id: page.id})}
                   >
                     <div className="p-1 text-center">
                       <Image

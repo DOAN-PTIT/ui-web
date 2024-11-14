@@ -10,12 +10,13 @@ import {
   Row,
   Select,
   Table,
+  Avatar
 } from "antd";
 import HeaderAction from "../HeaderAction/HeaderAction";
 import ActionTools from "../ActionTools/ActionTools";
 import type { TableProps } from "antd";
 import { useEffect, useState } from "react";
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, PlusOutlined, ProductOutlined } from "@ant-design/icons";
 import { AppDispatch, RootState } from "@/store";
 import { createProduct, getListProduct } from "@/action/product.action";
 import { connect } from "react-redux";
@@ -48,6 +49,7 @@ function Product(props: ProductProps) {
 
   const [modalVisiable, setModalVisiable] = useState(false);
   const [createProductParams, setCreateProductParams] = useState<any>({});
+  const [variationData, setVariationData] = useState<>([]);
 
   let shopId: any;
   if (typeof window !== "undefined") {
@@ -163,11 +165,12 @@ function Product(props: ProductProps) {
 
   const getDataVariation: () => TableProps<VariationProps>["dataSource"] =
     () => {
-      return [];
+      return [...variationData];
     };
 
   const callBack = () => {
     setModalVisiable(true);
+    setVariationData([]);
   };
 
   const handleCreateProduct = () => {
@@ -183,6 +186,30 @@ function Product(props: ProductProps) {
   const onInputChange = (key: string, value: any) => {
     setCreateProductParams((prev: any) => ({ ...prev, [key]: value }));
   };
+
+  const handleAddVariationColumn = () => {
+    const newVariationData = [...variationData];
+    const newVariation = {
+      id: <Input defaultValue={""} />,
+      image: <Avatar icon={<ProductOutlined />} />,
+      barcode: <Input defaultValue={""} />,
+      salePrice: <Input defaultValue={formatNumber(0)} />,
+      amount: <Input defaultValue={formatNumber(0)} />,
+    };
+
+    newVariationData.unshift(newVariation);
+
+    setVariationData(newVariationData);
+  }
+
+  const renderTitleVariation = () => {
+    return (
+      <div className="flex justify-between">
+        <Input.Search placeholder="Tim kiem mau ma" className="w-[180px]" />
+        <Button icon={<PlusOutlined />} type="primary" onClick={handleAddVariationColumn}>Them mau ma</Button>
+      </div>
+    )
+  }
 
   return (
     <Layout>
@@ -281,6 +308,7 @@ function Product(props: ProductProps) {
             className="shadow-sm"
             columns={columnsVariation}
             dataSource={getDataVariation()}
+            title={renderTitleVariation}
           />
         </Layout>
       </Modal>
