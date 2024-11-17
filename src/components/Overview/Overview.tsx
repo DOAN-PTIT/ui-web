@@ -29,6 +29,10 @@ import axios from "axios";
 import { getHostName } from "@/utils/tools";
 import apiClient from "@/service/auth";
 import { Input } from "postcss";
+import { AppDispatch, RootState } from "@/store";
+import { connect } from "react-redux";
+import { getUserProfile } from "@/action/user.action";
+import { getCurrentShop } from "@/action/shop.action";
 
 const { Content } = Layout;
 
@@ -50,8 +54,12 @@ export interface ListShop {
   name: string;
   updatedAt: string; 
 }
-function Overview() {
-  const [profile, setProfile] = useState<{ access_token: string }>();
+
+interface OverviewProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> {}
+
+function Overview(props: OverviewProps) {
+  const {getCurrentUser, currentUser} = props
+
   const [listFBPages, setListFBPages] = useState<FBShopProps[]>([]);
   const [openModal, setOpenModal] = useState(false);
   const [isLoadingFbPage, setIsLoadingFbPage] = useState(false);
@@ -59,8 +67,8 @@ function Overview() {
   const [isLoading, setIsLoading] = useState(false);
   const [dataListShop,setDataListShop] = useState<ListShop[]>([])
   useEffect(() => {
-    getUserInfo();
     getListShop();
+    getCurrentUser()
   }, []);
 
   const route = useRouter();
@@ -78,24 +86,9 @@ function Overview() {
     }
   }
 
-  const getUserInfo = async () => {
-    const url = `${getHostName()}/user/profile`;
-    return await axios
-      .get(url, {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-      .then((res) => {
-        setProfile(res.data);
-      })
-      .catch((error) => console.log(error));
-  };
-
   const getListPage = async () => {
     setIsLoadingFbPage(true);
-    const access_token = profile ? profile.access_token : "";
+    const access_token = currentUser ? currentUser.access_token : "";
     const url = `https://graph.facebook.com/v21.0/me/accounts?fields=name,picture,category&access_token=${access_token}`;
     return await axios
       .get(url)
@@ -125,9 +118,12 @@ function Overview() {
       .finally(() => setIsLoading(false));
   };
 
-  const handleClickAccess = (shopId: number) => {
+  const handleClickAccess = async (shopId: number) => {
     localStorage.setItem('shopId', shopId.toString())
-    route.push(`/shop/${shopId}/dashbroad`);
+    await props.getCurrentShop({shopId})
+    setTimeout(() => {
+      route.push(`/shop/${shopId}/dashbroad`);
+    }, 1000)
   };
 
   const handleOpenModel = () => {
@@ -265,4 +261,17 @@ function Overview() {
   );
 }
 
-export default Overview;
+const mapStateToProps = (state: RootState) => {
+  return {
+    currentUser: state.userReducer.user
+  }
+}
+
+const mapDispatchToProps = (dispatch: AppDispatch) => {
+  return {
+    getCurrentUser: () => dispatch(getUserProfile()),
+    getCurrentShop: (data) => dispatch(getCurrentShop(data))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Overview);

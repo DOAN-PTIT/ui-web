@@ -18,7 +18,7 @@ import type { TableProps } from "antd";
 import { useEffect, useState } from "react";
 import { DeleteOutlined, PlusOutlined, ProductOutlined } from "@ant-design/icons";
 import { AppDispatch, RootState } from "@/store";
-import { createProduct, getListProduct } from "@/action/product.action";
+import { createProduct, getListProduct, getListProductFBShop } from "@/action/product.action";
 import { connect } from "react-redux";
 import { formatNumber } from "@/utils/tools";
 
@@ -45,11 +45,11 @@ interface ProductProps
     ReturnType<typeof mapDispatchToProps> {}
 
 function Product(props: ProductProps) {
-  const { getListProduct, listProduct } = props;
+  const { getListProduct, getListProductFBShop, listProduct, currentShop, currentUser } = props;
 
   const [modalVisiable, setModalVisiable] = useState(false);
   const [createProductParams, setCreateProductParams] = useState<any>({});
-  const [variationData, setVariationData] = useState<>([]);
+  const [variationData, setVariationData] = useState([]);
 
   let shopId: any;
   if (typeof window !== "undefined") {
@@ -57,8 +57,8 @@ function Product(props: ProductProps) {
   }
 
   useEffect(() => {
-    getListProduct({ shopId, page: 1 });
-  }, []);
+    getListProduct({ shopId, page: 1 })
+  }, [shopId]);
 
   const columns: TableProps<ProductType>["columns"] = [
     {
@@ -149,6 +149,11 @@ function Product(props: ProductProps) {
     },
   });
 
+  const callBackSyncFBCatalog = () => {
+    const { currentUser, currentShop } = props;
+    return getListProductFBShop({ access_token: currentUser.access_token, fb_shop_id: currentShop.fb_shop_id });
+  }
+
   const getData: () => TableProps<ProductType>["dataSource"] = () => {
     return listProduct?.products
       ? listProduct?.products.map((product) => ({
@@ -222,6 +227,8 @@ function Product(props: ProductProps) {
         <ActionTools
           callBack={callBack}
           reloadCallBack={reloadCallBack}
+          hasSyncFBCatalog={currentShop.fb_shop_id ? true : false}
+          callBackSyncFBCatalog={callBackSyncFBCatalog}
         />
         <Table
           columns={columns}
@@ -320,7 +327,9 @@ const mapStateToProps = (state: RootState) => {
   return {
     isLoading: state.productReducer.isLoading,
     listProduct: state.productReducer.listProduct,
-    totalPage: state.productReducer.listProduct.totalCount
+    totalPage: state.productReducer.listProduct.totalCount,
+    currentShop: state.shopReducer.shop,
+    currentUser: state.userReducer.user,
   };
 };
 
@@ -329,6 +338,7 @@ const mapDispatchToProps = (dispatch: AppDispatch) => {
     createProduct: (data: any) => dispatch(createProduct(data)),
     getListProduct: (data: { shopId: any; page: number }) =>
       dispatch(getListProduct(data)),
+    getListProductFBShop: (data: any) => dispatch(getListProductFBShop(data)),
   };
 };
 
