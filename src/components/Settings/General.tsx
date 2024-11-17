@@ -7,7 +7,10 @@ import TitleH from "../Custom/TitleH"
 import TitleLabel from "../Custom/TitleLabel"
 import HeaderAction from "../HeaderAction/HeaderAction"
 import apiClient from "@/service/auth"
+import axios from "axios"
+import { getHostName } from "@/utils/tools"
 const { Content } = Layout
+
 interface ShopSettings {
     id: number;
     date_format: string;
@@ -20,11 +23,12 @@ interface ShopSettings {
     createdAt: string;
     shop_id: number;
 }
+
 export default function Genaral() {
     const options = [
         {
             value: 'vi',
-            label: 'Tiếng việt',
+            label: 'Tiếng Việt',
         },
         {
             value: 'en',
@@ -32,9 +36,15 @@ export default function Genaral() {
         },
     ];
 
-
     const [imageUrl, setImageUrl] = useState<string | undefined>("");
-
+    const [formData, setFormData] = useState({
+        date_format: '',
+        location: '',
+        language: '',
+        time_zone: '',
+        auto_product_code: false, 
+        source_order: 'facebook',
+    });
 
     const handleUpload = (file: File) => {
         const reader = new FileReader();
@@ -42,50 +52,65 @@ export default function Genaral() {
         reader.readAsDataURL(file);
         return false;
     };
-    const [data, setData] = useState<ShopSettings>()
+
+    const [data, setData] = useState<ShopSettings>();
+
+    const shopId = localStorage.getItem('shopId');
+
     async function GetSetting() {
         try {
             const accessToken = localStorage.getItem('accessToken');
-            const res = await apiClient.get(`shop/setting/1`, {
+            const res = await apiClient.get(`shop/setting/${shopId}`, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`
                 }
             })
-            console.log(res.data)
-            setData(res.data)
+            console.log('Settings:', res.data);
+            setData(res.data);
+            setFormData({
+                date_format: res.data.date_format,
+                location: res.data.location,
+                language: res.data.language,
+                time_zone: res.data.time_zone,
+                auto_product_code: res.data.auto_product_code,
+                source_order: 'facebook',
+            });
         } catch (error) {
-            console.log(error)
+            console.error("Error fetching settings:", error);
         }
     }
-    const [formData, setFormData] = useState({
-            date_format: '',
-            location: '',
-            language: '',
-            time_zone: '',
-        }
-    )
+
     async function handleUpdate() {
         try {
-            const accessToken = localStorage.getItem('accessToken');
-            const res = await apiClient.post(`shop/setting/${shopId}`, {
+            const shopId = localStorage.getItem("shopId");
+            const accessToken = localStorage.getItem("accessToken");
+
+            // Log request URL and form data
+            console.log("Request URL: ", `${getHostName()}/shop/setting/update/${shopId}`);
+            console.log("Form data being sent:", formData);
+
+            const res = await apiClient.post(`shop/setting/update/${shopId}`, formData, {
                 headers: {
-                    Authorization: `Bearer ${accessToken}`
-                }
-            }, {
-                date_format: '',
-                location: '',
-                language: '',
-                time_zone: '',
-            })
-            console.log(res.data)
-            setData(res.data)
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+            console.log("Response data:", res.data);
+            setData(res.data);
         } catch (error) {
-            console.log(error)
+            if (axios.isAxiosError(error)) {
+                console.error("Error response:", error.response?.data);
+                console.error("Error status:", error.response?.status);
+                console.error("Error headers:", error.response?.headers);
+            } else {
+                console.error("Error:", error);
+            }
         }
     }
+
     useEffect(() => {
-        GetSetting()
-    }, [])
+        GetSetting();
+    }, []);
+
     return (
         <Layout className="px-4">
             <HeaderAction
@@ -93,8 +118,8 @@ export default function Genaral() {
                 isShowSearch={true}
                 inputPlaholder="Tìm kiếm cấu hình" />
             <Breadcrumb style={{ margin: '16px 0' }}>
-                <Breadcrumb.Item href="/shop/1/settings">Cấu hình</Breadcrumb.Item>
-                <Breadcrumb.Item href="/shop/1/settings">Cửa hàng </Breadcrumb.Item>
+                <Breadcrumb.Item href={`/shop/${shopId}/settings`}>Cấu hình</Breadcrumb.Item>
+                <Breadcrumb.Item href={`/shop/${shopId}/settings`}>Cửa hàng </Breadcrumb.Item>
                 <Breadcrumb.Item className="mt-3 text-sm text-[#0050b3] font-medium">Cài đặt chung</Breadcrumb.Item>
             </Breadcrumb>
             <Content className="bg-white rounded-lg overflow-auto overflow-x-hidden p-5 gap-5 h-screen">
@@ -124,21 +149,34 @@ export default function Genaral() {
                         <div>
                             <TitleH className='mb-4' title='Thông tin cửa hàng' />
                             <TitleLabel title='Tên cửa hàng:' />
-                            <Input className='w-full mb-4' defaultValue="Shop 1" value={data?.id} />
+                            <Input
+                                className='w-full mb-4'
+                                defaultValue="Shop 1"
+                                value={data?.id}
+                                onChange={(e) => setFormData(prev => ({ ...prev, id: e.target.value }))}
+                            />
                             <TitleLabel title='Ngôn ngữ:' />
-                            <Select className='w-full mb-4' defaultValue="Tiếng việt" value={data?.language === 'en' ? 'Tiếng Anh' : 'Tiếng Việt'} options={options} />
+                            <Select
+                                className='w-full mb-4'
+                                value={formData.language}
+                                options={options}
+                                onChange={(value) => setFormData(prev => ({ ...prev, language: value }))}
+                            />
                             <TitleLabel title='Múi giờ:' />
-                            <Input className='w-full mb-4' defaultValue="Tiếng việt" value={data?.time_zone} />
+                            <Input
+                                className='w-full mb-4'
+                                value={formData.time_zone}
+                                onChange={(e) => setFormData(prev => ({ ...prev, time_zone: e.target.value }))}
+                            />
                             <TitleLabel title='Địa chỉ:' />
-                            <Input className='w-full mb-4' defaultValue="Tiếng việt" value={data?.location} />
-
-                            {/* <Space.Compact className="w-full">
-                                <Select defaultValue="Nghệ An" options={optionsAdress} />
-                                <Input defaultValue="Đồng Thành, Yên Thành" />
-                            </Space.Compact> */}
+                            <Input
+                                className='w-full mb-4'
+                                value={formData.location}
+                                onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                            />
                         </div>
                         <div className="flex justify-end">
-                            <Button className='mt-4' type="primary">Lưu thay đổi</Button>
+                            <Button className='mt-4' type="primary" onClick={handleUpdate}>Lưu thay đổi</Button>
                         </div>
                     </div>
 

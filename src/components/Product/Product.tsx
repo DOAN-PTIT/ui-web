@@ -65,33 +65,33 @@ function Product(props: ProductProps) {
     {
       key: "PRODUCT NAME",
       dataIndex: "productImage",
-      title: "Ten san pham",
+      title: "Tên sản phẩm",
       fixed: "left",
     },
     {
       key: "TOTAL AMOUNT",
       dataIndex: "totalAmount",
-      title: "Tong so luong",
+      title: "Tổng số lượng",
     },
     {
       key: "TOTAL VARIATION",
       dataIndex: "totalVariation",
-      title: "Tong so mau ma",
+      title: "Tổng số mẫu mã",
     },
     {
       key: "SALE  PRICE",
       dataIndex: "salePrice",
-      title: "Gia ban",
+      title: "Giá bán",
     },
     {
       key: "IMPORTED PRICE",
       dataIndex: "importedPrice",
-      title: "Gia nhap",
+      title: "Giá nhập",
     },
     {
       key: "NOTE",
       dataIndex: "note",
-      title: "Ghi chu",
+      title: "Ghi chú",
     },
   ];
 
@@ -99,31 +99,31 @@ function Product(props: ProductProps) {
     {
       key: "ID",
       dataIndex: "id",
-      title: "Ma mau",
+      title: "Mẫu mã",
       width: 120,
       fixed: "left"
     },
     {
       key: "IMAGE",
       dataIndex: "image",
-      title: "Hinh anh",
+      title: "Hình ảnh",
       width: 120,
       fixed: "left"
     },
     {
       key: "BARCODE",
       dataIndex: "barcode",
-      title: "Ma vach",
+      title: "Mã vạch",
     },
     {
       key: "SALE PRICE",
       dataIndex: "salePrice",
-      title: "Gia ban",
+      title: "Giá bán",
     },
     {
       key: "AMOUNT",
       dataIndex: "amount",
-      title: "So luong",
+      title: "Số lượng",
     },
   ];
 
@@ -201,24 +201,24 @@ function Product(props: ProductProps) {
           <Row justify="space-between" className="mb-5">
             <Col span={12} className="bg-white rounded-lg shadow-sm">
               <Form layout="vertical" className="p-6">
-                <Form.Item name="custom_id" label="Ma san pham" required>
-                  <Input placeholder="Ma san pham" name="custom_id" onChange={(e) => onInputChange("product_code", e.target.value)} />
+                <Form.Item name="custom_id" label="Mã sản phẩm" required>
+                  <Input placeholder="Mã sản phẩm" name="custom_id" onChange={(e) => onInputChange("product_code", e.target.value)} />
                 </Form.Item>
-                <Form.Item name="product_name" label="Ten san pham" required>
-                  <Input placeholder="Ten san pham" name="product_name" onChange={(e) => onInputChange("name", e.target.value)} />
+                <Form.Item name="product_name" label="Tên sảm phẩm" required>
+                  <Input placeholder="Tên sản phẩm" name="product_name" onChange={(e) => onInputChange("name", e.target.value)} />
                 </Form.Item>
                 <Form.Item name="product_note" label="Ghi chu">
-                  <Input.TextArea placeholder="Ghi chu" name="product_note" onChange={(e) => onInputChange("description", e.target.value)} />
+                  <Input.TextArea placeholder="Ghi chú" name="product_note" onChange={(e) => onInputChange("description", e.target.value)} />
                 </Form.Item>
               </Form>
             </Col>
             <Col span={11} className="bg-white rounded-lg h-fit shadow-sm">
               <Form layout="vertical" className="p-6">
-                <Form.Item name="product_tag" label="The">
-                  <Select options={[]} placeholder="The" onChange={(value) => onInputChange("product_tag", value)} />
+                <Form.Item name="product_tag" label="Thẻ">
+                  <Select options={[]} placeholder="Thẻ" onChange={(value) => onInputChange("product_tag", value)} />
                 </Form.Item>
-                <Form.Item label="Nha cung cap">
-                  <Select options={[]} placeholder="Nha cung cap" onChange={(value) => onInputChange("supplier", value)} />
+                <Form.Item label="Nhà cung cấp">
+                  <Select options={[]} placeholder="Nhà cung cấp" onChange={(value) => onInputChange("supplier", value)} />
                 </Form.Item>
               </Form>
             </Col>

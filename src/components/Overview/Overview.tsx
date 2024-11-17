@@ -186,7 +186,7 @@ function Overview() {
             loading={isLoadingFbPage}
             icon={<ThunderboltOutlined />}
           >
-            Tich hop cua hang
+            Tích hợp cửa hàng
           </Button>
           <AddModel open={openModal} onOk={handleOk} onCancel={handleCancel} />
         </Space>

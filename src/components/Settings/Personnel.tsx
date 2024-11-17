@@ -55,6 +55,7 @@ export default function Genaral() {
             avtUrl: 'https://thucanhviet.com/wp-content/uploads/2017/09/pug-dog-dac-diem-nhan-dang-cho-mat-xe.jpg'
         },
     ]
+    const shopId = localStorage.getItem('shopId')
     return (
         <Layout className="px-4">
             <HeaderAction
@@ -62,8 +63,8 @@ export default function Genaral() {
                 isShowSearch={true}
                 inputPlaholder="Tìm kiếm cấu hình" />
             <Breadcrumb style={{ margin: '16px 0' }}>
-                <Breadcrumb.Item href="/shop/1/settings">Cấu hình</Breadcrumb.Item>
-                <Breadcrumb.Item href="/shop/1/settings">Nhân viên</Breadcrumb.Item>
+                <Breadcrumb.Item href={`/shop/${shopId}/settings`}>Cấu hình</Breadcrumb.Item>
+                <Breadcrumb.Item href={`/shop/${shopId}/settings`}>Nhân viên</Breadcrumb.Item>
                 <Breadcrumb.Item className="mt-3 text-sm text-[#0050b3] font-medium">Danh sách nhân viên</Breadcrumb.Item>
             </Breadcrumb>
             <Content className="overflow-auto overflow-x-hidden flex gap-5 h-screen">
