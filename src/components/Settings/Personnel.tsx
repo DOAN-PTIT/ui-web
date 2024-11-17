@@ -18,9 +18,7 @@ interface User {
     date_of_birth: string | null; 
     createdAt: string; 
 }
-interface Employees {
-    employees: User[]
-}
+
 export default function Genaral() {
     const dataRow = [
         {
