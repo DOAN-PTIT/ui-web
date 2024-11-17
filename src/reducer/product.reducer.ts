@@ -4,7 +4,10 @@ import { createProduct, getListProduct } from "@/action/product.action";
 const productReducer = createSlice({
     name: 'product',
     initialState: {
-        listProduct: [],
+        listProduct: {
+            products: [] as Product[],
+            totalCount: 0
+        },
         isLoading: false,
         createProduct: {}
     },

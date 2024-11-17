@@ -6,15 +6,16 @@ import {
 import { Button, Space } from "antd";
 
 interface ActionToolsProps {
-  callBack: () => void
+  callBack: () => void;
+  reloadCallBack: () => Promise<any>;
 }
 
 function ActionTools(props: ActionToolsProps) {
-  const { callBack } = props
+  const { callBack, reloadCallBack } = props
   return (
     <Space className="mb-5">
       <Button onClick={callBack} icon={<PlusOutlined />} type="primary" />
-      <Button icon={<SyncOutlined />}>Tải lại</Button>
+      <Button icon={<SyncOutlined />} onClick={reloadCallBack}>Tải lại</Button>
       <Button icon={<DownloadOutlined />}>Xuất Excel</Button>
     </Space>
   );

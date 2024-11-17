@@ -45,7 +45,7 @@ export const formatInputNumber = (value: any, currency: string) => {
   return formatValue;
 };
 
-export const formatNumber = (value: any, currency: string, prefix = true) => {
+export const formatNumber = (value: any, currency: string = "VND", prefix = true) => {
   const floatChar = getFloatChar(currency);
   value = value ? value.toString() : "0";
   if (

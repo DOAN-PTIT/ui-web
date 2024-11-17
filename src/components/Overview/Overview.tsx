@@ -1,14 +1,15 @@
 "use client";
 
-import _ from "lodash";
+import apiClient from "@/service/auth";
+import { getHostName } from "@/utils/tools";
 import {
-  UserOutlined,
-  PlusCircleOutlined,
-  EditOutlined,
   DeleteOutlined,
+  EditOutlined,
   LoginOutlined,
+  PlusCircleOutlined,
   SyncOutlined,
   ThunderboltOutlined,
+  UserOutlined
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -20,13 +21,12 @@ import {
   Space,
   Tooltip,
 } from "antd";
-import { useRouter, useSearchParams } from "next/navigation";
-import HeaderAction from "../HeaderAction/HeaderAction";
-import { useEffect, useState } from "react";
-import AddModel from "./components/ModelAdd";
 import axios from "axios";
-import { getHostName } from "@/utils/tools";
-import apiClient from "@/service/auth";
+import _ from "lodash";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import HeaderAction from "../HeaderAction/HeaderAction";
+import AddModel from "./components/ModelAdd";
 
 const { Content } = Layout;
 
@@ -150,7 +150,7 @@ function Overview() {
       .catch((error) => console.log(error));
   };
 
-  const handleCreateShopFb = async (param: { name: string, avatar: string }) => {
+  const handleCreateShopFb = async (param: {name: string, avatar: string, fb_shop_id: string}) => {
     const url = `${getHostName()}/user/integrate-fb-shop`;
 
     return await axios.post(url, param, {
@@ -170,7 +170,7 @@ function Overview() {
       <HeaderAction isShowSearch={false} title="Danh sách cửa hàng" />
       <Content className="p-8">
         <Space className="w-full justify-end" align="center">
-          <Button type="primary" icon={<SyncOutlined />}>
+          <Button type="primary" onClick={getListShop} icon={<SyncOutlined />}>
             Tải lại
           </Button>
           <Button
@@ -241,7 +241,7 @@ function Overview() {
                   <Card
                     key={page.id}
                     className="w-[300px] h-[150px]] hover:border-sky-500 transition-all ease-out cursor-pointer"
-                    onClick={() => handleCreateShopFb({ name: page.name, avatar: page.picture.data.url })}
+                    onClick={() => handleCreateShopFb({name: page.name, avatar: page.picture.data.url, fb_shop_id: page.id})}
                   >
                     <div className="p-1 text-center">
                       <Image

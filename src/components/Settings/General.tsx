@@ -1,14 +1,12 @@
 "use client"
 
-import { UploadOutlined } from "@ant-design/icons"
-import { Avatar, Breadcrumb, Button, Input, Layout, Select, Space, Upload } from "antd"
+import apiClient from "@/service/auth"
+import { Breadcrumb, Button, Input, Layout, Select } from "antd"
+import axios from "axios"
 import { useEffect, useState } from "react"
 import TitleH from "../Custom/TitleH"
 import TitleLabel from "../Custom/TitleLabel"
 import HeaderAction from "../HeaderAction/HeaderAction"
-import apiClient from "@/service/auth"
-import axios from "axios"
-import { getHostName } from "@/utils/tools"
 const { Content } = Layout
 
 interface ShopSettings {
@@ -42,7 +40,7 @@ export default function Genaral() {
         location: '',
         language: '',
         time_zone: '',
-        auto_product_code: false, 
+        auto_product_code: false,
         source_order: 'facebook',
     });
 
@@ -84,10 +82,7 @@ export default function Genaral() {
         try {
             const shopId = localStorage.getItem("shopId");
             const accessToken = localStorage.getItem("accessToken");
-
-            // Log request URL and form data
-            console.log("Request URL: ", `${getHostName()}/shop/setting/update/${shopId}`);
-            console.log("Form data being sent:", formData);
+            // console.log("Form data being sent:", formData);
 
             const res = await apiClient.post(`shop/setting/update/${shopId}`, formData, {
                 headers: {
@@ -123,61 +118,35 @@ export default function Genaral() {
                 <Breadcrumb.Item className="mt-3 text-sm text-[#0050b3] font-medium">Cài đặt chung</Breadcrumb.Item>
             </Breadcrumb>
             <Content className="bg-white rounded-lg overflow-auto overflow-x-hidden p-5 gap-5 h-screen">
-                <div className="grid grid-cols-2 w-full">
-                    <div className="col-span-1 p-5 mb-2 sm:grid-cols-1 lg:grid-cols-1 bg-white flex justify-center">
-                        <div className="">
-                            <Avatar
-                                className="w-[280px] h-[280px] mr-4 rounded-full object-cover"
-                                src={imageUrl || "https://huanluyencho119.vn/storage/9c/b8/9cb8sza53kwquhgx4wmgnll6g3wu_cach-huan-luyen-cho-phat-mot-chu-cho-khi-lam-sai-lieu-co-hieu-qua-nhu-mong-doi.jpg"} // Hiển thị ảnh hiện có hoặc ảnh mặc định
-                                alt="Ảnh đại diện"
-                            />
-                            <div className="flex justify-center mt-2">
-                                <Upload
-                                    showUploadList={false}
-                                    beforeUpload={handleUpload} // Hàm xử lý ảnh mới
-                                    accept="image/*" // Chỉ chấp nhận file ảnh
-                                >
-                                    <Button icon={<UploadOutlined />} className="p-1">
-                                        Thay đổi ảnh đại diện
-                                    </Button>
-                                </Upload>
-                            </div>
-                        </div>
+                <div className="grid grid-cols-4 w-full">
+                    <div>
+                        <TitleH className='mb-4' title='Thông tin cửa hàng' />
+                    </div>
+                    <div className="col-span-1 rounded-lg p-y mb-2 sm:col-span-1 lg:col-span-2 bg-white">
+
+                        <TitleLabel title='Ngôn ngữ:' />
+                        <Select
+                            className='w-full mb-4'
+                            value={formData.language}
+                            options={options}
+                            onChange={(value) => setFormData(prev => ({ ...prev, language: value }))}
+                        />
+                        <TitleLabel title='Múi giờ:' />
+                        <Input
+                            className='w-full mb-4'
+                            value={formData.time_zone}
+                            onChange={(e) => setFormData(prev => ({ ...prev, time_zone: e.target.value }))}
+                        />
+                        <TitleLabel title='Địa chỉ:' />
+                        <Input
+                            className='w-full mb-4'
+                            value={formData.location}
+                            onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                        />
 
                     </div>
-                    <div className="col-span-1 rounded-lg p-5 mb-2 sm:grid-cols-1 lg:grid-cols-1 bg-white">
-                        <div>
-                            <TitleH className='mb-4' title='Thông tin cửa hàng' />
-                            <TitleLabel title='Tên cửa hàng:' />
-                            <Input
-                                className='w-full mb-4'
-                                defaultValue="Shop 1"
-                                value={data?.id}
-                                onChange={(e) => setFormData(prev => ({ ...prev, id: e.target.value }))}
-                            />
-                            <TitleLabel title='Ngôn ngữ:' />
-                            <Select
-                                className='w-full mb-4'
-                                value={formData.language}
-                                options={options}
-                                onChange={(value) => setFormData(prev => ({ ...prev, language: value }))}
-                            />
-                            <TitleLabel title='Múi giờ:' />
-                            <Input
-                                className='w-full mb-4'
-                                value={formData.time_zone}
-                                onChange={(e) => setFormData(prev => ({ ...prev, time_zone: e.target.value }))}
-                            />
-                            <TitleLabel title='Địa chỉ:' />
-                            <Input
-                                className='w-full mb-4'
-                                value={formData.location}
-                                onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                            />
-                        </div>
-                        <div className="flex justify-end">
-                            <Button className='mt-4' type="primary" onClick={handleUpdate}>Lưu thay đổi</Button>
-                        </div>
+                    <div className="flex justify-end">
+                        <Button className='' type="primary" onClick={handleUpdate}>Lưu thay đổi</Button>
                     </div>
 
                 </div>
