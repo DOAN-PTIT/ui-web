@@ -22,21 +22,15 @@ import {
   Tooltip,
 } from "antd";
 import axios from "axios";
-<<<<<<< HEAD
 import _ from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import HeaderAction from "../HeaderAction/HeaderAction";
 import AddModel from "./components/ModelAdd";
-=======
-import { getHostName } from "@/utils/tools";
-import apiClient from "@/service/auth";
-import { Input } from "postcss";
 import { AppDispatch, RootState } from "@/store";
 import { connect } from "react-redux";
 import { getUserProfile } from "@/action/user.action";
 import { getCurrentShop } from "@/action/shop.action";
->>>>>>> 804ea05716091c0ac3c5d5f4c8a655467b027551
 
 const { Content } = Layout;
 
