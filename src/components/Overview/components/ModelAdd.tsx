@@ -13,18 +13,13 @@ import {
 import { useState } from "react";
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 import { RcFile } from 'antd/es/upload/interface';
+import apiClient from "@/service/auth";
 
 interface AddModelProps {
   open: boolean;
   onOk: (param: { name: string; avatar: any }) => Promise<void>;
   onCancel: () => void;
 }
-
-const getBase64 = (img: FileType, callback: (url: string) => void) => {
-  const reader = new FileReader();
-  reader.addEventListener("load", () => callback(reader.result as string));
-  reader.readAsDataURL(img);
-};
 
 const beforeUpload = (file: FileType) => {
   const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
@@ -74,6 +69,13 @@ function AddModel({ open, onOk, onCancel }: AddModelProps) {
     </button>
   );
 
+  // async function handleShopInfo() {
+  //   try {
+  //     const res = await apiClient.get(`/shop/${shopId}`)
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }
   return (
     <>
       <Modal

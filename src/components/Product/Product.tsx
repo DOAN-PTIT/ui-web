@@ -77,27 +77,27 @@ function Product(props: ProductProps) {
     {
       key: "TOTAL AMOUNT",
       dataIndex: "totalAmount",
-      title: "Tong so luong",
+      title: "Tổng số lượng",
     },
     {
       key: "TOTAL VARIATION",
       dataIndex: "totalVariation",
-      title: "Tong so mau ma",
+      title: "Tổng số mẫu mã",
     },
     {
       key: "SALE  PRICE",
       dataIndex: "salePrice",
-      title: "Gia ban",
+      title: "Giá bán",
     },
     {
       key: "IMPORTED PRICE",
       dataIndex: "importedPrice",
-      title: "Gia nhap",
+      title: "Giá nhập",
     },
     {
       key: "NOTE",
       dataIndex: "note",
-      title: "Ghi chu",
+      title: "Ghi chú",
     },
   ];
 
@@ -105,31 +105,31 @@ function Product(props: ProductProps) {
     {
       key: "ID",
       dataIndex: "id",
-      title: "Ma mau",
+      title: "Mẫu mã",
       width: 120,
       fixed: "left",
     },
     {
       key: "IMAGE",
       dataIndex: "image",
-      title: "Hinh anh",
+      title: "Hình ảnh",
       width: 120,
       fixed: "left",
     },
     {
       key: "BARCODE",
       dataIndex: "barcode",
-      title: "Ma vach",
+      title: "Mã vạch",
     },
     {
       key: "SALE PRICE",
       dataIndex: "salePrice",
-      title: "Gia ban",
+      title: "Giá bán",
     },
     {
       key: "AMOUNT",
       dataIndex: "amount",
-      title: "So luong",
+      title: "Số lượng",
     },
   ];
 
@@ -247,7 +247,7 @@ function Product(props: ProductProps) {
         />
       </Layout.Content>
       <Modal
-        title="Thiet lap san pham"
+        title="Thiết lập sản phẩm"
         open={modalVisiable}
         width={1200}
         styles={{

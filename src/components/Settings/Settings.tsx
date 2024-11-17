@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation"
 const { Content } = Layout
 function Settings() {
     const router = useRouter()
-  
+    const shopId = localStorage.getItem('shopId')
     return (
         <Layout className="px-4">
             <HeaderAction
@@ -26,8 +26,8 @@ function Settings() {
                                 </div>
                                 <div className="text-[#101828] text-base font-semibold">Cửa hàng</div>
                             </div>
-                            <Link href={'/shop/1/settings/general'}>
-                                <div  className="mt-3 text-sm text-[#0050b3] font-medium">Cài đặt chung</div>
+                            <Link href={`/shop/${shopId}/settings/general`}>
+                                <div className="mt-3 text-sm text-[#0050b3] font-medium">Cài đặt chung</div>
                             </Link>
                         </div>
                         <div className="">
@@ -37,7 +37,7 @@ function Settings() {
                                 </div>
                                 <div className="text-[#101828] text-base font-semibold">Nhân viên</div>
                             </div>
-                            <Link href={'/shop/1/settings/personnel'}>
+                            <Link href={`/shop/${shopId}/settings/personnel`}>
                                 <div onClick={() => router.push('/general')} className="mt-3 text-sm text-[#0050b3] font-medium">Danh sách nhân viên</div>
                             </Link>
                         </div>
@@ -48,7 +48,7 @@ function Settings() {
                                 </div>
                                 <div className="text-[#101828] text-base font-semibold">Khách hàng</div>
                             </div>
-                            <Link href={'/shop/1/settings/customer'}>
+                            <Link href={`/shop/${shopId}/settings/customer`}>
                                 <div className="mt-3 text-sm text-[#0050b3] font-medium">Cài đặt khách hàng</div>
                             </Link>
                         </div>

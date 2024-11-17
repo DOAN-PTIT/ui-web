@@ -2,13 +2,23 @@
 
 import { DeleteOutlined, FilterOutlined, PlusOutlined } from "@ant-design/icons";
 import { Avatar, Breadcrumb, Button, Input, Layout, Select, TimePicker } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TitleH from "../Custom/TitleH";
 import HeaderAction from "../HeaderAction/HeaderAction";
 import AuthCard from "./components/Card";
 import ModalAddCustomer from "./components/ModalAddCustomer";
+import apiClient from "@/service/auth";
 const { Content } = Layout
 const { Search } = Input;
+interface User {
+    id: number;
+    name: string;
+    email: string;
+    phone_number: string | null; 
+    date_of_birth: string | null; 
+    createdAt: string; 
+}
+
 export default function Genaral() {
     const dataRow = [
         {
@@ -27,8 +37,10 @@ export default function Genaral() {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [openActor, setOpenActor] = useState(false)
     const [checkId, setCheckId] = useState()
+    const [dataPersonnel, setDataPersonnel] = useState<User[]>()
     const handleOpenActor = (id: any) => {
         setOpenActor(true);
+        localStorage.setItem('personId', id)
         setCheckId(id)
     }
     const showModal = () => {
@@ -55,6 +67,19 @@ export default function Genaral() {
             avtUrl: 'https://thucanhviet.com/wp-content/uploads/2017/09/pug-dog-dac-diem-nhan-dang-cho-mat-xe.jpg'
         },
     ]
+    const shopId = localStorage.getItem('shopId')
+    async function fetchListPersonnel() {
+        try {
+            const res = await apiClient.get(`shop/${shopId}/employees?page=1&sortBy=CREATED_AT_ASC`)
+            setDataPersonnel(res.data.employees)
+            console.log(res.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    useEffect(() => {
+        fetchListPersonnel()
+    }, [])
     return (
         <Layout className="px-4">
             <HeaderAction
@@ -62,8 +87,8 @@ export default function Genaral() {
                 isShowSearch={true}
                 inputPlaholder="Tìm kiếm cấu hình" />
             <Breadcrumb style={{ margin: '16px 0' }}>
-                <Breadcrumb.Item href="/shop/1/settings">Cấu hình</Breadcrumb.Item>
-                <Breadcrumb.Item href="/shop/1/settings">Nhân viên</Breadcrumb.Item>
+                <Breadcrumb.Item href={`/shop/${shopId}/settings`}>Cấu hình</Breadcrumb.Item>
+                <Breadcrumb.Item href={`/shop/${shopId}/settings`}>Nhân viên</Breadcrumb.Item>
                 <Breadcrumb.Item className="mt-3 text-sm text-[#0050b3] font-medium">Danh sách nhân viên</Breadcrumb.Item>
             </Breadcrumb>
             <Content className="overflow-auto overflow-x-hidden flex gap-5 h-screen">
@@ -81,26 +106,30 @@ export default function Genaral() {
                             </div>
                         </div>
                         <div className="p-4 ">
-                            {customer.map(i => (
+                            {dataPersonnel?.map(i => (
                                 <div key={i.id} onClick={() => handleOpenActor(i.id)} className="rounded-lg flex items-center justify-between text-sm px-2 py-1 mb-1 bg-cyan-100 cursor-pointer">
                                     <div className="flex">
-                                        <Avatar src={i.avtUrl} alt="avt" className="mr-2 size-6" />
+                                        <Avatar src={null} alt="avt" className="mr-2 size-6" />
                                         <div>{i.name}</div>
                                     </div>
                                     <div><DeleteOutlined /></div>
                                 </div>
+                                // <div key={i?.id || null}>
+
+                                //     {i.id}
+                                // </div>
                             ))}
 
                         </div>
                     </div>
-                    {openActor && customer.find(i => i.id === checkId) ? (
+                    {openActor && dataPersonnel?.find(i => i.id === checkId) ? (
                         <div className="col-span-7 rounded-lg py-4 px-6 bg-white">
-                            {customer
+                            {dataPersonnel
                                 .filter(i => i.id === checkId)
                                 .map(i => (
                                     <div key={i.id} >
                                         <div className="flex items-center gap-4">
-                                            <Avatar src={i.avtUrl} alt="avt" size={48} />
+                                            <Avatar src={null} alt="avt" size={48} />
                                             <div className="flex-1">
                                                 <div className="flex items-center justify-between">
                                                     <div className="text-base font-semibold">{i.name}</div>

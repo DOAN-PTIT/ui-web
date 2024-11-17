@@ -1,15 +1,15 @@
 "use client";
 
-import _ from "lodash";
+import apiClient from "@/service/auth";
+import { getHostName } from "@/utils/tools";
 import {
-  UserOutlined,
-  PlusCircleOutlined,
-  EditOutlined,
   DeleteOutlined,
+  EditOutlined,
   LoginOutlined,
+  PlusCircleOutlined,
   SyncOutlined,
   ThunderboltOutlined,
-  PlusOutlined,
+  UserOutlined
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -21,11 +21,14 @@ import {
   Space,
   Tooltip,
 } from "antd";
-import { useRouter, useSearchParams } from "next/navigation";
-import HeaderAction from "../HeaderAction/HeaderAction";
-import { useEffect, useState } from "react";
-import AddModel from "./components/ModelAdd";
 import axios from "axios";
+<<<<<<< HEAD
+import _ from "lodash";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import HeaderAction from "../HeaderAction/HeaderAction";
+import AddModel from "./components/ModelAdd";
+=======
 import { getHostName } from "@/utils/tools";
 import apiClient from "@/service/auth";
 import { Input } from "postcss";
@@ -33,6 +36,7 @@ import { AppDispatch, RootState } from "@/store";
 import { connect } from "react-redux";
 import { getUserProfile } from "@/action/user.action";
 import { getCurrentShop } from "@/action/shop.action";
+>>>>>>> 804ea05716091c0ac3c5d5f4c8a655467b027551
 
 const { Content } = Layout;
 
@@ -48,11 +52,11 @@ interface FBShopProps {
 }
 export interface ListShop {
   avatar: string;
-  createdAt: string; 
+  createdAt: string;
   description: string;
   id: number;
   name: string;
-  updatedAt: string; 
+  updatedAt: string;
 }
 
 interface OverviewProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> {}
@@ -65,7 +69,7 @@ function Overview(props: OverviewProps) {
   const [isLoadingFbPage, setIsLoadingFbPage] = useState(false);
   const [openIntegration, setOpenIntegration] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [dataListShop,setDataListShop] = useState<ListShop[]>([])
+  const [dataListShop, setDataListShop] = useState<ListShop[]>([])
   useEffect(() => {
     getListShop();
     getCurrentUser()
@@ -132,20 +136,20 @@ function Overview(props: OverviewProps) {
 
   const handleOk = async (param: { name: string; avatar: any }) => {
     const createShopFormData = new FormData();
-    createShopFormData.append('name', param.name);      
+    createShopFormData.append('name', param.name);
     createShopFormData.append('avatar', param.avatar);
-    
+
     const url = `/user/create-shop`;
 
     return await apiClient
-    .post(url, createShopFormData, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        // 'Content-Type': 'multipart/form-data',
-      },
-    })
-    .then((res) => console.log(res))
-    .catch((error) => console.log(error));
+      .post(url, createShopFormData, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          // 'Content-Type': 'multipart/form-data',
+        },
+      })
+      .then((res) => console.log(res))
+      .catch((error) => console.log(error));
   };
 
   const handleCreateShopFb = async (param: {name: string, avatar: string, fb_shop_id: string}) => {
@@ -156,7 +160,7 @@ function Overview(props: OverviewProps) {
         Authorization: `Bearer ${accessToken}`,
       }
     }).then(res => console.log(res))
-    .catch(error => console.log(error))
+      .catch(error => console.log(error))
   }
 
   const handleCancel = () => {
@@ -168,7 +172,7 @@ function Overview(props: OverviewProps) {
       <HeaderAction isShowSearch={false} title="Danh sách cửa hàng" />
       <Content className="p-8">
         <Space className="w-full justify-end" align="center">
-          <Button type="primary" icon={<SyncOutlined />}>
+          <Button type="primary" onClick={getListShop} icon={<SyncOutlined />}>
             Tải lại
           </Button>
           <Button
@@ -184,7 +188,7 @@ function Overview(props: OverviewProps) {
             loading={isLoadingFbPage}
             icon={<ThunderboltOutlined />}
           >
-            Tich hop cua hang
+            Tích hợp cửa hàng
           </Button>
           <AddModel open={openModal} onOk={handleOk} onCancel={handleCancel} />
         </Space>
@@ -196,7 +200,7 @@ function Overview(props: OverviewProps) {
                 className="w-[300px] min-h-[250px]"
                 title={
                   <div className="p-5 text-center">
-                    <Avatar icon={<UserOutlined />} size={80} />
+                    <Avatar src={shop.avatar} icon={<UserOutlined />} size={80} />
                     <h1 className="mt-4">{shop.name}</h1>
                   </div>
                 }

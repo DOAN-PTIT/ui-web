@@ -1,55 +1,71 @@
-import axios from "axios";
-import { getHostName } from "@/utils/tools";
+import axios from 'axios';
+import { getHostName } from '@/utils/tools';
 
-
- function saveTokenWithExpiration(token:any, expiresIn = 1800) { 
-    const expirationTime = Date.now() + expiresIn * 1000;
-    localStorage.setItem('accessToken', token);
-    localStorage.setItem('tokenExpiration', expirationTime.toString());
-}
-
-
-function isTokenExpired() {
-    const expirationTime = localStorage.getItem('tokenExpiration');
-    if (!expirationTime) return true;
-
-    const currentTime = Date.now();
-    return currentTime >= parseInt(expirationTime);
-}
-
-
+// Tạo axios instance
 const apiClient = axios.create({
-    baseURL: getHostName(),
+    baseURL: getHostName(), 
+    headers: {
+        'Content-Type': 'application/json',
+    },
 });
 
-apiClient.interceptors.request.use(async (config) => {
-    let accessToken = null;
-    let refreshToken = null
-    if (typeof window !== "undefined") {
-        accessToken = localStorage.getItem("accessToken");
-        refreshToken = localStorage.getItem("refreshToken");
+
+async function refreshAccessToken() {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) {
+        throw new Error("Refresh token không tồn tại.");
     }
 
-    if (accessToken) {
-        if (isTokenExpired() && refreshToken) {
-            try {
-                const response = await axios.post(`${getHostName()}/auth/refresh-token`, {
-                    token: refreshToken,
-                });
+    try {
+        const response = await axios.post(`${getHostName()}/auth/refresh-token`, {
+            refreshToken,
+        });
 
-                
-                accessToken = response.data.accessToken;
-                saveTokenWithExpiration(accessToken, 1800);
-                config.headers.Authorization = `Bearer ${accessToken}`;
-            } catch (error) {
-                console.error("Lỗi khi làm mới token:", error);
-            }
-        } else {
-            config.headers.Authorization = `Bearer ${accessToken}`;
-        }
+        const newAccessToken = response.data.accessToken;
+        localStorage.setItem('accessToken', newAccessToken); 
+        return newAccessToken;
+    } catch (error) {
+        console.error("Lấy lại access token thất bại:", error);
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken'); 
+        throw error;
     }
+}
 
+
+apiClient.interceptors.request.use((config) => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+    }
     return config;
 });
+
+
+apiClient.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+        const originalRequest = error.config;
+
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+
+            try {
+                const newAccessToken = await refreshAccessToken();
+                apiClient.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
+                originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+                return apiClient(originalRequest); 
+            } catch (refreshError) {
+                console.error("Làm mới token thất bại:", refreshError);
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                window.location.href = '/login'; 
+                return Promise.reject(refreshError);
+            }
+        }
+
+        return Promise.reject(error);
+    }
+);
 
 export default apiClient;

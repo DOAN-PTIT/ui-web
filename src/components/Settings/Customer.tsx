@@ -9,6 +9,7 @@ const { Content } = Layout
 export default function Customer() {
     const [openSetVoucher, setOpenSetVoucher] = useState(false)
     const [openForm, setOpenForm] = useState(false)
+    const shopId = localStorage.getItem('shopId')
     const handleOpenSetVoucher = (checked: boolean) => {
         setOpenSetVoucher(checked);
     }
@@ -28,8 +29,8 @@ export default function Customer() {
                 isShowSearch={true}
                 inputPlaholder="Tìm kiếm cấu hình" />
             <Breadcrumb style={{ margin: '16px 0' }}>
-                <Breadcrumb.Item href="/shop/1/settings">Cấu hình</Breadcrumb.Item>
-                <Breadcrumb.Item href="/shop/1/settings">Khách hàng</Breadcrumb.Item>
+                <Breadcrumb.Item href={`/shop/${shopId}/settings`}>Cấu hình</Breadcrumb.Item>
+                <Breadcrumb.Item href={`/shop/${shopId}/settings`}>Khách hàng</Breadcrumb.Item>
                 <Breadcrumb.Item className="mt-3 text-sm text-[#0050b3] font-medium">Cài đặt khách hàng</Breadcrumb.Item>
             </Breadcrumb>
             <Content className="overflow-auto overflow-x-hidden flex gap-5 h-screen">

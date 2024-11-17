@@ -14,13 +14,13 @@ import HeaderAction from "../HeaderAction/HeaderAction";
 import PassModel from './components/ModelPass';
 const { Content, Sider } = Layout;
 interface Profile {
-    access_token: string 
+    access_token: string
     date_of_birth: string  // Nếu bạn có định dạng ngày tháng cụ thể, có thể thay đổi kiểu dữ liệu
     email: string;
-    fb_id: string 
+    fb_id: string
     id: number;
     name: string;
-    phone_number: string 
+    phone_number: string
     role: string;
 }
 function Settings() {
@@ -58,7 +58,7 @@ function Settings() {
     async function fetchProfile() {
         const accessToken = localStorage.getItem('accessToken')
         try {
-            const res = await apiClient.get("/user/profile",{
+            const res = await apiClient.get("/user/profile", {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                 }
@@ -70,9 +70,9 @@ function Settings() {
         }
 
     }
-    useEffect(()=> {
+    useEffect(() => {
         fetchProfile()
-    },[])
+    }, [])
     return (
         <Layout className="bg-[#f2f4f7] min-h-screen">
             <Sider
@@ -110,7 +110,7 @@ function Settings() {
 
                     />
                 </div>
-                
+
 
                 <div className="rounded-xl bg-[#eaecf0]">
                     <div className="flex items-center mx-5" />
@@ -148,7 +148,7 @@ function Settings() {
                                     <div className='mb-4'>
                                         {/* <div className='col-span-5'> */}
                                         <TitleLabel title='Họ và tên:' />
-                                        <Input placeholder="Nhập họ và tên đầy đủ" value={dataProfile?.name}/>
+                                        <Input placeholder="Nhập họ và tên đầy đủ" value={dataProfile?.name} />
                                         {/* </div> */}
                                         {/* <div className='col-span-5'>
                                             <TitleLabel title='Tên:' />
@@ -161,11 +161,11 @@ function Settings() {
                                     </div>
                                     <div className='mb-4'>
                                         <TitleLabel title='Số điện thoại:' />
-                                        <Input placeholder="Nhập SĐT" value={dataProfile?.phone_number}/>
+                                        <Input placeholder="Nhập SĐT" value={dataProfile?.phone_number} />
                                     </div>
                                     <div className='mb-4'>
                                         <TitleLabel title='Email:' />
-                                        <Input placeholder="Nhập email" value={dataProfile?.email}/>
+                                        <Input placeholder="Nhập email" value={dataProfile?.email} />
                                     </div>
                                     <div className='flex justify-end'>
                                         <Button type="primary">Lưu thay đổi</Button>
@@ -195,7 +195,9 @@ function Settings() {
                                         </div>
                                         <div className='flex items-center'>
                                             <LinkSimple size={18} color="#51a9e9" />
-                                            <Button className='p-1' type="link">Liên kết với tài khoản Facebook</Button>
+                                            <Button className='p-1' type="link">
+                                                {dataProfile?.fb_id == null ? 'Liên kết với tài khoản Facebook' : `${dataProfile?.fb_id}`}
+                                            </Button>
                                         </div>
                                     </div>
                                 </div>
