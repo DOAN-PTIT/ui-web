@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createProduct, getListProduct } from "@/action/product.action";
+import { createProduct, getListProduct, getListProductFBShop } from "@/action/product.action";
 
 const productReducer = createSlice({
     name: 'product',
@@ -39,6 +39,16 @@ const productReducer = createSlice({
                 state.createProduct = action.payload;
             })
             .addCase(createProduct.rejected, (state) => {
+                state.isLoading = false;
+            })
+            .addCase(getListProductFBShop.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(getListProductFBShop.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.listProduct = action.payload;
+            })
+            .addCase(getListProductFBShop.rejected, (state) => {
                 state.isLoading = false;
             })
     }
