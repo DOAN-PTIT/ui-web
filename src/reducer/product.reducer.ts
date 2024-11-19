@@ -9,7 +9,7 @@ const productReducer = createSlice({
             totalCount: 0
         },
         isLoading: false,
-        createProduct: {}
+        createProduct: {} as any
     },
     reducers: {
         setListProduct: (state, action) => {
