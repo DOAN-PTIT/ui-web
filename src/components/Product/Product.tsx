@@ -10,17 +10,28 @@ import {
   Row,
   Select,
   Table,
-  Avatar
+  Dropdown,
+  Image,
 } from "antd";
 import HeaderAction from "../HeaderAction/HeaderAction";
 import ActionTools from "../ActionTools/ActionTools";
 import type { TableProps } from "antd";
-import { useEffect, useState } from "react";
-import { DeleteOutlined, PlusOutlined, ProductOutlined } from "@ant-design/icons";
+import { ChangeEvent, useEffect, useState } from "react";
+import {
+  DeleteOutlined,
+  PlusOutlined,
+  ProductOutlined,
+} from "@ant-design/icons";
 import { AppDispatch, RootState } from "@/store";
-import { createProduct, getListProduct, getListProductFBShop } from "@/action/product.action";
+import {
+  createProduct,
+  getListProduct,
+  getListProductFBShop,
+} from "@/action/product.action";
 import { connect } from "react-redux";
 import { formatNumber } from "@/utils/tools";
+import defaultImage from "../../assets/default.png";
+import apiClient from "@/service/auth";
 
 interface ProductType {
   id: string;
@@ -45,20 +56,30 @@ interface ProductProps
     ReturnType<typeof mapDispatchToProps> {}
 
 function Product(props: ProductProps) {
-  const { getListProduct, getListProductFBShop, listProduct, currentShop, currentUser } = props;
+  const {
+    getListProduct,
+    getListProductFBShop,
+    listProduct,
+    currentShop,
+    currentUser,
+    createProduct
+  } = props;
 
   const [modalVisiable, setModalVisiable] = useState(false);
   const [createProductParams, setCreateProductParams] = useState<any>({});
   const [variationData, setVariationData] = useState([]);
-
-  let shopId: any;
-  if (typeof window !== "undefined") {
-    shopId = localStorage.getItem("shopId");
+  interface VariationParam {
+    index: number;
+    [key: string]: any;
   }
 
+  const [createVariationParams, setCreateVariationParams] = useState<
+    VariationParam[]
+  >([]);
+
   useEffect(() => {
-    getListProduct({ shopId, page: 1 })
-  }, [shopId]);
+    getListProduct({ shopId: currentShop.id, page: 1 });
+  }, [currentShop.id]);
 
   const columns: TableProps<ProductType>["columns"] = [
     {
@@ -150,9 +171,11 @@ function Product(props: ProductProps) {
   });
 
   const callBackSyncFBCatalog = () => {
-    const { currentUser, currentShop } = props;
-    return getListProductFBShop({ access_token: currentUser.access_token, fb_shop_id: currentShop.fb_shop_id });
-  }
+    return getListProductFBShop({
+      access_token: currentUser.access_token,
+      fb_shop_id: currentShop.fb_shop_id,
+    });
+  };
 
   const getData: () => TableProps<ProductType>["dataSource"] = () => {
     return listProduct?.products
@@ -178,14 +201,30 @@ function Product(props: ProductProps) {
     setVariationData([]);
   };
 
-  const handleCreateProduct = () => {
+  const handleCreateProduct = async () => {
     const { createProduct } = props;
-    createProduct({ ...createProductParams, shopId });
+    console.log(createVariationParams);
+    await createProduct({ ...createProductParams, shopId: currentShop.id });
+    if(createVariationParams.length > 0) {
+      await handleCreateVariations();
+    }
   };
+
+  const handleCreateVariations = async () => {
+    const url = `/shop/${currentShop.id}/8/create-variations`;
+    return await apiClient
+      .post(url, createVariationParams )
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   const reloadCallBack = async () => {
     const { getListProduct } = props;
-    return await getListProduct({ shopId, page: 1 });
+    return await getListProduct({ shopId: currentShop.id, page: 1 });
   };
 
   const onInputChange = (key: string, value: any) => {
@@ -195,26 +234,65 @@ function Product(props: ProductProps) {
   const handleAddVariationColumn = () => {
     const newVariationData = [...variationData];
     const newVariation = {
-      id: <Input defaultValue={""} />,
-      image: <Avatar icon={<ProductOutlined />} />,
-      barcode: <Input defaultValue={""} />,
-      salePrice: <Input defaultValue={formatNumber(0)} />,
-      amount: <Input defaultValue={formatNumber(0)} />,
-    };
-
+      id: <Input name="variation_code" />,
+      image: (
+        <Dropdown menu={{ items: [{ label: "Chỉnh sửa", key: "edit-image" }] }}>
+          <Image alt="" src={defaultImage.src} preview={false} />
+        </Dropdown>
+      ),
+      barcode: <Input name="barcode" />,
+      salePrice: <Input name="retail_price" />,
+      amount: <Input name="amount" />,
+    } as never;
     newVariationData.unshift(newVariation);
 
     setVariationData(newVariationData);
-  }
+  };
 
   const renderTitleVariation = () => {
     return (
       <div className="flex justify-between">
-        <Input.Search placeholder="Tim kiem mau ma" className="w-[180px]" />
-        <Button icon={<PlusOutlined />} type="primary" onClick={handleAddVariationColumn}>Them mau ma</Button>
+        <Input.Search placeholder="Tìm kiếm mẫu mã" className="w-[180px]" />
+        <Button
+          icon={<PlusOutlined />}
+          type="primary"
+          onClick={handleAddVariationColumn}
+        >
+          Thêm mẫu mã
+        </Button>
       </div>
-    )
-  }
+    );
+  };
+
+  const handleUpdateStateCreateVariation = (index: number, key: string, value: string | number) => {
+    if (!key || !value) return;
+
+    const exitVariation = createVariationParams.find(
+      (item) => item.index === index
+    );
+    const newVariation = {
+      ...exitVariation,
+      [key]: value,
+      price_at_counter: 0,
+      // image: defaultImage,
+      index,
+    };
+
+    if (exitVariation) {
+      setCreateVariationParams((prev) => {
+        return prev.map((item) => {
+          if (item.index === index) {
+            return newVariation;
+          }
+          return item;
+        });
+      });
+    } else {
+      setCreateVariationParams((prev) => {
+        return [...prev, newVariation];
+      });
+    }
+  } 
 
   return (
     <Layout>
@@ -316,6 +394,18 @@ function Product(props: ProductProps) {
             columns={columnsVariation}
             dataSource={getDataVariation()}
             title={renderTitleVariation}
+            onRow={(record, rowIndex): any => {
+              return {
+                //current value
+                onClick: (e: ChangeEvent<HTMLInputElement>) => {
+                  handleUpdateStateCreateVariation(rowIndex as number, e.target.name, e.target.value);
+                },
+                // previous value
+                onBlur: (e: ChangeEvent<HTMLInputElement>) => {
+                  handleUpdateStateCreateVariation(rowIndex as number, e.target.name, e.target.value);
+                },
+              };
+            }}
           />
         </Layout>
       </Modal>
@@ -327,9 +417,10 @@ const mapStateToProps = (state: RootState) => {
   return {
     isLoading: state.productReducer.isLoading,
     listProduct: state.productReducer.listProduct,
-    totalPage: state.productReducer.listProduct.totalCount,
+    totalPage: state.productReducer.listProduct?.totalCount || 0,
     currentShop: state.shopReducer.shop,
     currentUser: state.userReducer.user,
+    createProduct: state.productReducer.createProduct,
   };
 };
 
