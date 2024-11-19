@@ -1,7 +1,8 @@
 "use client";
 
 import moment from "moment";
-import { Layout, Modal, Table, Input, Divider, DatePicker, Space, Button, message, notification, Avatar } from "antd";
+import Avatar from "react-avatar";
+import { Layout, Modal, Table, Input, Divider, DatePicker, Space, Button, message, notification } from "antd";
 import HeaderAction from "../HeaderAction/HeaderAction";
 import ActionTools from "../ActionTools/ActionTools";
 import type { TableProps } from "antd";
@@ -67,7 +68,7 @@ function Customer(props: CustomerProps) {
       render: (text: string, record: any) => {
         return (
           <div>
-            <Avatar icon={<UserOutlined />} className="mr-5" />
+            <Avatar name={text} size="30" round className="mr-5" />
             {text}
           </div>
         );
