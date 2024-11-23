@@ -87,7 +87,6 @@ function ProductSearchBar(props: ProductSearchBarProps) {
       value={null}
       onChange={(value) => {
         handleSelectedProduct(value);
-        console.log(selectedProduct);
       }}
       notFoundContent={
         isLoading ? (
