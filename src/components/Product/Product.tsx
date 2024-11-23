@@ -40,11 +40,9 @@ function Product(props: ProductProps) {
   const {
     getListProduct,
     getListProductFBShop,
-    createVariation,
     listProduct,
     currentShop,
     currentUser,
-    createProduct,
   } = props;
 
   useEffect(() => {

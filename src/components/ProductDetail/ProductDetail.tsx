@@ -5,7 +5,6 @@ import {
 } from "@/action/product.action";
 import { createVariation } from "@/action/variation.action";
 import { AppDispatch, RootState } from "@/store";
-import { formatNumber } from "@/utils/tools";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   TableProps,
@@ -65,7 +64,7 @@ function ProductDetail(props: ProductDetailProps) {
 
   const handleDeleteVariationColumn = (index: any) => {
     const indexSelectedColumn = variationData.findIndex(
-      (item) => item.index === index
+      (item: any) => item.index === index
     );
 
     const newVariationData = [...variationData];
@@ -134,7 +133,7 @@ function ProductDetail(props: ProductDetailProps) {
     }).then((res) => {
       if (res.payload) {
         const { id: product_id } = res.payload;
-        createVariationParams.forEach(async (variation) => {
+        createVariationParams.forEach(async (variation: any) => {
           delete variation.index;
           await createVariation({
             ...variation,
