@@ -7,6 +7,7 @@ const reducer = createSlice({
         shop: {
             fb_shop_id: "",
             id: 0,
+            name: "",
         },
         isLoading: false
     },
