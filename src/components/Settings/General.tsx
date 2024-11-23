@@ -1,12 +1,13 @@
 "use client"
 
 import apiClient from "@/service/auth"
-import { Breadcrumb, Button, Input, Layout, Select } from "antd"
+import { Breadcrumb, Button, Input, Layout, message, Popconfirm, PopconfirmProps, Select } from "antd"
 import axios from "axios"
 import { useEffect, useState } from "react"
 import TitleH from "../Custom/TitleH"
 import TitleLabel from "../Custom/TitleLabel"
 import HeaderAction from "../HeaderAction/HeaderAction"
+import { QuestionCircleOutlined } from "@ant-design/icons"
 const { Content } = Layout
 
 interface ShopSettings {
@@ -44,12 +45,12 @@ export default function Genaral() {
         source_order: 'facebook',
     });
 
-    const handleUpload = (file: File) => {
-        const reader = new FileReader();
-        reader.onload = () => setImageUrl(reader.result as string);
-        reader.readAsDataURL(file);
-        return false;
-    };
+    // const handleUpload = (file: File) => {
+    //     const reader = new FileReader();
+    //     reader.onload = () => setImageUrl(reader.result as string);
+    //     reader.readAsDataURL(file);
+    //     return false;
+    // };
 
     const [data, setData] = useState<ShopSettings>();
 
@@ -90,6 +91,8 @@ export default function Genaral() {
                 },
             });
             console.log("Response data:", res.data);
+            message.success('Đã lưu');
+
             setData(res.data);
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -104,8 +107,13 @@ export default function Genaral() {
 
     useEffect(() => {
         GetSetting();
-    }, []);
+    }, [0]);
 
+
+    const cancel: PopconfirmProps['onCancel'] = (e) => {
+        console.log(e);
+        message.error('Chưa lưu');
+    };
     return (
         <Layout className="px-4">
             <HeaderAction
@@ -145,8 +153,21 @@ export default function Genaral() {
                         />
 
                     </div>
-                    <div className="flex justify-end">
+                    {/* <div className="flex justify-end">
                         <Button className='' type="primary" onClick={handleUpdate}>Lưu thay đổi</Button>
+                    </div> */}
+                    <div className="flex justify-end">
+                        <Popconfirm
+                            title="Lưu cài đặt"
+                            description="Bạn có chắc chắn lưu cài đặt này?"
+                            onConfirm={handleUpdate}
+                            onCancel={cancel}
+                            okText="Đồng ý"
+                            cancelText="Không"
+                            icon={<QuestionCircleOutlined style={{ color: '#9ecbf5' }} />}
+                        >
+                            <Button type="primary">Lưu cài đặt</Button>
+                        </Popconfirm>
                     </div>
 
                 </div>
