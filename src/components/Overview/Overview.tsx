@@ -18,6 +18,7 @@ import {
   Card,
   Image,
   Layout,
+  message,
   Modal,
   notification,
   Space,
@@ -148,11 +149,16 @@ function Overview(props: OverviewProps) {
   };
 
   const handleOk = async (param: { name: string; avatar: any }) => {
-    const { name, avatar } = param;
+    if (!param.name || !param.avatar) {
+      console.error("Missing name or avatar:", param);
+      return;
+    }
 
     const createShopFormData = new FormData();
-    createShopFormData.append("name", name);
-    if (avatar) createShopFormData.append("avatar", avatar);
+    createShopFormData.append("name", param.name);
+    createShopFormData.append("avatar", param.avatar);
+
+    console.log("FormData Preview:", Array.from(createShopFormData.entries()));
 
     const url = `/user/create-shop`;
 
@@ -160,59 +166,26 @@ function Overview(props: OverviewProps) {
       .post(url, createShopFormData, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          // 'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data", 
         },
       })
-      .then((res) => {
-        notification.success({
-          message: "Tạo cửa hàng thành công",
-          description: "Cửa hàng của bạn đã được tạo thành công",
-        });
-
-        getListShop();
-        setOpenModal(false);
-
-        return res.data;
-      })
-      .catch((error) => {
-        notification.error({
-          message: "Tạo cửa hàng thất bại",
-          description: error.response.data.message,
-        });
-      });
+      .then(message.success("Thêm cửa hàng thành công!"))
+      .then(()=>setOpenModal(false))
+      .then(()=>getListShop())
+      .catch((error) => console.log("Error:", error));
   };
 
-  const handleCreateShopFb = async (param: {
-    name: string;
-    avatar: string;
-    fb_shop_id: string;
-  }) => {
+
+  const handleCreateShopFb = async (param: {name: string, avatar: string, fb_shop_id: string}) => {
     const url = `${getHostName()}/user/integrate-fb-shop`;
 
-    return await axios
-      .post(url, param, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-      .then((res) => {
-        notification.success({
-          message: "Tạo cửa hàng thành công",
-          description: "Cửa hàng của bạn đã được tạo thành công",
-        });
-
-        getListShop();
-        setOpenIntegration(false);
-
-        return res.data;
-      })
-      .catch((error) => {
-        notification.error({
-          message: "Tạo cửa hàng thất bại",
-          description: error.response.data.message,
-        });
-      });
-  };
+    return await apiClient.post(url, param, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      }
+    }).then(res => console.log(res))
+      .catch(error => console.log(error))
+  }
 
   const handleCancel = () => {
     setOpenModal(false);
@@ -351,8 +324,8 @@ const mapStateToProps = (state: RootState) => {
 const mapDispatchToProps = (dispatch: AppDispatch) => {
   return {
     getCurrentUser: () => dispatch(getUserProfile()),
-    getCurrentShop: (data) => dispatch(getCurrentShop(data)),
-  };
-};
+    getCurrentShop: (data:any) => dispatch(getCurrentShop(data))
+  }
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(Overview);

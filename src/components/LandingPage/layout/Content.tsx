@@ -49,7 +49,7 @@ export default function LandingContent() {
                         <Image
                             src={ImageEx}
                             alt=''
-                            className='h-full object-cover' // Cập nhật để cắt phần tràn của ảnh
+                            className='h-full object-cover' 
                         />
                     </div>
                 </div>
