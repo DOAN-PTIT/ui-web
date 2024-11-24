@@ -5,11 +5,12 @@ import { getHostName } from "@/utils/tools";
 import {
   DeleteOutlined,
   EditOutlined,
+  LoadingOutlined,
   LoginOutlined,
   PlusCircleOutlined,
   SyncOutlined,
   ThunderboltOutlined,
-  UserOutlined
+  UserOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -19,13 +20,14 @@ import {
   Layout,
   message,
   Modal,
+  notification,
   Space,
   Tooltip,
 } from "antd";
 import axios from "axios";
 import _ from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import HeaderAction from "../HeaderAction/HeaderAction";
 import AddModel from "./components/ModelAdd";
 import { AppDispatch, RootState } from "@/store";
@@ -54,34 +56,36 @@ export interface ListShop {
   updatedAt: string;
 }
 
-interface OverviewProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> {}
+interface OverviewProps
+  extends ReturnType<typeof mapStateToProps>,
+    ReturnType<typeof mapDispatchToProps> {}
 
 function Overview(props: OverviewProps) {
-  const {getCurrentUser, currentUser} = props
+  const { getCurrentUser, currentUser } = props;
 
   const [listFBPages, setListFBPages] = useState<FBShopProps[]>([]);
   const [openModal, setOpenModal] = useState(false);
   const [isLoadingFbPage, setIsLoadingFbPage] = useState(false);
   const [openIntegration, setOpenIntegration] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [dataListShop, setDataListShop] = useState<ListShop[]>([])
+  const [dataListShop, setDataListShop] = useState<ListShop[]>([]);
   useEffect(() => {
     getListShop();
-    getCurrentUser()
+    getCurrentUser();
   }, []);
 
   const route = useRouter();
-  const searchParams = useSearchParams()
+  const searchParams = useSearchParams();
 
-  let accessToken: any
+  let accessToken: any;
   if (useSearchParams().values().next().value) {
-    accessToken = searchParams.get('access_token')
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('accessToken', accessToken)
+    accessToken = searchParams.get("access_token");
+    if (typeof window !== "undefined") {
+      localStorage.setItem("accessToken", accessToken);
     }
   } else {
-    if (typeof window !== 'undefined') {
-      accessToken = localStorage.getItem('accessToken')
+    if (typeof window !== "undefined") {
+      accessToken = localStorage.getItem("accessToken");
     }
   }
 
@@ -92,15 +96,22 @@ function Overview(props: OverviewProps) {
     return await axios
       .get(url)
       .then((res) => {
+        setIsLoadingFbPage(false);
         if (res.status == 200) {
           let data = res.data.data;
-          data = _.differenceBy(data, dataListShop || [], 'name')
+          data = _.differenceBy(data, dataListShop || [], "name");
           setListFBPages(data);
           setOpenIntegration(true);
         }
       })
-      .catch((error) => console.log(error))
-      .finally(() => setIsLoadingFbPage(false));
+      .catch((error) => {
+        notification.error({
+          message: "Lấy danh sách cửa hàng thất bại",
+          description: error.response.data.message,
+        });
+
+        setIsLoadingFbPage(false);
+      })
   };
 
   const getListShop = async () => {
@@ -112,17 +123,25 @@ function Overview(props: OverviewProps) {
           Authorization: `Bearer ${accessToken}`,
         },
       })
-      .then((res) => setDataListShop(res.data))
-      .catch((error) => console.log(error))
-      .finally(() => setIsLoading(false));
+      .then((res) => {
+        setDataListShop(res.data);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        notification.error({
+          message: "Lấy danh sách cửa hàng thất bại",
+          description: error.response.data.message,
+        });
+      })
   };
 
   const handleClickAccess = async (shopId: number) => {
-    localStorage.setItem('shopId', shopId.toString())
-    await props.getCurrentShop({shopId})
+    localStorage.setItem("shopId", shopId.toString());
+    await props.getCurrentShop({ shopId });
     setTimeout(() => {
       route.push(`/shop/${shopId}/dashbroad`);
-    }, 1000)
+    }, 1000);
   };
 
   const handleOpenModel = () => {
@@ -176,95 +195,121 @@ function Overview(props: OverviewProps) {
     <Layout className="w-full min-h-screen px-4">
       <HeaderAction isShowSearch={false} title="Danh sách cửa hàng" />
       <Content className="p-8">
-        <Space className="w-full justify-end" align="center">
-          <Button type="primary" onClick={getListShop} icon={<SyncOutlined />}>
-            Tải lại
-          </Button>
-          <Button
-            type="primary"
-            onClick={handleOpenModel}
-            icon={<PlusCircleOutlined />}
-          >
-            Thêm cửa hàng
-          </Button>
-          <Button
-            type="primary"
-            onClick={getListPage}
-            loading={isLoadingFbPage}
-            icon={<ThunderboltOutlined />}
-          >
-            Tích hợp cửa hàng
-          </Button>
-          <AddModel open={openModal} onOk={handleOk} onCancel={handleCancel} />
-        </Space>
-        <Space className="gap-10 mt-10 justify-center w-full">
-          {dataListShop?.map((shop) => {
-            return (
-              <Card
-                key={shop.id}
-                className="w-[300px] min-h-[250px]"
-                title={
-                  <div className="p-5 text-center">
-                    <Avatar src={shop.avatar} icon={<UserOutlined />} size={80} />
-                    <h1 className="mt-4">{shop.name}</h1>
-                  </div>
-                }
-                actions={[
-                  <Tooltip key="edit" title="Cập nhật cửa hàng">
-                    <EditOutlined />
-                  </Tooltip>,
-                  <Tooltip key="delete" title="Xóa cửa hàng">
-                    <DeleteOutlined />
-                  </Tooltip>,
-                  <Tooltip key="leave" title="Rời khỏi cửa hàng">
-                    <LoginOutlined />
-                  </Tooltip>,
-                ]}
+        {isLoading ? (
+          <div className="w-full h-full flex items-center justify-center">
+            <LoadingOutlined size={64} />
+          </div>
+        ) : (
+          <Fragment>
+            <Space className="w-full justify-end" align="center">
+              <Button
+                type="primary"
+                onClick={getListShop}
+                icon={<SyncOutlined />}
               >
-                <div className="text-center">
-                  <p className="opacity-80 mb-4">{shop.description}</p>
-                  <Button
-                    onClick={() => handleClickAccess(shop.id)}
-                    icon={<LoginOutlined />}
-                  >
-                    Truy cập
-                  </Button>
-                </div>
-              </Card>
-            );
-          })}
-        </Space>
-        <Modal
-          open={openIntegration}
-          onCancel={() => setOpenIntegration(false)}
-          title={<div className="font-bold mb-5 text-2xl">Kich hoat</div>}
-          footer={[]}
-          width={1200}
-        >
-          <Space className="gap-10">
-            {listFBPages &&
-              listFBPages.map((page) => {
+                Tải lại
+              </Button>
+              <Button
+                type="primary"
+                onClick={handleOpenModel}
+                icon={<PlusCircleOutlined />}
+              >
+                Thêm cửa hàng
+              </Button>
+              <Button
+                type="primary"
+                onClick={getListPage}
+                loading={isLoadingFbPage}
+                icon={<ThunderboltOutlined />}
+              >
+                Tích hợp cửa hàng
+              </Button>
+              <AddModel
+                open={openModal}
+                onOk={handleOk}
+                onCancel={handleCancel}
+              />
+            </Space>
+            <Space className="gap-10 mt-10 justify-center w-full">
+              {dataListShop?.map((shop) => {
                 return (
                   <Card
-                    key={page.id}
-                    className="w-[300px] h-[150px]] hover:border-sky-500 transition-all ease-out cursor-pointer"
-                    onClick={() => handleCreateShopFb({name: page.name, avatar: page.picture.data.url, fb_shop_id: page.id})}
+                    key={shop.id}
+                    className="w-[300px] min-h-[250px]"
+                    title={
+                      <div className="p-5 text-center">
+                        <Avatar
+                          src={shop.avatar}
+                          icon={<UserOutlined />}
+                          size={80}
+                        />
+                        <h1 className="mt-4">{shop.name}</h1>
+                      </div>
+                    }
+                    actions={[
+                      <Tooltip key="edit" title="Cập nhật cửa hàng">
+                        <EditOutlined />
+                      </Tooltip>,
+                      <Tooltip key="delete" title="Xóa cửa hàng">
+                        <DeleteOutlined />
+                      </Tooltip>,
+                      <Tooltip key="leave" title="Rời khỏi cửa hàng">
+                        <LoginOutlined />
+                      </Tooltip>,
+                    ]}
                   >
-                    <div className="p-1 text-center">
-                      <Image
-                        src={page.picture.data.url}
-                        width={page.picture.data.width}
-                        alt=""
-                        preview={false}
-                        className="rounded-full"
-                      />
-                      <h1 className="mt-4 font-bold">{page.name}</h1>
+                    <div className="text-center">
+                      <p className="opacity-80 mb-4">{shop.description}</p>
+                      <Button
+                        onClick={() => handleClickAccess(shop.id)}
+                        icon={<LoginOutlined />}
+                      >
+                        Truy cập
+                      </Button>
                     </div>
                   </Card>
                 );
               })}
-          </Space>
-        </Modal>
+            </Space>
+            <Modal
+              open={openIntegration}
+              onCancel={() => setOpenIntegration(false)}
+              title={<div className="font-bold mb-5 text-2xl">Kich hoat</div>}
+              footer={[]}
+              width={1200}
+            >
+              <Space className="gap-10">
+                {listFBPages &&
+                  listFBPages.map((page) => {
+                    return (
+                      <Card
+                        key={page.id}
+                        className="w-[300px] h-[150px]] hover:border-sky-500 transition-all ease-out cursor-pointer"
+                        onClick={() =>
+                          handleCreateShopFb({
+                            name: page.name,
+                            avatar: page.picture.data.url,
+                            fb_shop_id: page.id,
+                          })
+                        }
+                      >
+                        <div className="p-1 text-center">
+                          <Image
+                            src={page.picture.data.url}
+                            width={page.picture.data.width}
+                            alt=""
+                            preview={false}
+                            className="rounded-full"
+                          />
+                          <h1 className="mt-4 font-bold">{page.name}</h1>
+                        </div>
+                      </Card>
+                    );
+                  })}
+              </Space>
+            </Modal>
+          </Fragment>
+        )}
       </Content>
     </Layout>
   );
@@ -272,9 +317,9 @@ function Overview(props: OverviewProps) {
 
 const mapStateToProps = (state: RootState) => {
   return {
-    currentUser: state.userReducer.user
-  }
-}
+    currentUser: state.userReducer.user,
+  };
+};
 
 const mapDispatchToProps = (dispatch: AppDispatch) => {
   return {

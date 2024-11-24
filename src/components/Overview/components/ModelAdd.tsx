@@ -11,7 +11,7 @@ import {
   UploadProps,
 } from "antd";
 import { RcFile } from 'antd/es/upload/interface';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
 interface AddModelProps {
@@ -40,6 +40,13 @@ function AddModel({ open, onOk, onCancel }: AddModelProps) {
     name: "",
     avatar: null,
   });
+
+  useEffect(() => {
+    setParam({
+      name: "",
+      avatar: null,
+    });
+  }, [open]);
 
   const handleChange: UploadProps["onChange"] = (info) => {
     if (info.file.status === "uploading") {

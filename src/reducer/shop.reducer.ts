@@ -4,7 +4,11 @@ import { createSlice } from "@reduxjs/toolkit";
 const reducer = createSlice({
     name: 'shop',
     initialState: {
-        shop: {},
+        shop: {
+            fb_shop_id: "",
+            id: 0,
+            name: "",
+        },
         isLoading: false
     },
     reducers: {

@@ -4,7 +4,9 @@ import { createSlice } from "@reduxjs/toolkit";
 const reducer = createSlice({
     name: 'user',
     initialState: {
-        user: {},
+        user: {
+            access_token: "",
+        },
         isLoading: false
     },
     reducers: {

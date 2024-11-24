@@ -14,6 +14,8 @@ import {
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { useParams, usePathname, useRouter } from "next/navigation";
+import { AppDispatch, RootState } from "@/store";
+import { connect } from "react-redux";
 
 const { Sider } = Layout;
 const listItem = [
@@ -53,7 +55,12 @@ const listItem = [
     icon: <LeftCircleOutlined />,
   },
 ];
-function Menu() {
+
+interface MenuComponentProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> {}
+
+function Menu(props: MenuComponentProps) {
+    const { currentShop } = props;
+
   const route = useRouter();
   const params = useParams();
   const pathName = usePathname().split("/");
@@ -74,7 +81,7 @@ function Menu() {
       {params.id && (
         <div className="flex items-center  gap-3 flex-col mt-5">
           <Avatar icon={<UserOutlined />} size={64} />
-          <h1 className="text-[#101828] text-xl font-bold">Shop test</h1>
+          <h1 className="text-[#101828] text-xl font-bold">{currentShop.name || "Chưa có tên"}</h1>
         </div>
       )}
       <Divider />
@@ -91,4 +98,14 @@ function Menu() {
   );
 }
 
-export default Menu;
+const mapStateToProps = (state: RootState) => {
+  return {
+    currentShop: state.shopReducer.shop
+  }
+}
+
+const mapDispatchToProps = (dispatch: AppDispatch) => {
+  return {}
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Menu);
