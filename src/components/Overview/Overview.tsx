@@ -17,6 +17,7 @@ import {
   Card,
   Image,
   Layout,
+  message,
   Modal,
   Space,
   Tooltip,
@@ -129,27 +130,37 @@ function Overview(props: OverviewProps) {
   };
 
   const handleOk = async (param: { name: string; avatar: any }) => {
+    if (!param.name || !param.avatar) {
+      console.error("Missing name or avatar:", param);
+      return;
+    }
+
     const createShopFormData = new FormData();
-    createShopFormData.append('name', param.name);
-    createShopFormData.append('avatar', param.avatar);
+    createShopFormData.append("name", param.name);
+    createShopFormData.append("avatar", param.avatar);
+
+    console.log("FormData Preview:", Array.from(createShopFormData.entries()));
 
     const url = `/user/create-shop`;
 
     return await apiClient
       .post(url, createShopFormData, {
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          // 'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "multipart/form-data", 
         },
       })
-      .then((res) => console.log(res))
-      .catch((error) => console.log(error));
+      .then(message.success("Thêm cửa hàng thành công!"))
+      .then(()=>setOpenModal(false))
+      .then(()=>getListShop())
+      .catch((error) => console.log("Error:", error));
   };
+
 
   const handleCreateShopFb = async (param: {name: string, avatar: string, fb_shop_id: string}) => {
     const url = `${getHostName()}/user/integrate-fb-shop`;
 
-    return await axios.post(url, param, {
+    return await apiClient.post(url, param, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       }
@@ -268,7 +279,7 @@ const mapStateToProps = (state: RootState) => {
 const mapDispatchToProps = (dispatch: AppDispatch) => {
   return {
     getCurrentUser: () => dispatch(getUserProfile()),
-    getCurrentShop: (data) => dispatch(getCurrentShop(data))
+    getCurrentShop: (data:any) => dispatch(getCurrentShop(data))
   }
 }
 

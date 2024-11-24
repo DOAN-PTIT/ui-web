@@ -55,18 +55,7 @@ export default function Genaral() {
         setIsModalOpen(false);
     };
 
-    const customer = [
-        {
-            id: "1",
-            name: "QUÂN",
-            avtUrl: 'https://thucanhviet.com/wp-content/uploads/2017/09/pug-dog-dac-diem-nhan-dang-cho-mat-xe.jpg'
-        },
-        {
-            id: "2",
-            name: "KHAI DAN",
-            avtUrl: 'https://thucanhviet.com/wp-content/uploads/2017/09/pug-dog-dac-diem-nhan-dang-cho-mat-xe.jpg'
-        },
-    ]
+
     const shopId = localStorage.getItem('shopId')
     async function fetchListPersonnel() {
         try {

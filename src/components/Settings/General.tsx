@@ -107,7 +107,7 @@ export default function Genaral() {
 
     useEffect(() => {
         GetSetting();
-    }, [0]);
+    }, []);
 
 
     const cancel: PopconfirmProps['onCancel'] = (e) => {

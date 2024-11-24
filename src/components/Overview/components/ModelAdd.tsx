@@ -10,10 +10,9 @@ import {
   Upload,
   UploadProps,
 } from "antd";
+import { RcFile } from 'antd/es/upload/interface';
 import { useState } from "react";
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
-import { RcFile } from 'antd/es/upload/interface';
-import apiClient from "@/service/auth";
 
 interface AddModelProps {
   open: boolean;
@@ -69,13 +68,6 @@ function AddModel({ open, onOk, onCancel }: AddModelProps) {
     </button>
   );
 
-  // async function handleShopInfo() {
-  //   try {
-  //     const res = await apiClient.get(`/shop/${shopId}`)
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // }
   return (
     <>
       <Modal
@@ -106,13 +98,20 @@ function AddModel({ open, onOk, onCancel }: AddModelProps) {
             showUploadList={false}
             beforeUpload={beforeUpload}
             onChange={handleChange}
+            customRequest={({ file, onSuccess }) => {
+              setTimeout(() => {
+                onSuccess?.("ok");
+              }, 1000);
+            }}
           >
             {param.avatar ? (
-              <Image
-                src={avatarUrl}
-                alt="avatar"
-                style={{ width: "100%" }}
-              />
+              <Image src={avatarUrl} alt="avatar" style={{
+                width: "100%",        
+                height: "90px",       
+                objectFit: "cover",   
+                maxWidth: "100%",     
+                maxHeight: "100%",    
+              }} />
             ) : (
               uploadButton
             )}
