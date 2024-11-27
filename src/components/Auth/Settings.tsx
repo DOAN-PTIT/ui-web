@@ -3,7 +3,7 @@
 import { default as Img, default as Logo } from '@/assets/favicon.png'; // Ensure this path is correct
 import apiClient from '@/service/auth';
 import { FacebookLogo, LinkSimple } from '@phosphor-icons/react';
-import { Avatar, Button, Divider, Input, Layout, Select } from "antd"; // Optional: You can also use Ant Design's Image if needed
+import { Avatar, Button, DatePicker, Divider, Input, Layout, Select } from "antd"; // Optional: You can also use Ant Design's Image if needed
 import Image from 'next/image'; // Next.js Image for optimized image loading
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -15,7 +15,7 @@ import PassModel from './components/ModelPass';
 const { Content, Sider } = Layout;
 interface Profile {
     access_token: string
-    date_of_birth: string  // Nếu bạn có định dạng ngày tháng cụ thể, có thể thay đổi kiểu dữ liệu
+    date_of_birth: string
     email: string;
     fb_id: string
     id: number;
@@ -102,7 +102,7 @@ function Settings() {
                 {/* <Menu className="bg-[#eaecf0]" defaultSelectedKeys={['1']} mode="inline" /> */}
             </Sider>
 
-            <Content className="bg-[#f2f4f7]">
+            <Content className="bg-[#f2f4f7] min-h-screen">
                 <div className='px-4'>
                     <HeaderAction
                         title="Thiết lập tài khoản"
@@ -132,9 +132,9 @@ function Settings() {
                                 <TitleH className='mb-4' title='Ngôn ngữ & Múi giờ' />
                                 <TitleLabel title='Ngôn ngữ:' />
                                 <Select className='w-full mb-4' defaultValue="Tiếng việt" options={options} />
-                                <TitleLabel title='Múi giờ:' />
-                                <Select className='w-full' defaultValue="(GMT +7:00) Bangkok, Hanoi, Jakarta" options={optionsTime} />
-                                <Button className='w-full mt-4' type="primary" danger>Đăng xuất khỏi các thiết bị khác</Button>
+                                {/* <TitleLabel title='Múi giờ:' />
+                                <Select className='w-full' defaultValue="(GMT +7:00) Bangkok, Hanoi, Jakarta" options={optionsTime} /> */}
+                                <Button className='w-full mt-4' type="primary" danger>Đăng xuất</Button>
 
                             </div>
                         </div>
@@ -157,15 +157,15 @@ function Settings() {
                                     </div>
                                     <div className='mb-4'>
                                         <TitleLabel title='Đăng nhập bằng Email' />
-                                        <Input placeholder="Nhập Email" value={dataProfile?.name} />
+                                        <Input placeholder="Nhập Email" value={dataProfile?.email} />
                                     </div>
                                     <div className='mb-4'>
                                         <TitleLabel title='Số điện thoại:' />
                                         <Input placeholder="Nhập SĐT" value={dataProfile?.phone_number} />
                                     </div>
                                     <div className='mb-4'>
-                                        <TitleLabel title='Email:' />
-                                        <Input placeholder="Nhập email" value={dataProfile?.email} />
+                                        <TitleLabel title='Ngày sinh:' />
+                                        <DatePicker placeholder='Chọn ngày' className='w-full' />
                                     </div>
                                     <div className='flex justify-end'>
                                         <Button type="primary">Lưu thay đổi</Button>
