@@ -58,7 +58,7 @@ export interface ListShop {
 
 interface OverviewProps
   extends ReturnType<typeof mapStateToProps>,
-    ReturnType<typeof mapDispatchToProps> {}
+  ReturnType<typeof mapDispatchToProps> { }
 
 function Overview(props: OverviewProps) {
   const { getCurrentUser, currentUser } = props;
@@ -150,7 +150,7 @@ function Overview(props: OverviewProps) {
 
   const handleOk = async (param: { name: string; avatar: any }) => {
     if (!param.name || !param.avatar) {
-      console.error("Missing name or avatar:", param);
+      message.error("Thiếu hình đại diện");
       return;
     }
 
@@ -161,22 +161,35 @@ function Overview(props: OverviewProps) {
     console.log("FormData Preview:", Array.from(createShopFormData.entries()));
 
     const url = `/user/create-shop`;
-
-    return await apiClient
-      .post(url, createShopFormData, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "multipart/form-data", 
-        },
-      })
-      .then(message.success("Thêm cửa hàng thành công!"))
-      .then(()=>setOpenModal(false))
-      .then(()=>getListShop())
-      .catch((error) => console.log("Error:", error));
+    try {
+      await apiClient
+        .post(url, createShopFormData, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "multipart/form-data",
+          },
+        })
+      setOpenModal(false)
+      message.success("Thêm cửa hàng thành công!")
+      getListShop()
+    } catch (error) {
+      console.log("Error:", error)
+    }
+    // return await apiClient
+    //   .post(url, createShopFormData, {
+    //     headers: {
+    //       Authorization: `Bearer ${accessToken}`,
+    //       "Content-Type": "multipart/form-data",
+    //     },
+    //   })
+    //   .then(message.success("Thêm cửa hàng thành công!"))
+    //   .then(() => setOpenModal(false))
+    //   .then(() => getListShop())
+    //   .catch((error) => console.log("Error:", error));
   };
 
 
-  const handleCreateShopFb = async (param: {name: string, avatar: string, fb_shop_id: string}) => {
+  const handleCreateShopFb = async (param: { name: string, avatar: string, fb_shop_id: string }) => {
     const url = `${getHostName()}/user/integrate-fb-shop`;
 
     return await apiClient.post(url, param, {
@@ -324,7 +337,7 @@ const mapStateToProps = (state: RootState) => {
 const mapDispatchToProps = (dispatch: AppDispatch) => {
   return {
     getCurrentUser: () => dispatch(getUserProfile()),
-    getCurrentShop: (data:any) => dispatch(getCurrentShop(data))
+    getCurrentShop: (data: any) => dispatch(getCurrentShop(data))
   }
 }
 

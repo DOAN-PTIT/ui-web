@@ -6,7 +6,8 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Avatar, Dropdown, Input, Layout, Menu } from "antd";
+import { Avatar, Dropdown, Input, Layout, Menu, message } from "antd";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 
 interface HeaderActionProps {
@@ -34,11 +35,7 @@ function HeaderAction(props: HeaderActionProps) {
         router.push('/login');
         return;
       }
-      const response = await apiClient.post(`/auth/logout`, null, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await axios.post(`http://localhost:8000/auth/logout`);
 
       if (response.status === 200) {
         localStorage.removeItem('accessToken');
@@ -48,8 +45,13 @@ function HeaderAction(props: HeaderActionProps) {
       } else {
         console.error('Đăng xuất thất bại:', response.statusText);
       }
-    } catch (error: any) {
+      
+    } 
+    catch (error: any) {
       console.error('Lỗi khi gọi API đăng xuất:', error.response?.data || error.message);
+    } 
+    finally{
+      message.success('Đăng xuất thành công'); 
     }
   }
 
