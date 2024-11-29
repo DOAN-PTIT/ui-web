@@ -21,6 +21,7 @@ import {
   message,
   Modal,
   notification,
+  Popconfirm,
   Space,
   Tooltip,
 } from "antd";
@@ -203,7 +204,17 @@ function Overview(props: OverviewProps) {
   const handleCancel = () => {
     setOpenModal(false);
   };
+  const handleDeleteShop = async (shopId: any) => {
+    try {
+      await apiClient.delete(`/shop/${shopId}`)
+      message.success('Xóa cửa hàng thành công')
+      window.location.reload()
+    } catch (error) {
+      console.log(error)
+      message.error('Xóa cửa hàng thất bại')
 
+    }
+  }
   return (
     <Layout className="w-full min-h-screen">
       <HeaderAction isShowSearch={false} title="Danh sách cửa hàng" />
@@ -264,7 +275,18 @@ function Overview(props: OverviewProps) {
                         <EditOutlined />
                       </Tooltip>,
                       <Tooltip key="delete" title="Xóa cửa hàng">
-                        <DeleteOutlined />
+                        <Popconfirm
+                          title="Xóa cửa hàng"
+                          description="Bạn chắc chắn muốn xóa?"
+                          onConfirm={() => handleDeleteShop(shop.id)}
+                          // onCancel={cancel}
+                          okText="Xóa"
+                          cancelText="Hủy"
+                        >
+                          <DeleteOutlined />
+
+                        </Popconfirm>
+
                       </Tooltip>,
                       <Tooltip key="leave" title="Rời khỏi cửa hàng">
                         <LoginOutlined />
