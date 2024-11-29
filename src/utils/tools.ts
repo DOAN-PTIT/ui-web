@@ -1,3 +1,5 @@
+import { Order, OrderItems } from "./type";
+
 export const intCurrencyList = [
   "VND",
   "TWD",
@@ -45,7 +47,11 @@ export const formatInputNumber = (value: any, currency: string) => {
   return formatValue;
 };
 
-export const formatNumber = (value: any, currency: string = "VND", prefix = true) => {
+export const formatNumber = (
+  value: any,
+  currency: string = "VND",
+  prefix = true
+) => {
   const floatChar = getFloatChar(currency);
   value = value ? value.toString() : "0";
   if (
@@ -117,5 +123,76 @@ export const convertVN = (
 };
 
 export const getHostName = () => {
-  return 'http://localhost:8000'
+  return "http://localhost:8000";
+};
+
+export const calculateTotalPriceProduct = (order: Order) => {
+  let totalPrice = 0;
+  if (order.items) {
+    order.items.forEach((item: OrderItems) => {
+      totalPrice += item.quantity * item.variation_info?.retail_price;
+    });
+  }
+
+  return totalPrice || 0;
+};
+
+export const calcOrderDebt = (order: Order) => {
+  let totalPriceProduct = calculateTotalPriceProduct(order);
+  return totalPriceProduct - (order.discount || 0) - (order.prepaid || 0) + (order.surcharge || 0);
 }
+
+export const fuzzySearch = (pattern, string) =>
+  fuzzyMatch(pattern, string) !== null;
+
+export const fuzzyMatch = (pattern, string, options = {}) => {
+  const notConvert = options.notConvert;
+  pattern = pattern || "";
+  string = string || "";
+  if (!notConvert) {
+    pattern = convertVN(pattern);
+    string = convertVN(string);
+  }
+  const opts: any = {};
+  let patternIdx = 0,
+    result = [],
+    len = string.length,
+    totalScore = 0,
+    currScore = 0,
+    // prefix
+    pre = opts.pre || "",
+    // suffix
+    post = opts.post || "",
+    // String to compare against. This might be a lowercase version of the
+    // raw string
+    compareString = (opts.caseSensitive && string) || string.toLowerCase(),
+    ch;
+
+  pattern = (opts.caseSensitive && pattern) || pattern.toLowerCase();
+
+  // For each character in the string, either add it to the result
+  // or wrap in template if it's the next string in the pattern
+  for (let idx = 0; idx < len; idx++) {
+    ch = string[idx];
+    if (compareString[idx] === pattern[patternIdx]) {
+      ch = pre + ch + post;
+      patternIdx += 1;
+
+      // consecutive characters should increase the score more than linearly
+      currScore += 1 + currScore;
+    } else {
+      currScore = 0;
+    }
+    totalScore += currScore;
+    result[result.length] = ch;
+  }
+
+  // return rendered string if we have a match for every char
+  if (patternIdx === pattern.length) {
+    // if the string is an exact match with pattern, totalScore should be maxed
+    totalScore = compareString === pattern ? Infinity : totalScore;
+    return { rendered: result.join(""), score: totalScore };
+  }
+
+  return null;
+};

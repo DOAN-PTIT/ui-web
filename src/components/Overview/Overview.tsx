@@ -192,7 +192,7 @@ function Overview(props: OverviewProps) {
   };
 
   return (
-    <Layout className="w-full min-h-screen px-4">
+    <Layout className="w-full min-h-screen">
       <HeaderAction isShowSearch={false} title="Danh sách cửa hàng" />
       <Content className="p-8">
         {isLoading ? (

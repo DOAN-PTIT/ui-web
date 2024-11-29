@@ -3,12 +3,32 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     isLoading: false,
+    createOrder: {
+        delivery_company: "",
+        discount_percent: 0,
+        tracking_number: "",
+        delivery_cost: 0,
+        total_cost: 0,
+        surcharge: 0,
+    } as any
 }
 
 const reducer = createSlice({
     name: "order",
     initialState,
-    reducers: {},
+    reducers: {
+        createOrder: (state, action) => {
+            const defaultOrder = {
+                delivery_company: "",
+                discount_percent: 0,
+                tracking_number: "",
+                delivery_cost: 0,
+                total_cost: 0,
+                surcharge: 0,
+            }
+            state.createOrder = { ...defaultOrder, ...action.payload }
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(getListOrders.pending, (state) => {
@@ -23,5 +43,6 @@ const reducer = createSlice({
     }
 })
 
+export const { createOrder } = reducer.actions
 const orderReducer = reducer.reducer
 export default orderReducer

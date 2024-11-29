@@ -7,11 +7,12 @@ import {
   LoadingOutlined,
 } from "@ant-design/icons";
 import { DatePicker, Divider, notification, Select } from "antd";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { connect } from "react-redux";
 import Avatar from "react-avatar";
 import moment from "moment";
 import { Customer } from "@/utils/type";
+import { createOrder } from "@/reducer/order.reducer";
 
 interface FormBoxCustomerProps
   extends ReturnType<typeof mapStateToProps>,
@@ -24,6 +25,12 @@ function FormBoxCustomer(props: FormBoxCustomerProps) {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | undefined>(undefined);
+
+  useEffect(() => {
+    if (selectedCustomer) {
+      props.createOrder({ ...props.orderParams, add_customer: selectedCustomer });
+    }
+  }, [selectedCustomer])
 
   const handleSearchCustomer = useCallback(
     async (value: string) => {
@@ -173,11 +180,14 @@ function FormBoxCustomer(props: FormBoxCustomerProps) {
 const mapStateToProps = (state: RootState) => {
   return {
     currentShop: state.shopReducer.shop,
+    orderParams: state.orderReducer.createOrder,
   };
 };
 
 const mapDispatchToProps = (dispatch: AppDispatch) => {
-  return {};
+  return {
+    createOrder: (order: any) => dispatch(createOrder(order)),
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(FormBoxCustomer);
