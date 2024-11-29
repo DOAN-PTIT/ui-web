@@ -4,6 +4,33 @@ export type Product = {
     description: string;
     note: string;
     product_code: string;
+    variation: Variation[];
+}
+
+export type Variation = {
+    id: any
+    retail_price: number
+    image: string;
+    amount: number
+    barcode: string
+    variation_code: string
+    price_at_counter: number
+    updatedAt: Date
+    createdAt: Date
+    product: Product
+    orderAmount
+}
+
+export type Order = {
+    total_price: number;
+    items: OrderItems[];
+}
+
+export type OrderItems = {
+    quantity: number;
+    advance_promotion: number;
+    variation_info: Variation;
+    variation_id: any;
 }
 
 export type Customer = {
