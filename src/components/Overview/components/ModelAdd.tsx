@@ -62,6 +62,7 @@ function AddModel({ open, onOk, onCancel }: AddModelProps) {
         ...prevState,
         avatar: info.file.originFileObj as RcFile, // Lưu file thay vì base64
       }));
+      console.log(param)
     }
   };
 
@@ -108,7 +109,7 @@ function AddModel({ open, onOk, onCancel }: AddModelProps) {
             customRequest={({ file, onSuccess }) => {
               setTimeout(() => {
                 onSuccess?.("ok");
-              }, 1000);
+              }, 0);
             }}
           >
             {param.avatar ? (

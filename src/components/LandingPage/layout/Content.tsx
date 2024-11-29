@@ -4,12 +4,15 @@ import { Button, Layout } from 'antd';
 import Image from 'next/image';
 import Link from 'next/link';
 import Background from '@/assets/background.png';
-import ImageEx from '@/assets/dashboard1.png'
+import ImageEx from '@/assets/dashboard2.png'
 
 const { Content } = Layout;
 
 export default function LandingContent() {
-
+    const handleLoginWithFacebook = () => {
+        const fb_url = "http://localhost:8000/social/facebook"
+        document.location = fb_url;
+    };
     return (
         <Content>
             <Image className='h-[754px] object-cover w-auto' src={Background} alt="" />
@@ -40,16 +43,16 @@ export default function LandingContent() {
                             <Link href='/login'>
                                 <Button className='px-[24px] py-[26px] mr-8 rounded-2xl text-xl font-medium border-1 bg-cyan-600 text-white'>Đăng nhập ngay <SendOutlined /></Button>
                             </Link>
-                            <Link href='/login'>
-                                <Button className='px-[24px] py-[26px] border-1 border-slate-50 rounded-2xl text-xl font-medium border-1'>Đăng nhập với Facebook</Button>
-                            </Link>
+                            {/* <Link href='/login'> */}
+                            <Button onClick={handleLoginWithFacebook} className='px-[24px] py-[26px] border-1 border-slate-50 rounded-2xl text-xl font-medium border-1'>Đăng nhập với Facebook</Button>
+                            {/* </Link> */}
                         </div>
                     </div>
-                    <div className='w-[380px] sm:w-[906px] sm:overflow-hidden'>
+                    <div className='w-[300px] ml-14 sm:w-[606px] sm:overflow-hidden'>
                         <Image
                             src={ImageEx}
                             alt=''
-                            className='h-full object-cover' 
+                            className='h-full object-cover'
                         />
                     </div>
                 </div>

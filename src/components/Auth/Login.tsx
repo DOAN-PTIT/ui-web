@@ -40,7 +40,7 @@ function LoginComponent() {
   });
   const [api, contextHolder] = notification.useNotification();
   const [isLoading, setIsLoading] = useState(false);
-
+  const [errorLogin, setErrorLogin] = useState()
   useEffect(() => { }, []);
   const route = useRouter();
   const handleSubmitForm = async () => {
@@ -57,9 +57,10 @@ function LoginComponent() {
         route.push("/shop/overview");
       })
       .catch((error: any) => {
-        const res = error.response.data.message.join("\n ");
-        console.log(error);
-        openNotification(res);
+        const res = error.response.data.message;
+        console.log('rfgds',res);
+        setErrorLogin(res)
+        // openNotification(res);
       })
       .finally(() => {
         setIsLoading(false);
@@ -93,94 +94,97 @@ function LoginComponent() {
                   required: true,
                   message: "Tài khoản không được để trống",
                 },
+
               ]}
+            validateStatus={errorLogin ? 'error' : undefined}
+            help={errorLogin ? 'Tài khoản hoặc mật khẩu không đúng!' : undefined}
             >
-              <Input
-                placeholder="Tên đăng nhập"
-                name="username"
-                onChange={(e) =>
-                  setParams({ ...params, email: e.target.value })
-                }
-              />
-            </Form.Item>
-            <Form.Item
-              label="Mật khẩu"
-              name={"password"}
-              rules={[
-                {
-                  required: true,
-                  message: "Mật khẩu trông được để trống",
-                },
-              ]}
-            >
-              <Password
-                placeholder="Mật khẩu"
-                name="password"
-                onChange={(e) =>
-                  setParams({ ...params, password: e.target.value })
-                }
-              />
-            </Form.Item>
-            <Form.Item className="text-center">
-              <Button htmlType="submit" type="primary" loading={isLoading}>
-                Đăng nhập
-              </Button>
-            </Form.Item>
-            <Form.Item className="text-center">
-              <span>
-                Nếu bạn chưa có tài khoản, đăng ký{" "}
-                <Link href={"/sign-up"} className="font-medium">
-                  tại đây!!
-                </Link>
-              </span>
-            </Form.Item>
-          </Form>
-          <Divider />
-          <div className="text-center">
-            <Button
-              onClick={handleLoginWithFacebook}
-              icon={<FacebookOutlined />}
-              type="primary"
-            >
-              Đăng nhập bằng Facebook
-            </Button>
-          </div>
-        </Col>
-        <Col span={14} className="h-full text-center">
-          <Carousel
-            autoplay
-            autoplaySpeed={5000}
-            rootClassName="h-full"
-            className="h-full"
+            <Input
+              placeholder="Tên đăng nhập"
+              name="username"
+              onChange={(e) =>
+                setParams({ ...params, email: e.target.value })
+              }
+            />
+          </Form.Item>
+          <Form.Item
+            label="Mật khẩu"
+            name={"password"}
+            rules={[
+              {
+                required: true,
+                message: "Mật khẩu trông được để trống",
+              },
+            ]}
           >
-            <div>
-              <Image src={orderImage} height={500} alt="" />
-              <h1 className="text-4xl font-bold mb-2">Quản lý bán hàng</h1>
-              <span className="font-medium opacity-85">
-                Ghi nhận các giao dịch bán hàng, in hóa đơn, và quản lý thanh
-                toán
-              </span>
-            </div>
-            <div>
-              <Image src={customerImage} height={480} alt="" />
-              <h1 className="text-4xl font-bold mb-2">Quản lý khách hàng</h1>
-              <span className="font-medium opacity-85">
-                Lưu trữ thông tin khách hàng, theo dõi lịch sử giao dịch và
-                chương trình khách hàng thân thiết.
-              </span>
-            </div>
-            <div>
-              <Image src={reportImage} height={480} alt="" />
-              <h1 className="text-4xl font-bold mb-2">Báo cáo và phân tích</h1>
-              <span className="font-medium opacity-85">
-                Cung cấp các báo cáo chi tiết về doanh thu, lợi nhuận và hiệu
-                suất kinh doanh để giúp người quản lý đưa ra quyết định.
-              </span>
-            </div>
-          </Carousel>
-        </Col>
-      </Row>
-    </main>
+            <Password
+              placeholder="Mật khẩu"
+              name="password"
+              onChange={(e) =>
+                setParams({ ...params, password: e.target.value })
+              }
+            />
+          </Form.Item>
+          <Form.Item className="text-center">
+            <Button htmlType="submit" type="primary" loading={isLoading}>
+              Đăng nhập
+            </Button>
+          </Form.Item>
+          <Form.Item className="text-center">
+            <span>
+              Nếu bạn chưa có tài khoản, đăng ký{" "}
+              <Link href={"/sign-up"} className="font-medium">
+                tại đây!!
+              </Link>
+            </span>
+          </Form.Item>
+        </Form>
+        <Divider />
+        <div className="text-center">
+          <Button
+            onClick={handleLoginWithFacebook}
+            icon={<FacebookOutlined />}
+            type="primary"
+          >
+            Đăng nhập bằng Facebook
+          </Button>
+        </div>
+      </Col>
+      <Col span={14} className="h-full text-center">
+        <Carousel
+          autoplay
+          autoplaySpeed={5000}
+          rootClassName="h-full"
+          className="h-full"
+        >
+          <div>
+            <Image src={orderImage} height={500} alt="" />
+            <h1 className="text-4xl font-bold mb-2">Quản lý bán hàng</h1>
+            <span className="font-medium opacity-85">
+              Ghi nhận các giao dịch bán hàng, in hóa đơn, và quản lý thanh
+              toán
+            </span>
+          </div>
+          <div>
+            <Image src={customerImage} height={480} alt="" />
+            <h1 className="text-4xl font-bold mb-2">Quản lý khách hàng</h1>
+            <span className="font-medium opacity-85">
+              Lưu trữ thông tin khách hàng, theo dõi lịch sử giao dịch và
+              chương trình khách hàng thân thiết.
+            </span>
+          </div>
+          <div>
+            <Image src={reportImage} height={480} alt="" />
+            <h1 className="text-4xl font-bold mb-2">Báo cáo và phân tích</h1>
+            <span className="font-medium opacity-85">
+              Cung cấp các báo cáo chi tiết về doanh thu, lợi nhuận và hiệu
+              suất kinh doanh để giúp người quản lý đưa ra quyết định.
+            </span>
+          </div>
+        </Carousel>
+      </Col>
+    </Row>
+    </main >
   );
 }
 

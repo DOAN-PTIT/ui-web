@@ -21,14 +21,15 @@ export default function WrapperLayout({
   return (
     <html lang="en">
       <body
-        className={`antialiased ${inter.className}`}
+        className={`antialiased ${inter.className} bg-gray-100`}
         style={{ display: "flex" }}
       >
         <ReduxProvider>
-          <div style={{ width: 200 }}>
+          <div>
             <Menu />
           </div>
-          <div style={{ width: "calc(100% - 200px)" }}>{children}</div>
+          {/* Lạy bố */}
+          <div className="w-full">{children}</div>
         </ReduxProvider>
       </body>
     </html>

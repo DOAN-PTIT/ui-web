@@ -1,14 +1,13 @@
 import axios from 'axios';
 import { getHostName } from '@/utils/tools';
 
-// Tạo axios instance
+
 const apiClient = axios.create({
     baseURL: getHostName(), 
     headers: {
         'Content-Type': 'application/json',
     },
 });
-
 
 async function refreshAccessToken() {
     const refreshToken = localStorage.getItem('refreshToken');

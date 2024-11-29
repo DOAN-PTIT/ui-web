@@ -10,7 +10,7 @@ function Settings() {
     const router = useRouter()
     const shopId = localStorage.getItem('shopId')
     return (
-        <Layout className="px-4">
+        <Layout className="">
             <HeaderAction
                 title="Cấu hình"
                 isShowSearch={true}

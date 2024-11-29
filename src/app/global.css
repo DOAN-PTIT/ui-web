@@ -7,3 +7,17 @@
     margin: 0;
     box-sizing: border-box;
 }
+.custom-sider .ant-layout-sider-trigger{
+    @apply bg-gray-100
+}
+.custom-sider .anticon-right {
+    @apply text-zinc-900
+
+}
+.custom-sider .anticon-left {
+    @apply text-zinc-900
+
+}
+.change-password .ant-modal-content{
+    @apply !pb-0;
+}

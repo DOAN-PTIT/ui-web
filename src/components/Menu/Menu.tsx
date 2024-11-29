@@ -1,20 +1,20 @@
 "use client";
 
-import React from "react";
-import { Layout, Menu as AntdMenu, Avatar, Divider } from "antd";
+import { AppDispatch, RootState } from "@/store";
 import {
-  ReconciliationOutlined,
   AuditOutlined,
-  SettingOutlined,
-  PieChartOutlined,
-  LeftCircleOutlined,
-  UserOutlined,
   ContainerOutlined,
+  LeftCircleOutlined,
+  PieChartOutlined,
+  ReconciliationOutlined,
+  SettingOutlined,
   ShoppingCartOutlined,
+  UserOutlined
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
+import { Menu as AntdMenu, Avatar, Layout } from "antd";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { AppDispatch, RootState } from "@/store";
+import { useState } from "react";
 import { connect } from "react-redux";
 
 const { Sider } = Layout;
@@ -56,11 +56,11 @@ const listItem = [
   },
 ];
 
-interface MenuComponentProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> {}
+interface MenuComponentProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> { }
 
 function Menu(props: MenuComponentProps) {
-    const { currentShop } = props;
-
+  const { currentShop } = props;
+  const [collapsed, setCollapsed] = useState(true);
   const route = useRouter();
   const params = useParams();
   const pathName = usePathname().split("/");
@@ -71,29 +71,40 @@ function Menu(props: MenuComponentProps) {
     icon: item.icon,
     onClick: () => {
       return item.key === "home"
-        ? route.push("/shop/overview")
+        ? ''
         : route.push(`/shop/${params.id[0]}/${item.key}`);
     },
   }));
 
   return (
-    <Sider className="h-screen bg-[#f2f4f7] overflow-auto fixed bottom-0 top-0">
-      {params.id && (
-        <div className="flex items-center  gap-3 flex-col mt-5">
-          <Avatar icon={<UserOutlined />} size={64} />
-          <h1 className="text-[#101828] text-xl font-bold">{currentShop.name || "Chưa có tên"}</h1>
-        </div>
-      )}
-      <Divider />
-      <AntdMenu
-        className="bg-[#f2f4f7] text-[#101828]"
-        defaultOpenKeys={['dashbroad']}
-        defaultSelectedKeys={['dashbroad']}
-        selectedKeys={[pathName[3]]}
-        items={params.id ? items : []}
-        theme="light"
-        mode="inline"
-      />
+    <Sider
+      collapsible
+      collapsedWidth={60}
+      collapsed={collapsed}
+      onCollapse={(value) => setCollapsed(value)}
+      
+      className="custom-sider min-h-fit bg-[#f2f4f7] bottom-0 top-0 ">
+      <div>
+        {params.id && (
+          <div className="flex items-center  gap-3 flex-col mt-3 mb-2">
+            <Avatar icon={<UserOutlined />} size={collapsed ? 24 : 64} />
+            {!collapsed && (
+              <h1 className="text-[#101828] text-sm font-medium">{currentShop.name || "Chưa có tên"}</h1>
+            )}
+          </div>
+        )}
+        <AntdMenu
+          className="bg-[#f2f4f7] text-[#101828] !border-none"
+          defaultOpenKeys={['dashbroad']}
+          defaultSelectedKeys={['dashbroad']}
+          selectedKeys={[pathName[3]]}
+          items={params.id ? items : []}
+          theme="light"
+          mode="inline"
+          
+        />
+      </div>
+
     </Sider>
   );
 }
