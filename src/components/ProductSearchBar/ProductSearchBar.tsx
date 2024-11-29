@@ -35,7 +35,7 @@ function ProductSearchBar(props: ProductSearchBarProps) {
       const fetchId = fetchRef.current;
       setIsLoading(true);
       setSearchProductResult([]);
-      const url = `/shop/${currentShop.id}/${value}`;
+      const url = `/shop/${currentShop.id}/variation/${value}`;
 
       return await apiClient
         .get(url)

@@ -1,14 +1,45 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { formatNumber } from "@/utils/tools";
 import { DeleteOutlined } from "@ant-design/icons";
 import { Button, Empty, Input, Select, Tag } from "antd";
 import ProductSearchBar from "@/components/ProductSearchBar/ProductSearchBar";
 import Image from "next/image";
-const currency = "VND";
-function FormBoxProduct() {
-  const [selectedProduct, setSelectedProduct] = useState<[]>([]);
+import { AppDispatch, RootState } from "@/store";
+import { createOrder } from "@/reducer/order.reducer";
+import { connect } from "react-redux";
 
+const currency = "VND";
+
+interface FormBoxProductProps
+  extends ReturnType<typeof mapStateToProps>,
+    ReturnType<typeof mapDispatchToProps> {}
+
+function FormBoxProduct(props: FormBoxProductProps) {
+  const { createOrder, orderParams } = props;
+
+  const [selectedProduct, setSelectedProduct] = useState<[]>([]);
   const [typeOfSale, setTypeOfSale] = useState("online");
+  const [note, setNote] = useState<{ note: string; variation_id: any }[]>([]);
+
+  useEffect(() => {
+    createOrder({
+      ...orderParams,
+      items: selectedProduct.map((item: any) => {
+        const { orderAmount, ...variation_info } = item;
+        const noteItem = note?.find(
+          (note) => note.variation_id === item.id
+        )?.note;
+
+        return {
+          variation_id: item.id,
+          quantity: orderAmount || 1,
+          advance_promotion: item.promotion,
+          note: noteItem,
+          variation_info,
+        };
+      }),
+    });
+  }, [selectedProduct, note]);
 
   const onChangeAmountCurrentProduct = (
     currVariation: any,
@@ -32,6 +63,27 @@ function FormBoxProduct() {
     setSelectedProduct((prevState: any) => {
       return prevState.filter((_: any, i: number) => i !== index);
     });
+  };
+
+  const onChangeNoteOrderItem = (variation_id: any, noteItem: string) => {
+    const index = note?.findIndex((item) => item.variation_id === variation_id);
+    if (index !== -1) {
+      setNote((prevState: any) => {
+        return prevState.map((item: any, i: number) => {
+          if (i === index) {
+            return {
+              ...item,
+              note: noteItem,
+            };
+          }
+          return item;
+        });
+      });
+    } else {
+      setNote((prevState: { note: string; variation_id: any }[] | undefined) => {
+        return [...(prevState || []), { note: noteItem, variation_id: variation_id }];
+      });
+    }
   };
 
   return (
@@ -133,7 +185,12 @@ function FormBoxProduct() {
                         {formatNumber(variation?.promotion, currency)} ₫
                       </a>
                     </div>
-                    <Input variant="filled" className="w-[180px]" placeholder="Ghi chú cho sản phẩm này" />
+                    <Input
+                      variant="filled"
+                      className="w-[180px]"
+                      placeholder="Ghi chú cho sản phẩm này"
+                      onChange={(e) => onChangeNoteOrderItem(variation.id, e.target.value)}
+                    />
                   </div>
                 </div>
               );
@@ -149,4 +206,16 @@ function FormBoxProduct() {
   );
 }
 
-export default FormBoxProduct;
+const mapStateToProps = (state: RootState) => {
+  return {
+    orderParams: state.orderReducer.createOrder,
+  };
+};
+
+const mapDispatchToProps = (dispatch: AppDispatch) => {
+  return {
+    createOrder: (order: any) => dispatch(createOrder(order)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(FormBoxProduct);

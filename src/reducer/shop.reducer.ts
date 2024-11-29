@@ -1,4 +1,4 @@
-import { getCurrentShop } from "@/action/shop.action";
+import { getCurrentShop, getListShopUser } from "@/action/shop.action";
 import { createSlice } from "@reduxjs/toolkit";
 
 const reducer = createSlice({
@@ -9,6 +9,7 @@ const reducer = createSlice({
             id: 0,
             name: "",
         },
+        user: {},
         isLoading: false
     },
     reducers: {
@@ -29,6 +30,16 @@ const reducer = createSlice({
                 state.shop = action.payload
             })
             .addCase(getCurrentShop.rejected, (state) => {
+                state.isLoading = false
+            })
+            .addCase(getListShopUser.pending, (state) => {
+                state.isLoading = true
+            })
+            .addCase(getListShopUser.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.user = action.payload
+            })
+            .addCase(getListShopUser.rejected, (state) => {
                 state.isLoading = false
             })
     }
