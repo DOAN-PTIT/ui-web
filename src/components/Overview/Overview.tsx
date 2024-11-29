@@ -205,9 +205,9 @@ function Overview(props: OverviewProps) {
   };
 
   return (
-    <Layout className="w-full min-h-screen px-4">
+    <Layout className="w-full min-h-screen">
       <HeaderAction isShowSearch={false} title="Danh sách cửa hàng" />
-      <Content className="p-8">
+      <Content className=" bg-gray-200 rounded-lg overflow-auto overflow-x-hidden p-5 gap-5">
         {isLoading ? (
           <div className="w-full h-full flex items-center justify-center">
             <LoadingOutlined size={64} />
@@ -243,7 +243,7 @@ function Overview(props: OverviewProps) {
                 onCancel={handleCancel}
               />
             </Space>
-            <Space className="gap-10 mt-10 justify-center w-full">
+            <Space className="grid grid-cols-2 xl:grid-cols-3 gap-7 mx-auto h-full mt-10 justify-center max-w-fit ">
               {dataListShop?.map((shop) => {
                 return (
                   <Card

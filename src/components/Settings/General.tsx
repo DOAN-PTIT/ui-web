@@ -115,7 +115,7 @@ export default function Genaral() {
         message.error('Chưa lưu');
     };
     return (
-        <Layout className="px-4">
+        <Layout className="">
             <HeaderAction
                 title="Cấu hình"
                 isShowSearch={true}

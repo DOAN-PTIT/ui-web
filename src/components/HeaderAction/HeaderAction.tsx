@@ -1,5 +1,4 @@
 "use client";
-import apiClient from "@/service/auth";
 import {
   LogoutOutlined,
   SettingOutlined,
@@ -87,7 +86,7 @@ function HeaderAction(props: HeaderActionProps) {
       </div>
 
       <Dropdown overlay={<Menu items={items} />} trigger={['click']}>
-        <Avatar className="cursor-pointer" icon={<UserOutlined />} />
+        <Avatar className="cursor-pointer mr-2" icon={<UserOutlined />} />
       </Dropdown>
     </Layout.Header>
   );

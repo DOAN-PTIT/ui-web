@@ -23,7 +23,7 @@ export default function Customer() {
         setOpenForm(false)
     }
     return (
-        <Layout className="px-4">
+        <Layout className="">
             <HeaderAction
                 title="Cấu hình"
                 isShowSearch={true}

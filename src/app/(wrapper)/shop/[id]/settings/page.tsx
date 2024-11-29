@@ -1,5 +1,10 @@
 import Settings from "@/components/Settings/Settings";
 
 export default function SettingsPage() {
-    return <Settings/>
+    return (
+        <div className="w-full">
+
+            <Settings />
+        </div>
+    )
 }
