@@ -82,7 +82,7 @@ function Menu(props: MenuComponentProps) {
       collapsedWidth={60}
       collapsed={collapsed}
       onCollapse={(value) => setCollapsed(value)}
-      
+
       className="custom-sider min-h-fit bg-[#f2f4f7] bottom-0 top-0 ">
       <div>
         {params.id && (
@@ -101,7 +101,7 @@ function Menu(props: MenuComponentProps) {
           items={params.id ? items : []}
           theme="light"
           mode="inline"
-          
+
         />
       </div>
 

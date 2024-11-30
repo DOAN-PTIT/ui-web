@@ -70,33 +70,32 @@ export const formatNumber = (
       typeof currency != "undefined" &&
       currency
       ? `${Math.floor(amount / 100)
-          .toString()
-          .replace(
-            /(\d)(?=(\d{3})+(?!\d))/g,
-            `$1${floatChar == "." ? "," : "."}`
-          )}${
-          Math.abs(amount) % 100
-            ? prefix
-              ? floatChar +
-                (Math.abs(amount) % 100 > 9
-                  ? Math.abs(amount) % 100
-                  : "0" + (Math.abs(amount) % 100))
-              : floatChar +
-                ((Math.abs(amount) % 100) % 10
-                  ? Math.abs(amount) % 100 > 9
-                    ? Math.abs(amount) % 100
-                    : "0" + (Math.abs(amount) % 100)
-                  : Math.floor((Math.abs(amount) % 100) / 10))
-            : prefix && !xctCurrencyList.includes(currency)
-            ? `${floatChar}00`
-            : ""
-        }`
+        .toString()
+        .replace(
+          /(\d)(?=(\d{3})+(?!\d))/g,
+          `$1${floatChar == "." ? "," : "."}`
+        )}${Math.abs(amount) % 100
+        ? prefix
+          ? floatChar +
+          (Math.abs(amount) % 100 > 9
+            ? Math.abs(amount) % 100
+            : "0" + (Math.abs(amount) % 100))
+          : floatChar +
+          ((Math.abs(amount) % 100) % 10
+            ? Math.abs(amount) % 100 > 9
+              ? Math.abs(amount) % 100
+              : "0" + (Math.abs(amount) % 100)
+            : Math.floor((Math.abs(amount) % 100) / 10))
+        : prefix && !xctCurrencyList.includes(currency)
+          ? `${floatChar}00`
+          : ""
+      }`
       : amount
-          .toString()
-          .replace(
-            /(\d)(?=(\d{3})+(?!\d))/g,
-            `$1${floatChar == "." ? "," : "."}`
-          )
+        .toString()
+        .replace(
+          /(\d)(?=(\d{3})+(?!\d))/g,
+          `$1${floatChar == "." ? "," : "."}`
+        )
     : amount;
   return minusChar + amount;
 };
