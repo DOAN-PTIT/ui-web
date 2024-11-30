@@ -87,7 +87,7 @@ function Menu(props: MenuComponentProps) {
       <div>
         {params.id && (
           <div className="flex items-center  gap-3 flex-col mt-3 mb-2">
-            <Avatar icon={<UserOutlined />} size={collapsed ? 24 : 64} />
+            <Avatar src={currentShop.avatar} icon={<UserOutlined />} size={collapsed ? 24 : 64} />
             {!collapsed && (
               <h1 className="text-[#101828] text-sm font-medium">{currentShop.name || "Chưa có tên"}</h1>
             )}

@@ -30,11 +30,12 @@ import _ from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
 import HeaderAction from "../HeaderAction/HeaderAction";
-import AddModel from "./components/ModelAdd";
+import AddModal from "./Modal/ModalAdd";
 import { AppDispatch, RootState } from "@/store";
 import { connect } from "react-redux";
 import { getUserProfile } from "@/action/user.action";
 import { getCurrentShop } from "@/action/shop.action";
+import { LayoutStyled } from "@/styles/layoutStyle";
 
 const { Content } = Layout;
 
@@ -208,7 +209,7 @@ function Overview(props: OverviewProps) {
     try {
       await apiClient.delete(`/shop/${shopId}`)
       message.success('Xóa cửa hàng thành công')
-      window.location.reload()
+      window.location.reload() 
     } catch (error) {
       console.log(error)
       message.error('Xóa cửa hàng thất bại')
@@ -218,7 +219,7 @@ function Overview(props: OverviewProps) {
   return (
     <Layout className="w-full min-h-screen">
       <HeaderAction isShowSearch={false} title="Danh sách cửa hàng" />
-      <Content className=" bg-gray-200 rounded-lg overflow-auto overflow-x-hidden p-5 gap-5">
+      <LayoutStyled className="bg-slate-200">
         {isLoading ? (
           <div className="w-full h-full flex items-center justify-center">
             <LoadingOutlined size={64} />
@@ -248,7 +249,7 @@ function Overview(props: OverviewProps) {
               >
                 Tích hợp cửa hàng
               </Button>
-              <AddModel
+              <AddModal
                 open={openModal}
                 onOk={handleOk}
                 onCancel={handleCancel}
@@ -345,7 +346,7 @@ function Overview(props: OverviewProps) {
             </Modal>
           </Fragment>
         )}
-      </Content>
+      </LayoutStyled>
     </Layout>
   );
 }

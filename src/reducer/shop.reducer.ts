@@ -8,6 +8,7 @@ const reducer = createSlice({
             fb_shop_id: "",
             id: 0,
             name: "",
+            avatar:"",
         },
         user: {},
         isLoading: false
