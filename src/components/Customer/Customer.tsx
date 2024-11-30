@@ -17,6 +17,7 @@ import {
 import { AppDispatch, RootState } from "@/store";
 import { connect } from "react-redux";
 import apiClient from "@/service/auth";
+import "../../styles/global.css";
 
 interface CustomerType {
   id: string;
@@ -219,7 +220,7 @@ function Customer(props: CustomerProps) {
         isShowSearch={true}
         inputPlaholder="Tim kiem khach hang"
       />
-      <Layout.Content className="p-5 h-screen">
+      <Layout.Content className="p-5 h-screen bg-gray-200 rounded-tl-xl order__table__container">
         <ActionTools callBack={callBack} reloadCallBack={getListCustomer} />
         <Table
           columns={columns}

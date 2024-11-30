@@ -18,6 +18,7 @@ import { connect } from "react-redux";
 import { formatNumber } from "@/utils/tools";
 import { createVariation } from "@/action/variation.action";
 import ProductDetail from "../ProductDetail/ProductDetail";
+import "../../styles/global.css";
 
 
 interface ProductType {
@@ -127,7 +128,7 @@ function Product(props: ProductProps) {
         isShowSearch={true}
         inputPlaholder="Tìm kiếm sản phẩm"
       />
-      <Layout.Content className="p-5 h-screen">
+      <Layout.Content className="p-5 h-screen bg-gray-200 rounded-tl-xl order__table__container">
         <ActionTools
           callBack={callBack}
           reloadCallBack={reloadCallBack}
