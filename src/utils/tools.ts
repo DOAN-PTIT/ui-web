@@ -125,6 +125,34 @@ export const getHostName = () => {
   return "http://localhost:8000";
 };
 
+export const orderStatus = [
+  {
+    key: 1,
+    value: "Mới",
+    color: "blue",
+  },
+  {
+    key: 2,
+    value: "Đã xác nhận",
+    color: "green",
+  },
+  {
+    key: 3,
+    value: "Đang giao hàng",
+    color: "orange",
+  },
+  {
+    key: 4,
+    value: "Đã giao hàng",
+    color: "purple",
+  },
+  {
+    key: 5,
+    value: "Đã hủy",
+    color: "red",
+  }
+]
+
 export const calculateTotalPriceProduct = (order: Order) => {
   let totalPrice = 0;
   if (order.items) {
