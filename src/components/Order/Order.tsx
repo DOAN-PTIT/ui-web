@@ -181,7 +181,7 @@ function Order(props: OrderProps) {
         isShowSearch={true}
         inputPlaholder="Tìm kiếm đơn hàng"
       />
-      <Content className="content p-5">
+      <Content className="content bg-gray-200 rounded-tl-xl p-5">
         <ActionTools
           callBack={() => route.push("sale")}
           reloadCallBack={() => getListOrders(params)}
@@ -189,7 +189,7 @@ function Order(props: OrderProps) {
         <Table
           columns={columns}
           rootClassName={"order__table__container"}
-          style={{ height: "100vh" }}
+          style={{ height: "calc(100vh - 248px)" }}
           dataSource={getData()}
           footer={() => renderTableFooter()}
           virtual
@@ -205,7 +205,7 @@ function Order(props: OrderProps) {
               }
             },
           }}
-          scroll={{ x: 2880, y: 500 }}
+          scroll={{ x: 2880, y: 'calc(100vh - 250px)' }}
           size="small"
           loading={isLoading}
         />
