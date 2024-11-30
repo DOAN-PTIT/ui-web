@@ -1,13 +1,15 @@
 "use client";
+import { RootState } from "@/store";
 import {
   LogoutOutlined,
   SettingOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Avatar, Dropdown, Input, Layout, Menu, message } from "antd";
+import { Avatar, Dropdown, Input, Layout, Menu, message, Spin } from "antd";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface HeaderActionProps {
   title: string;
@@ -18,8 +20,9 @@ interface HeaderActionProps {
 function HeaderAction(props: HeaderActionProps) {
   const { isShowSearch, title, inputPlaholder } = props;
   const router = useRouter();
-
-  async function logout(): Promise<void> {
+  const [loading, setLoading] = useState(false)
+  async function logout() {
+    setLoading(true)
     try {
       const accessToken = localStorage.getItem('accessToken');
       if (!accessToken) {
@@ -44,13 +47,14 @@ function HeaderAction(props: HeaderActionProps) {
       } else {
         console.error('Đăng xuất thất bại:', response.statusText);
       }
-      
-    } 
+
+    }
     catch (error: any) {
       console.error('Lỗi khi gọi API đăng xuất:', error.response?.data || error.message);
-    } 
-    finally{
-      message.success('Đăng xuất thành công'); 
+    }
+    finally {
+      setLoading(false)
+      message.success('Đăng xuất thành công');
     }
   }
 
@@ -79,16 +83,18 @@ function HeaderAction(props: HeaderActionProps) {
   ];
 
   return (
-    <Layout.Header className="flex items-center justify-between px-4 h-12 bg-slate-100">
-      <div className="flex items-center w-1/2">
-        <div className="w-1/3 text-xl font-bold">{title}</div>
-        {isShowSearch && <Input placeholder={inputPlaholder} />}
-      </div>
+    
+      <Layout.Header className="flex items-center justify-between px-2 h-12 bg-slate-100">
+        <div className="flex items-center w-1/2">
+          <div className="w-1/3 text-xl font-bold">{title}</div>
+          {isShowSearch && <Input placeholder={inputPlaholder} />}
+        </div>
 
-      <Dropdown overlay={<Menu items={items} />} trigger={['click']}>
-        <Avatar className="cursor-pointer mr-2" icon={<UserOutlined />} />
-      </Dropdown>
-    </Layout.Header>
+        <Dropdown overlay={<Menu items={items} />} trigger={['click']}>
+          <Avatar className="cursor-pointer mr-2" icon={<UserOutlined />} />
+        </Dropdown>
+      </Layout.Header>
+
   );
 }
 

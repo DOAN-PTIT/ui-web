@@ -11,7 +11,7 @@ import TitleA from "../Custom/TitleA";
 import TitleH from "../Custom/TitleH";
 import TitleLabel from '../Custom/TitleLabel';
 import HeaderAction from "../HeaderAction/HeaderAction";
-import PassModel from './components/ModelPass';
+import PassModel from './Modal/ModelPass';
 import dayjs from 'dayjs';
 
 const { Content, Sider } = Layout;

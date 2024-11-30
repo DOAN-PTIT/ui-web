@@ -14,7 +14,7 @@ import { RcFile } from 'antd/es/upload/interface';
 import { useEffect, useState } from "react";
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
-interface AddModelProps {
+interface AddModalProps {
   open: boolean;
   onOk: (param: { name: string; avatar: any }) => Promise<void>;
   onCancel: () => void;
@@ -31,7 +31,7 @@ const beforeUpload = (file: FileType) => {
   }
   return isJpgOrPng && isLt2M;
 };
-function AddModel({ open, onOk, onCancel }: AddModelProps) {
+function AddModal({ open, onOk, onCancel }: AddModalProps) {
   const [loading, setLoading] = useState(false);
   const [param, setParam] = useState<{
     name: string;
@@ -130,4 +130,4 @@ function AddModel({ open, onOk, onCancel }: AddModelProps) {
   );
 }
 
-export default AddModel;
+export default AddModal;
