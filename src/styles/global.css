@@ -1,0 +1,5 @@
+.custom_select_antd {
+    .ant-select-selector {
+        border: none !important;
+    }
+}
