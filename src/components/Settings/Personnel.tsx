@@ -1,25 +1,32 @@
 "use client"
 
-import { DeleteOutlined, FilterOutlined, PlusOutlined } from "@ant-design/icons";
-import { Avatar, Breadcrumb, Button, Input, Layout, Select, TimePicker } from "antd";
+import { DeleteOutlined, FilterOutlined, PlusOutlined, UserOutlined } from "@ant-design/icons";
+import { Avatar, Breadcrumb, Button, Input, Layout, message, Popconfirm, Select, TimePicker } from "antd";
 import { useEffect, useState } from "react";
 import TitleH from "../Custom/TitleH";
 import HeaderAction from "../HeaderAction/HeaderAction";
 import AuthCard from "./components/Card";
 import ModalAddCustomer from "./components/ModalAddCustomer";
 import apiClient from "@/service/auth";
+import { LayoutStyled } from "@/styles/layoutStyle";
+import { connect, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
+import { getListShopUser } from "@/action/shop.action";
+
 const { Content } = Layout
 const { Search } = Input;
 interface User {
     id: number;
     name: string;
     email: string;
-    phone_number: string | null; 
-    date_of_birth: string | null; 
-    createdAt: string; 
+    avatar: string;
+    phone_number: string | null;
+    date_of_birth: string | null;
+    createdAt: string;
 }
-
-export default function Genaral() {
+interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> { }
+ function Personnel(props: PesonnelProps) {
+    const {employeeShop,getEmployeeShop} = props
     const dataRow = [
         {
             id: '1',
@@ -34,10 +41,12 @@ export default function Genaral() {
             name: 'Gộp shop'
         }
     ]
+    
+    // console.log(employeeShop)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [openActor, setOpenActor] = useState(false)
     const [checkId, setCheckId] = useState()
-    const [dataPersonnel, setDataPersonnel] = useState<User[]>()
+    // const [dataPersonnel, setDataPersonnel] = useState<User[]>()
     const handleOpenActor = (id: any) => {
         setOpenActor(true);
         localStorage.setItem('personId', id)
@@ -49,6 +58,7 @@ export default function Genaral() {
 
     const handleOk = () => {
         setIsModalOpen(false);
+        getEmployeeShop(shopId)
     };
 
     const handleCancel = () => {
@@ -57,20 +67,36 @@ export default function Genaral() {
 
 
     const shopId = localStorage.getItem('shopId')
-    async function fetchListPersonnel() {
+    // async function fetchListPersonnel() {
+    //     try {
+    //         const res = await apiClient.get(`shop/${shopId}/employees?page=1&sortBy=CREATED_AT_ASC`)
+    //         setDataPersonnel(res.data.employees)
+    //         // console.log(res.data)
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
+    const handleRemove = async (id: any) => {
+        console.log(id)
+        console.log(`/shop/${shopId}/employee/${id}/remove`)
+
         try {
-            const res = await apiClient.get(`shop/${shopId}/employees?page=1&sortBy=CREATED_AT_ASC`)
-            setDataPersonnel(res.data.employees)
-            console.log(res.data)
+            await apiClient.post(`/shop/${shopId}/employee/${id}/remove`)
+            message.success('Xóa nhân viên thành công')
+            getEmployeeShop(shopId)
+            
         } catch (error) {
             console.log(error)
         }
     }
     useEffect(() => {
-        fetchListPersonnel()
+        // fetchListPersonnel()
+        getEmployeeShop(shopId)
     }, [])
+
     return (
-        <Layout className="">
+        <Layout >
+
             <HeaderAction
                 title="Cấu hình"
                 isShowSearch={true}
@@ -80,7 +106,7 @@ export default function Genaral() {
                 <Breadcrumb.Item href={`/shop/${shopId}/settings`}>Nhân viên</Breadcrumb.Item>
                 <Breadcrumb.Item className="mt-3 text-sm text-[#0050b3] font-medium">Danh sách nhân viên</Breadcrumb.Item>
             </Breadcrumb>
-            <Content className="overflow-auto overflow-x-hidden flex gap-5 h-screen">
+            <LayoutStyled className="">
                 <div className="grid grid-cols-10 w-full gap-4">
                     <div className="col-span-3 rounded-lg bg-white min-h-screen">
                         <div className="p-4 text-base font-semibold">Danh sách nhân viên</div>
@@ -95,13 +121,21 @@ export default function Genaral() {
                             </div>
                         </div>
                         <div className="p-4 ">
-                            {dataPersonnel?.map(i => (
-                                <div key={i.id} onClick={() => handleOpenActor(i.id)} className="rounded-lg flex items-center justify-between text-sm px-2 py-1 mb-1 bg-cyan-100 cursor-pointer">
-                                    <div className="flex">
-                                        <Avatar src={null} alt="avt" className="mr-2 size-6" />
+                            {employeeShop.employees?.map(i => (
+                                <div key={i.id}  className="rounded-lg flex items-center justify-between text-sm px-2 py-1 mb-1 bg-cyan-100 cursor-pointer">
+                                    <div onClick={() => handleOpenActor(i.id)} className="flex w-full">
+                                        <Avatar src={i.avatar} icon={<UserOutlined />} alt="avt" className="mr-2 size-6" />
                                         <div>{i.name}</div>
                                     </div>
-                                    <div><DeleteOutlined /></div>
+                                    <Popconfirm
+                                        title="Xóa nhân viên"
+                                        description="Bạn chắc chắn muốn xóa nhân viên shop?"
+                                        onConfirm={() => handleRemove(i.id)}
+                                        okText="Yes"
+                                        cancelText="No"
+                                    >
+                                        <div><DeleteOutlined /></div>
+                                    </Popconfirm>
                                 </div>
                                 // <div key={i?.id || null}>
 
@@ -111,14 +145,14 @@ export default function Genaral() {
 
                         </div>
                     </div>
-                    {openActor && dataPersonnel?.find(i => i.id === checkId) ? (
+                    {openActor && employeeShop.employees?.find(i => i.id === checkId) ? (
                         <div className="col-span-7 rounded-lg py-4 px-6 bg-white">
-                            {dataPersonnel
+                            {employeeShop.employees
                                 .filter(i => i.id === checkId)
                                 .map(i => (
                                     <div key={i.id} >
                                         <div className="flex items-center gap-4">
-                                            <Avatar src={null} alt="avt" size={48} />
+                                            <Avatar src={i.avatar} icon={<UserOutlined />} alt="avt" size={48} />
                                             <div className="flex-1">
                                                 <div className="flex items-center justify-between">
                                                     <div className="text-base font-semibold">{i.name}</div>
@@ -183,7 +217,21 @@ export default function Genaral() {
                     ) : null}
 
                 </div>
-            </Content>
+            </LayoutStyled>
         </Layout>
     )
 }
+const mapStateToProps = (state: RootState) => {
+    return {
+        employeeShop: state.shopReducer.user,
+        loading:state.shopReducer.isLoading
+    }
+}
+
+const mapDispatchToProps = (dispatch: AppDispatch) => {
+    return {
+        getEmployeeShop: (shopId:any) => dispatch(getListShopUser(shopId))
+        
+    }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(Personnel)

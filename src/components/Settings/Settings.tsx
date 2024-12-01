@@ -16,7 +16,7 @@ function Settings() {
                 title="Cấu hình"
                 isShowSearch={true}
                 inputPlaholder="Tìm kiếm cấu hình" />
-            <LayoutStyled className="bg-white w-full h-screen">
+            <LayoutStyled className="bg-white">
                 <div className="w-full h-full p-5">
                     <div className="text-xl font-bold w-full">Cấu hình chung</div>
                     <div className="grid grid-cols-3 gap-4 mt-4">

@@ -8,9 +8,18 @@ const reducer = createSlice({
             fb_shop_id: "",
             id: 0,
             name: "",
-            avatar:"",
+            avatar: "",
         },
-        user: {},
+        user: {
+            employees: [{
+                id: '',
+                name: '',
+                avatar:'',
+                email: '',
+                phone_number: '',
+            }]
+
+        },
         isLoading: false
     },
     reducers: {
@@ -43,6 +52,7 @@ const reducer = createSlice({
             .addCase(getListShopUser.rejected, (state) => {
                 state.isLoading = false
             })
+
     }
 })
 

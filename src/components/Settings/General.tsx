@@ -8,6 +8,7 @@ import TitleH from "../Custom/TitleH"
 import TitleLabel from "../Custom/TitleLabel"
 import HeaderAction from "../HeaderAction/HeaderAction"
 import { QuestionCircleOutlined } from "@ant-design/icons"
+import { LayoutStyled } from "@/styles/layoutStyle"
 const { Content } = Layout
 
 interface ShopSettings {
@@ -35,7 +36,6 @@ export default function Genaral() {
         },
     ];
 
-    const [imageUrl, setImageUrl] = useState<string | undefined>("");
     const [formData, setFormData] = useState({
         date_format: '',
         location: '',
@@ -57,6 +57,7 @@ export default function Genaral() {
     const shopId = localStorage.getItem('shopId');
 
     async function GetSetting() {
+        
         try {
             const accessToken = localStorage.getItem('accessToken');
             const res = await apiClient.get(`shop/setting/${shopId}`, {
@@ -76,10 +77,11 @@ export default function Genaral() {
             });
         } catch (error) {
             console.error("Error fetching settings:", error);
-        }
+        } 
     }
 
     async function handleUpdate() {
+        
         try {
             const shopId = localStorage.getItem("shopId");
             const accessToken = localStorage.getItem("accessToken");
@@ -91,18 +93,20 @@ export default function Genaral() {
                 },
             });
             console.log("Response data:", res.data);
-            message.success('Đã lưu');
+            message.success('Đã lưu thành công');
 
             setData(res.data);
         } catch (error) {
             if (axios.isAxiosError(error)) {
+                message.error('Lưu cài đặt thất bại');
+
                 console.error("Error response:", error.response?.data);
                 console.error("Error status:", error.response?.status);
                 console.error("Error headers:", error.response?.headers);
             } else {
                 console.error("Error:", error);
             }
-        }
+        } 
     }
 
     useEffect(() => {
@@ -125,7 +129,7 @@ export default function Genaral() {
                 <Breadcrumb.Item href={`/shop/${shopId}/settings`}>Cửa hàng </Breadcrumb.Item>
                 <Breadcrumb.Item className="mt-3 text-sm text-[#0050b3] font-medium">Cài đặt chung</Breadcrumb.Item>
             </Breadcrumb>
-            <Content className="bg-white rounded-lg overflow-auto overflow-x-hidden p-5 gap-5 h-screen">
+            <LayoutStyled className="bg-white">
                 <div className="grid grid-cols-4 w-full">
                     <div>
                         <TitleH className='mb-4' title='Thông tin cửa hàng' />
@@ -172,7 +176,7 @@ export default function Genaral() {
 
                 </div>
 
-            </Content>
+            </LayoutStyled>
         </Layout>
     )
 }
