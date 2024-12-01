@@ -60,7 +60,7 @@ interface MenuComponentProps extends ReturnType<typeof mapStateToProps>, ReturnT
 
 function Menu(props: MenuComponentProps) {
   const { currentShop } = props;
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const route = useRouter();
   const params = useParams();
   const pathName = usePathname().split("/");
@@ -95,7 +95,7 @@ function Menu(props: MenuComponentProps) {
           </div>
         )}
         <AntdMenu
-          className="bg-[#f2f4f7] text-[#101828] !border-none"
+          className="bg-[#f2f4f7] text-[#101828] !border-none justify-center "
           defaultOpenKeys={['dashbroad']}
           defaultSelectedKeys={['dashbroad']}
           selectedKeys={[pathName[3]]}
@@ -112,7 +112,8 @@ function Menu(props: MenuComponentProps) {
 
 const mapStateToProps = (state: RootState) => {
   return {
-    currentShop: state.shopReducer.shop
+    currentShop: state.shopReducer.shop,
+    
   }
 }
 

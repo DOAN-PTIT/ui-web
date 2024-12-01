@@ -64,7 +64,7 @@ interface OverviewProps
 
 function Overview(props: OverviewProps) {
   const { getCurrentUser, currentUser } = props;
-
+console.log(props)
   const [listFBPages, setListFBPages] = useState<FBShopProps[]>([]);
   const [openModal, setOpenModal] = useState(false);
   const [isLoadingFbPage, setIsLoadingFbPage] = useState(false);
