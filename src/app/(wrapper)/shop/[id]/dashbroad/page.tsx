@@ -1,3 +1,5 @@
+import Dashbroad from "@/components/Dashbroad";
+
 export default function DashbroadPage() {
-    return <h1>dashbroad page</h1>
+    return <Dashbroad />
 }

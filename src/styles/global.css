@@ -3,3 +3,20 @@
         border: none !important;
     }
 }
+
+.order__table__container .ant-table-container {
+    height: calc(100vh - 228px) !important;
+}
+
+.order__table__container .ant-table-container .ant-table-tbody-virtual {
+    position: unset !important;
+    height: 100%;
+}
+
+.order__table__container .ant-table-container .ant-table-tbody-virtual .ant-table-tbody-virtual-holder {
+    height: 100% !important;
+}
+
+.order__table__container .ant-table-container .ant-table-tbody-virtual .ant-table-tbody-virtual-holder > div {
+    height: 100% !important;
+}
