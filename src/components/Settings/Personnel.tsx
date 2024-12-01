@@ -1,6 +1,6 @@
 "use client"
 
-import { DeleteOutlined, FilterOutlined, PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, FilterOutlined, PlusOutlined, UserOutlined } from "@ant-design/icons";
 import { Avatar, Breadcrumb, Button, Input, Layout, Select, TimePicker } from "antd";
 import { useEffect, useState } from "react";
 import TitleH from "../Custom/TitleH";
@@ -8,12 +8,16 @@ import HeaderAction from "../HeaderAction/HeaderAction";
 import AuthCard from "./components/Card";
 import ModalAddCustomer from "./components/ModalAddCustomer";
 import apiClient from "@/service/auth";
+import { LayoutStyled } from "@/styles/layoutStyle";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 const { Content } = Layout
 const { Search } = Input;
 interface User {
     id: number;
     name: string;
     email: string;
+    avatar:string;
     phone_number: string | null; 
     date_of_birth: string | null; 
     createdAt: string; 
@@ -34,6 +38,8 @@ export default function Genaral() {
             name: 'Gộp shop'
         }
     ]
+    
+
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [openActor, setOpenActor] = useState(false)
     const [checkId, setCheckId] = useState()
@@ -66,9 +72,21 @@ export default function Genaral() {
             console.log(error)
         }
     }
+    const handleRemove =async(id:any)=>{
+        console.log(id)
+        console.log(`/shop/${shopId}/employee/${id}/remove`)
+        
+        try {
+            await apiClient.post(`/shop/${shopId}/employee/${id}/remove`)
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
     useEffect(() => {
         fetchListPersonnel()
     }, [])
+    
     return (
         <Layout className="">
             <HeaderAction
@@ -80,7 +98,7 @@ export default function Genaral() {
                 <Breadcrumb.Item href={`/shop/${shopId}/settings`}>Nhân viên</Breadcrumb.Item>
                 <Breadcrumb.Item className="mt-3 text-sm text-[#0050b3] font-medium">Danh sách nhân viên</Breadcrumb.Item>
             </Breadcrumb>
-            <Content className="overflow-auto overflow-x-hidden flex gap-5 h-screen">
+            <LayoutStyled className="">
                 <div className="grid grid-cols-10 w-full gap-4">
                     <div className="col-span-3 rounded-lg bg-white min-h-screen">
                         <div className="p-4 text-base font-semibold">Danh sách nhân viên</div>
@@ -98,10 +116,10 @@ export default function Genaral() {
                             {dataPersonnel?.map(i => (
                                 <div key={i.id} onClick={() => handleOpenActor(i.id)} className="rounded-lg flex items-center justify-between text-sm px-2 py-1 mb-1 bg-cyan-100 cursor-pointer">
                                     <div className="flex">
-                                        <Avatar src={null} alt="avt" className="mr-2 size-6" />
+                                        <Avatar src={i.avatar} icon={<UserOutlined />} alt="avt" className="mr-2 size-6" />
                                         <div>{i.name}</div>
                                     </div>
-                                    <div><DeleteOutlined /></div>
+                                    <div onClick={()=>handleRemove(i.id)}><DeleteOutlined /></div>
                                 </div>
                                 // <div key={i?.id || null}>
 
@@ -118,7 +136,7 @@ export default function Genaral() {
                                 .map(i => (
                                     <div key={i.id} >
                                         <div className="flex items-center gap-4">
-                                            <Avatar src={null} alt="avt" size={48} />
+                                            <Avatar src={i.avatar} alt="avt" size={48} />
                                             <div className="flex-1">
                                                 <div className="flex items-center justify-between">
                                                     <div className="text-base font-semibold">{i.name}</div>
@@ -183,7 +201,7 @@ export default function Genaral() {
                     ) : null}
 
                 </div>
-            </Content>
+            </LayoutStyled>
         </Layout>
     )
 }

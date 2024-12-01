@@ -5,6 +5,7 @@ import { Breadcrumb, Button, Layout, Select, Switch, Tooltip } from "antd"
 import { useState } from "react"
 import HeaderAction from "../HeaderAction/HeaderAction"
 import ModalSettingVoucher from "./components/ModalSettingVoucher"
+import { LayoutStyled } from "@/styles/layoutStyle"
 const { Content } = Layout
 export default function Customer() {
     const [openSetVoucher, setOpenSetVoucher] = useState(false)
@@ -33,7 +34,7 @@ export default function Customer() {
                 <Breadcrumb.Item href={`/shop/${shopId}/settings`}>Khách hàng</Breadcrumb.Item>
                 <Breadcrumb.Item className="mt-3 text-sm text-[#0050b3] font-medium">Cài đặt khách hàng</Breadcrumb.Item>
             </Breadcrumb>
-            <Content className="overflow-auto overflow-x-hidden flex gap-5 h-screen">
+            <LayoutStyled className="bg-white">
                 <div className="flex w-full gap-4 p-4 rounded-md bg-white">
                     <div className="font-medium w-1/4">Cấu hình khách hàng</div>
                     <div className="w-3/4">
@@ -69,7 +70,7 @@ export default function Customer() {
                     </div>
                 </div>
 
-            </Content>
+            </LayoutStyled>
         </Layout>
     )
 }

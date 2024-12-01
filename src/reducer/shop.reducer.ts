@@ -10,7 +10,13 @@ const reducer = createSlice({
             name: "",
             avatar:"",
         },
-        user: {},
+        user: {
+            id: '',
+            name: '',
+            email: '',
+            phone_number:'',
+           
+        },
         isLoading: false
     },
     reducers: {
@@ -43,6 +49,7 @@ const reducer = createSlice({
             .addCase(getListShopUser.rejected, (state) => {
                 state.isLoading = false
             })
+         
     }
 })
 

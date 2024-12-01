@@ -7,9 +7,9 @@ export const getCurrentShop = createAsyncThunk(
         const { shopId } = data
         const url = `/shop/${shopId}`;
         return await apiClient
-        .get(url)
-        .then((res) => res.data)
-        .catch((error) => console.log(error));
+            .get(url)
+            .then((res) => res.data)
+            .catch((error) => console.log(error));
     }
 )
 
@@ -19,8 +19,9 @@ export const getListShopUser = createAsyncThunk(
         const { shopId } = params
         const url = `/shop/${shopId}/employees?page=1&sortBy=CREATED_AT_ASC`;
         return await apiClient
-        .get(url)
-        .then((res) => res.data)
-        .catch((error) => console.log(error)); 
+            .get(url)
+            .then((res) => res.data)
+            .catch((error) => console.log(error));
     }
 )
+

@@ -1,14 +1,24 @@
 "use client"
 
-import { Button, Divider, Input, Modal, Radio, RadioChangeEvent, Select, Space, Switch } from "antd"
+import apiClient from "@/service/auth";
+import { RootState } from "@/store";
+import { Button, Divider, Input, message, Modal, Radio, RadioChangeEvent, Select, Space, Switch } from "antd"
 import { useState } from "react";
+import { useSelector } from "react-redux";
 interface Props {
     open: any;
     onOk: any;
     onCancel: any;
 }
+interface Employee{
+    email:string
+}
 export default function ModalAddCustomer({ open, onOk, onCancel }: Props) {
+
+    const { id} = useSelector((state: RootState) => state.shopReducer.shop)
+    
     const [value, setValue] = useState(1);
+    const [employee,setEmployee] = useState<Employee>({email:''})
     const options = [
         {
             value: '+84',
@@ -23,6 +33,16 @@ export default function ModalAddCustomer({ open, onOk, onCancel }: Props) {
         console.log('radio checked', e.target.value);
         setValue(e.target.value);
     };
+    const handleAdd=async()=>{
+        console.log(employee)
+        try {
+            await apiClient.post(`/shop/${id}/employee/add`, employee)
+            message.success('Thêm nhân viên thành công')
+        } catch (error) {
+            console.log(error)
+            message.error('Thêm nhân viên thất bại')
+        }
+    }
     return (
         <Modal title='Tên nhân viên' open={open} onOk={onOk} onCancel={onCancel} cancelText='Hủy' okText='Đồng ý'>
             <Divider className="m-0" />
@@ -38,7 +58,7 @@ export default function ModalAddCustomer({ open, onOk, onCancel }: Props) {
                     <Radio value={4}>Tên đăng nhập</Radio>
                 </Radio.Group>
                 <div className="flex w-full my-2">
-                    {value === 1 ? <Input placeholder="Nhập email nhân viên" />
+                    {value === 1 ? <Input onChange={(e)=> setEmployee(prev=> ({...prev,email:e.target.value}))} placeholder="Nhập email nhân viên" />
                         : value === 2
                             ? <Space.Compact className="w-full">
                                 <Select defaultValue="+84" options={options} />
@@ -47,7 +67,7 @@ export default function ModalAddCustomer({ open, onOk, onCancel }: Props) {
                             : value === 3 ? <Input placeholder="Nhập Facebook ID nhân viên" />
                                 : value === 4 ? <Input placeholder="Nhập Tên đăng nhập" /> : ''
                     }
-                    <Button className="ml-2" value={value} type="primary">Thêm mới</Button>
+                    <Button className="ml-2" value={value} type="primary" onClick={handleAdd}>Thêm mới</Button>
                 </div>
 
             </div>
