@@ -1,7 +1,7 @@
 "use client"
 
 import { DeleteOutlined, FilterOutlined, PlusOutlined, UserOutlined } from "@ant-design/icons";
-import { Avatar, Breadcrumb, Button, Input, Layout, message, Popconfirm, Select, TimePicker } from "antd";
+import { Avatar, Breadcrumb, Button, DatePicker, Input, Layout, message, Popconfirm, Select, TimePicker } from "antd";
 import { useEffect, useState } from "react";
 import TitleH from "../Custom/TitleH";
 import HeaderAction from "../HeaderAction/HeaderAction";
@@ -12,6 +12,8 @@ import { LayoutStyled } from "@/styles/layoutStyle";
 import { connect, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { getListShopUser } from "@/action/shop.action";
+import dayjs from "dayjs";
+import moment from "moment";
 
 const { Content } = Layout
 const { Search } = Input;
@@ -121,8 +123,8 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                             </div>
                         </div>
                         <div className="p-4 ">
-                            {employeeShop.employees?.map(i => (
-                                <div key={i.id}  className="rounded-lg flex items-center justify-between text-sm px-2 py-1 mb-1 bg-cyan-100 cursor-pointer">
+                            {employeeShop?.employees?.map(i => (
+                                <div key={i.id} className={`${checkId==i.id && openActor && 'bg-cyan-100'} rounded-lg flex items-center justify-between text-sm px-2 py-1 mb-1 hover:bg-cyan-100 cursor-pointer`}>
                                     <div onClick={() => handleOpenActor(i.id)} className="flex w-full">
                                         <Avatar src={i.avatar} icon={<UserOutlined />} alt="avt" className="mr-2 size-6" />
                                         <div>{i.name}</div>
@@ -145,9 +147,9 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
 
                         </div>
                     </div>
-                    {openActor && employeeShop.employees?.find(i => i.id === checkId) ? (
+                    {openActor && employeeShop?.employees?.find(i => i.id === checkId) ? (
                         <div className="col-span-7 rounded-lg py-4 px-6 bg-white">
-                            {employeeShop.employees
+                            {employeeShop?.employees
                                 .filter(i => i.id === checkId)
                                 .map(i => (
                                     <div key={i.id} >
@@ -172,19 +174,18 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                                         </div>
                                         <div className="flex gap-4 mt-4">
                                             <div className="flex-1">
-                                                <div className="text-sm font-medium mb-1">Bộ phận</div>
+                                                <div className="text-sm font-medium mb-1">Chức vụ</div>
                                                 <Select
                                                     className="w-full"
-                                                    defaultValue="lucy"
+                                                    defaultValue="Nhân viên"
                                                     options={[
-                                                        { value: 'jack', label: 'Jack' },
-                                                        { value: 'lucy', label: 'Lucy' },
-                                                        { value: 'Yiminghe', label: 'yiminghe' },
-                                                        { value: 'disabled', label: 'Disabled', disabled: true },
+                                                        { value: 'admin', label: 'Quản lý' },
+                                                        { value: 'employee', label: 'Nhân viên' },
+                                                        
                                                     ]}
                                                 />
                                             </div>
-                                            <div className="flex-1">
+                                            {/* <div className="flex-1">
                                                 <div className="text-sm font-medium mb-1">Kho hàng</div>
                                                 <Select
                                                     className="w-full"
@@ -196,10 +197,11 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                                                         { value: 'disabled', label: 'Disabled', disabled: true },
                                                     ]}
                                                 />
-                                            </div>
+                                            </div> */}
                                             <div className="flex-1">
-                                                <div className="text-sm font-medium mb-1">Thời gian làm việc</div>
-                                                <TimePicker.RangePicker className="w-full" placeholder={['Bắt đầu', 'Kết thúc']} />
+
+                                                <div className="text-sm font-medium mb-1">Bắt đầu làm việc</div>
+                                                <DatePicker className="w-full" defaultValue={moment(i?.shopusers[0].createdAt, 'YYYY/MM/DD')} format={'YYYY/MM/DD'}  disabled/>
                                             </div>
                                         </div>
                                         <div>

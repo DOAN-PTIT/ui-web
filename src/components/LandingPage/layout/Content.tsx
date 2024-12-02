@@ -16,7 +16,7 @@ export default function LandingContent() {
     return (
         <Content>
             <Image className='h-[754px] object-cover w-auto' src={Background} alt="" />
-            <div className='bg-cover bg-center max-w-[76rem] mx-auto  sm:w-[1300px]'>
+            <div className=' bg-cover bg-center max-w-[76rem] mx-auto sm:w-[1300px]'>
                 <div className=' absolute h-[1054px] top-24 sm:flex items-center justify-between sm:h-[720px]'>
                     <div className='sm:w-[706px] mr'>
                         <div className='flex item-center mx:3'>
@@ -56,10 +56,45 @@ export default function LandingContent() {
                         />
                     </div>
                 </div>
+                <div className=' '>
+                    <div>
+
+                    </div>
+                </div>
             </div>
-            {/* <div className='bg-cover bg-center relative bg-white'>
-                <div className='flex sm:flex h-[720px] items-center justify-between ml-[10px] sm:h-[720px] lg:ml-[150px] md:ml-[100px] sm:items-center sm:justify-between'>aaaaaaaaa</div>
-            </div> */}
+            <div className='bg-cover bg-center relative bg-white'>
+                <div className='flex sm:flex h-[720px] items-center justify-between sm:h-[720px] max-w-[76rem] mx-auto sm:w-[1300px]'>
+                    <div className='w-[546px] mr-16'>
+                        <div className='text-4xl font-bold '>Quản lý bán hàng đa kênh</div>
+                        <div className='text-[#6a6a6a] text-lg font-[450] mt-3'>Quản lý hoạt động bán hàng trên nhiều kênh khác nhau từ một hệ thống</div>
+                        <div className='flex mt-4'>
+                            <img className='mr-4 self-start' src="https://pos.pancake.vn/static/img/CheckCircle.svg" alt="" />
+                            <div>
+                                <div className='text-lg font-semibold'>Tích hợp đa kênh</div>
+                                <div className='text-[#6a6a6a] text-lg font-[450] mt-2'>Hỗ trợ tích hợp và quản lý đơn hàng từ các kênh bán hàng khác nhau như website, mạng xã hội, sàn thương mại điện tử và cửa hàng truyền thống.</div>
+                            </div>
+                        </div>
+                        <div className='flex mt-4'>
+                            <img className='mr-4 self-start' src="https://pos.pancake.vn/static/img/CheckCircle.svg" alt="" />
+                            <div>
+                                <div className='text-lg font-semibold'>Đồng bộ tồn kho</div>
+                                <div className='text-[#6a6a6a] text-lg font-[450] mt-2'>Tự động cập nhật và đồng bộ số lượng tồn kho giữa các kênh bán hàng để tránh tình trạng hết hàng hoặc tồn kho quá nhiều.</div>
+                            </div>
+                        </div>
+                        <div className='flex mt-4'>
+                            <img className='mr-4 self-start' src="https://pos.pancake.vn/static/img/CheckCircle.svg" alt="" />
+                            <div>
+                                <div className='text-lg font-semibold'>
+                                    Báo cáo tập trung</div>
+                                <div className='text-[#6a6a6a] text-lg font-[450] mt-2'>Cung cấp báo cáo chi tiết về doanh số, lượng hàng bán ra, và hiệu quả kinh doanh từ từng kênh, giúp đưa ra quyết định kinh doanh chính xác.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <img src="https://pos.pancake.vn/static/img/SalesChanel.webp" alt="" className='w-[681px]' />
+                    </div>
+                </div>
+            </div>
         </Content>
     );
 }
