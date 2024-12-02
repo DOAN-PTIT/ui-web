@@ -121,7 +121,7 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                             </div>
                         </div>
                         <div className="p-4 ">
-                            {employeeShop.employees?.map(i => (
+                            {employeeShop?.employees?.map(i => (
                                 <div key={i.id}  className="rounded-lg flex items-center justify-between text-sm px-2 py-1 mb-1 bg-cyan-100 cursor-pointer">
                                     <div onClick={() => handleOpenActor(i.id)} className="flex w-full">
                                         <Avatar src={i.avatar} icon={<UserOutlined />} alt="avt" className="mr-2 size-6" />
