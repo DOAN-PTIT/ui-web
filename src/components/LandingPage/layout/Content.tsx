@@ -67,7 +67,7 @@ export default function LandingContent() {
                     <div className='w-[546px] mr-16'>
                         <div className='text-4xl font-bold '>Quản lý bán hàng đa kênh</div>
                         <div className='text-[#6a6a6a] text-lg font-[450] mt-3'>Quản lý hoạt động bán hàng trên nhiều kênh khác nhau từ một hệ thống</div>
-                        <div className='flex mt-4'>
+                        <div className='flex mt-6'>
                             <img className='mr-4 self-start' src="https://pos.pancake.vn/static/img/CheckCircle.svg" alt="" />
                             <div>
                                 <div className='text-lg font-semibold'>Tích hợp đa kênh</div>
