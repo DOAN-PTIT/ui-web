@@ -1,30 +1,25 @@
 import {
-  getListProductFBShop,
   createProduct,
   getListProduct,
+  getListProductFBShop,
 } from "@/action/product.action";
 import { createVariation } from "@/action/variation.action";
 import { AppDispatch, RootState } from "@/store";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import {
-  TableProps,
   Button,
-  Modal,
-  Layout,
-  Row,
   Col,
   Form,
+  Image,
+  Input,
+  Layout,
+  Modal,
+  Row,
   Select,
   Table,
-  Input,
-  Dropdown,
-  Image,
-  Upload,
-  UploadFile,
-  UploadProps,
-  GetProp
+  TableProps
 } from "antd";
-import { useState, ChangeEvent, Dispatch, SetStateAction } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 import { connect } from "react-redux";
 import defaultImage from "../../assets/default.png";
 import { ModalUpLoad } from "./ModalUpload";

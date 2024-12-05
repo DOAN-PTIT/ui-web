@@ -15,7 +15,8 @@ export const getCurrentShop = createAsyncThunk(
 
 export const getListShopUser = createAsyncThunk(
     "shop/getListShopUser",
-    async (shopId: any) => {
+    async (param: any) => {
+        const { shopId} = param
         const url = `/shop/${shopId}/employees?page=1&sortBy=CREATED_AT_ASC`;
         return await apiClient
             .get(url)
