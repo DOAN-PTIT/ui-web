@@ -219,7 +219,7 @@ console.log(props)
   return (
     <Layout className="w-full min-h-screen">
       <HeaderAction isShowSearch={false} title="Danh sách cửa hàng" />
-      <LayoutStyled className="bg-slate-200 ">
+      <LayoutStyled className="bg-slate-200">
         {isLoading ? (
           <div className="w-full h-full flex items-center justify-center">
             <LoadingOutlined size={64} />

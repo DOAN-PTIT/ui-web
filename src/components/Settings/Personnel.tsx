@@ -29,6 +29,7 @@ interface User {
 interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> { }
  function Personnel(props: PesonnelProps) {
     const {employeeShop,getEmployeeShop} = props
+    console.log(props)
     const dataRow = [
         {
             id: '1',
@@ -69,15 +70,7 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
 
 
     const shopId = localStorage.getItem('shopId')
-    // async function fetchListPersonnel() {
-    //     try {
-    //         const res = await apiClient.get(`shop/${shopId}/employees?page=1&sortBy=CREATED_AT_ASC`)
-    //         setDataPersonnel(res.data.employees)
-    //         // console.log(res.data)
-    //     } catch (error) {
-    //         console.log(error)
-    //     }
-    // }
+
     const handleRemove = async (id: any) => {
         console.log(id)
         console.log(`/shop/${shopId}/employee/${id}/remove`)
@@ -93,7 +86,7 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
     }
     useEffect(() => {
         // fetchListPersonnel()
-        getEmployeeShop(shopId)
+        getEmployeeShop({shopId})
     }, [])
 
     return (

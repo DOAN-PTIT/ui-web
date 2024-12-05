@@ -1,28 +1,28 @@
 import {
-  getListProductFBShop,
   createProduct,
   getListProduct,
+  getListProductFBShop,
 } from "@/action/product.action";
 import { createVariation } from "@/action/variation.action";
 import { AppDispatch, RootState } from "@/store";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import {
-  TableProps,
   Button,
-  Modal,
-  Layout,
-  Row,
   Col,
   Form,
+  Image,
+  Input,
+  Layout,
+  Modal,
+  Row,
   Select,
   Table,
-  Input,
-  Dropdown,
-  Image
+  TableProps
 } from "antd";
-import { useState, ChangeEvent, Dispatch, SetStateAction } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 import { connect } from "react-redux";
 import defaultImage from "../../assets/default.png";
+import { ModalUpLoad } from "./ModalUpload";
 
 interface VariationProps {
   id: string;
@@ -34,25 +34,28 @@ interface VariationProps {
 }
 
 interface ProductDetailProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> {
-    typeView: string;
-    modalVisiable: boolean;
-    setModalVisiable: Dispatch<SetStateAction<boolean>>,
-    product?: any;
+  typeView: string;
+  modalVisiable: boolean;
+  setModalVisiable: Dispatch<SetStateAction<boolean>>,
+  product?: any;
 }
 
 function ProductDetail(props: ProductDetailProps) {
-    const {
-        createProduct,
-        getListProduct,
-        createVariation,
-        currentShop,
-        setModalVisiable,
-        modalVisiable,
-    } = props;
+  const {
+    createProduct,
+    getListProduct,
+    createVariation,
+    currentShop,
+    setModalVisiable,
+    modalVisiable,
+  } = props;
 
   const [createProductParams, setCreateProductParams] = useState<any>({});
+  const [isOpenModal, setIsOpenModal] = useState(false);
   const [variationData, setVariationData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+
+
   interface VariationParam {
     index: number;
     [key: string]: any;
@@ -170,9 +173,9 @@ function ProductDetail(props: ProductDetailProps) {
     const newVariation = {
       id: <Input name="variation_code" />,
       image: (
-        <Dropdown menu={{ items: [{ label: "Chỉnh sửa", key: "edit-image" }] }}>
-          <Image alt="" src={defaultImage.src} preview={false} />
-        </Dropdown>
+        <>
+            <Image alt="" onClick={() => setIsOpenModal(true)} src={defaultImage.src} preview={false} className="cursor-pointer" />
+        </>
       ),
       barcode: <Input name="barcode" />,
       salePrice: <Input name="retail_price" />,
@@ -221,7 +224,9 @@ function ProductDetail(props: ProductDetailProps) {
   const onInputChange = (key: string, value: any) => {
     setCreateProductParams((prev: any) => ({ ...prev, [key]: value }));
   };
-
+const handleCancel =() => {
+  setIsOpenModal(false)
+}
   return (
     <Modal
       title="Thiết lập sản phẩm"
@@ -236,6 +241,7 @@ function ProductDetail(props: ProductDetailProps) {
       onCancel={() => setModalVisiable(false)}
       onOk={handleCreateProduct}
     >
+      <ModalUpLoad open={isOpenModal} onCancel={handleCancel}/>
       <Layout className="p-5 h-[600px] overflow-y-scroll">
         <Row justify="space-between" className="mb-5">
           <Col span={12} className="bg-white rounded-lg shadow-sm">
