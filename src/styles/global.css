@@ -6,6 +6,8 @@
 
 .order__table__container .ant-table-container {
     height: calc(100vh - 228px) !important;
+    overflow: hidden;
+    overflow-y: scroll;
 }
 
 .order__table__container .ant-table-container .ant-table-tbody-virtual {
