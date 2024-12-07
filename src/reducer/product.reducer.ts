@@ -1,10 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createProduct, getListProduct, getListProductFBShop } from "@/action/product.action";
+import { Product } from "@/utils/type";
 
 const productReducer = createSlice({
     name: 'product',
     initialState: {
         listProduct: {
+            products: [] as Product[],
+            totalCount: 0
+        },
+        productsFacebookShop: {
             products: [] as Product[],
             totalCount: 0
         },
@@ -46,7 +51,7 @@ const productReducer = createSlice({
             })
             .addCase(getListProductFBShop.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.listProduct = action.payload;
+                state.productsFacebookShop = action.payload;
             })
             .addCase(getListProductFBShop.rejected, (state) => {
                 state.isLoading = false;

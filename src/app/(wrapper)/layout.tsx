@@ -28,8 +28,7 @@ export default function WrapperLayout({
           <div>
             <Menu />
           </div>
-          {/* Lạy bố */}
-          <div className="w-full">{children}</div>
+          <div className="w-full h-screen overflow-hidden">{children}</div>
         </ReduxProvider>
       </body>
     </html>
