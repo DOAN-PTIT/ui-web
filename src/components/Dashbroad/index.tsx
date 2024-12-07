@@ -26,7 +26,7 @@ function Dashbroad() {
   };
 
   return (
-    <Layout>
+    <Layout className="w-full">
       <HeaderAction title="Tổng quan" isShowSearch={false} />
       <Content className="p-5 bg-gray-200 rounded-tl-xl min-h-screen flex flex-col gap-4">
         {renderHeader()}

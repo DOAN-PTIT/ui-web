@@ -60,7 +60,7 @@ interface MenuComponentProps extends ReturnType<typeof mapStateToProps>, ReturnT
 
 function Menu(props: MenuComponentProps) {
   const { currentShop } = props;
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
   const route = useRouter();
   const params = useParams();
   const pathName = usePathname().split("/");
@@ -70,7 +70,6 @@ function Menu(props: MenuComponentProps) {
     label: item.label,
     icon: item.icon,
     onClick: () => {
-      console.log(item);
       return item.key === "home"
         ? route.push("/shop/overview")
         : route.push(`/shop/${params.id[0]}/${item.key}`);

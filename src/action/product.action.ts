@@ -40,7 +40,7 @@ export const getListProductFBShop = createAsyncThunk(
   async (data: any) => {
     const {access_token, fb_shop_id} = data
     const url = 
-      `https://graph.facebook.com/v21.0/${fb_shop_id}/product_catalogs?fields=product_count%2Cproducts%7Bname%2Cproduct_catalog%2Cdescription%2Cid%7D&access_token=${access_token}`;
+      `https://graph.facebook.com/v21.0/${fb_shop_id}/product_catalogs?fields=product_groups%7Bid%2Cretailer_id%2Cproduct_catalog%2Cproducts%7Bname%2Cdescription%2Cprice%2Cimage_url%2Curl%2Csale_price%2Cinventory%7D%2Cvariants%7D&access_token=${access_token}`;
 
     return await apiClient
       .get(url)

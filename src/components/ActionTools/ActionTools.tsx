@@ -10,7 +10,7 @@ interface ActionToolsProps {
   callBack: () => void;
   reloadCallBack: () => Promise<any>;
   hasSyncFBCatalog?: boolean;
-  callBackSyncFBCatalog?: () => Promise<any>;
+  callBackSyncFBCatalog?: () => void
 }
 
 function ActionTools(props: ActionToolsProps) {
