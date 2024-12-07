@@ -216,9 +216,9 @@ function Customer(props: CustomerProps) {
   return (
     <Layout>
       <HeaderAction
-        title="Khach hang"
+        title="Khách hàng"
         isShowSearch={true}
-        inputPlaholder="Tim kiem khach hang"
+        inputPlaholder="Tìm kiếm khách hàng"
       />
       <Layout.Content className="p-5 h-screen bg-gray-200 rounded-tl-xl order__table__container">
         <ActionTools callBack={callBack} reloadCallBack={getListCustomer} />

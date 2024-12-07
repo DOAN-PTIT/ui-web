@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  Layout,
-  Table,
-} from "antd";
+import { Image, Layout, Table } from "antd";
 import HeaderAction from "../HeaderAction/HeaderAction";
 import ActionTools from "../ActionTools/ActionTools";
 import type { TableProps } from "antd";
@@ -19,7 +16,7 @@ import { formatNumber } from "@/utils/tools";
 import { createVariation } from "@/action/variation.action";
 import ProductDetail from "../ProductDetail/ProductDetail";
 import "../../styles/global.css";
-
+import SyncProductFacebookShop from "../SyncProductFacebookShop";
 
 interface ProductType {
   id: string;
@@ -37,6 +34,7 @@ interface ProductProps
 
 function Product(props: ProductProps) {
   const [modalVisiable, setModalVisiable] = useState(false);
+  const [isSyncFBCatalog, setIsSyncFBCatalog] = useState(false);
 
   const {
     getListProduct,
@@ -56,38 +54,70 @@ function Product(props: ProductProps) {
       dataIndex: "id",
       title: "ID",
       fixed: "left",
-      width: 120,
+      width: "10%",
+      render: (text, record) => {
+        return <span className="font-medium">{text}</span>
+      }
     },
     {
       key: "PRODUCT NAME",
       dataIndex: "name",
-      title: "Ten san pham",
+      title: "Tên sản phẩm",
       fixed: "left",
+      width: "10%",
+      render: (text, record) => {
+        return <span className="font-medium">{text}</span>
+      }
+    },
+    {
+      key: "IMAGE",
+      dataIndex: "image",
+      title: "Hình ảnh",
+      fixed: "left",
+      width: "8%",
+      render: (text, record) => {
+        return <Image src={text} width={80} />
+      }
     },
     {
       key: "TOTAL AMOUNT",
       dataIndex: "totalAmount",
       title: "Tổng số lượng",
+      render: (text, record) => {
+        return <span className="font-medium">{text}</span>
+      }
     },
     {
       key: "TOTAL VARIATION",
       dataIndex: "totalVariation",
       title: "Tổng số mẫu mã",
+      render: (text, record) => {
+        return <span className="font-medium">{text}</span>
+      }
     },
     {
       key: "SALE  PRICE",
       dataIndex: "salePrice",
       title: "Giá bán",
+      render: (text, record) => {
+        return <span className="font-medium">{text}</span>
+      }
     },
     {
       key: "IMPORTED PRICE",
       dataIndex: "importedPrice",
       title: "Giá nhập",
+      render: (text, record) => {
+        return <span className="font-medium">{text}</span>
+      }
     },
     {
       key: "NOTE",
       dataIndex: "note",
       title: "Ghi chú",
+      render: (text, record) => {
+        return <span className="font-medium">{text}</span>
+      }
     },
   ];
 
@@ -101,28 +131,48 @@ function Product(props: ProductProps) {
   };
 
   const callBackSyncFBCatalog = () => {
-    return getListProductFBShop({
-      access_token: currentUser.access_token,
-      fb_shop_id: currentShop.fb_shop_id,
-    });
+    setIsSyncFBCatalog(true);
   };
 
   const getData: () => TableProps<ProductType>["dataSource"] = () => {
     return listProduct?.products
-      ? listProduct?.products.map((product) => ({
-          id: product.product_code || product.id,
-          name: product.name,
-          totalAmount: 0,
-          salePrice: formatNumber(1231289, "VND"),
-          importedPrice: formatNumber(3213912, "VND"),
-          note: product.description,
-          totalVariation: 0,
-        }))
+      ? listProduct?.products.map((product: any) => {
+        const firstVariation = product?.variations[0];
+          const totalAmount = product?.variations.reduce(
+            (total: number, variation: any) => total + (variation?.amount || 0),
+            0
+          );
+          const totalVariation = product?.variations?.length || 0;
+          // sale Price will get about variation min - max
+          const maxSalePrice = Math.max(
+            ...product?.variations?.map((variation: any) => variation?.retail_price)
+          );
+          const minSalePrice = Math.min(
+            ...product?.variations?.map((variation: any) => variation?.retail_price)
+          );
+          let salePrice;
+          if (maxSalePrice == minSalePrice) {
+            salePrice = `${formatNumber(maxSalePrice, "VND")} đ`;
+          } else {
+            salePrice = `${formatNumber(minSalePrice, "VND")} đ - ${formatNumber(maxSalePrice,"VND")} đ`;
+          }
+
+          return {
+            id: product.product_code || product.id,
+            name: product.name,
+            totalAmount,
+            salePrice,
+            importedPrice: formatNumber(3213912, "VND"),
+            note: product.description,
+            totalVariation,
+            image: firstVariation?.image,
+          };
+        })
       : [];
   };
 
   return (
-    <Layout>
+    <Layout className="h-full">
       <HeaderAction
         title="Sản phẩm"
         isShowSearch={true}
@@ -138,6 +188,7 @@ function Product(props: ProductProps) {
         <Table
           columns={columns}
           dataSource={getData()}
+          virtual
           pagination={{
             total: props.totalPage ? props.totalPage : 0,
             pageSize: 30,
@@ -151,10 +202,14 @@ function Product(props: ProductProps) {
           loading={props.isLoading}
         />
       </Layout.Content>
-      <ProductDetail 
+      <ProductDetail
         modalVisiable={modalVisiable}
         typeView="create"
         setModalVisiable={setModalVisiable}
+      />
+      <SyncProductFacebookShop
+        open={isSyncFBCatalog}
+        setOpen={setIsSyncFBCatalog}
       />
     </Layout>
   );
