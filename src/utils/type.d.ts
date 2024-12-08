@@ -23,7 +23,7 @@ export type Variation = {
 
 export type Order = {
     total_price: number;
-    items: OrderItems[];
+    orderitems: OrderItems[];
 }
 
 export type OrderItems = {

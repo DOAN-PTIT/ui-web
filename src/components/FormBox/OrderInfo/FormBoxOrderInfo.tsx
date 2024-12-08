@@ -5,9 +5,13 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { DatePicker, Select } from "antd";
 import { connect } from "react-redux";
 import Avatar from "react-avatar";
+import moment from "moment";
+import CustomDatePicker from "@/components/CustomDatePicker";
 interface FormBoxOrderInfoProps
   extends ReturnType<typeof mapStateToProps>,
-    ReturnType<typeof mapDispatchToProps> {}
+    ReturnType<typeof mapDispatchToProps> {
+      order?: any;
+    }
 
 function FormBoxOrderInfo(props: FormBoxOrderInfoProps) {
   const {
@@ -17,7 +21,8 @@ function FormBoxOrderInfo(props: FormBoxOrderInfoProps) {
     getListShopUser,
     isLoading,
     currentShop,
-    currentUser
+    currentUser,
+    order
   } = props;
 
   const onFocusSelect = async () => {
@@ -30,7 +35,7 @@ function FormBoxOrderInfo(props: FormBoxOrderInfoProps) {
       <div className="flex flex-col gap-3">
         <div className="flex justify-between">
           <p>Tạo lúc</p>
-          <DatePicker
+          <CustomDatePicker 
             className="w-[180px]"
             onChange={(date, datetime) => {
               createOrder({ ...orderParams, createdAt: date.format("YYYY-MM-DD HH:mm") });
@@ -40,6 +45,7 @@ function FormBoxOrderInfo(props: FormBoxOrderInfoProps) {
             showMinute
             showTime
             variant="filled"
+            defaultValue={moment(order?.createdAt)}
           />
         </div>
         <div className="flex justify-between">
@@ -56,7 +62,7 @@ function FormBoxOrderInfo(props: FormBoxOrderInfoProps) {
             notFoundContent={
               isLoading ? <LoadingOutlined /> : <div>Không có nhân viên!</div>
             }
-            defaultValue={currentUser.id}
+            defaultValue={order?.shopuser_id || currentUser.id}
           >
             {shopUser?.employees.map((user: any) => (
               <Select.Option key={user} value={user.id}>

@@ -12,7 +12,7 @@ import { connect } from "react-redux";
 
 const listFee = [
   {
-    key: "delivery_cost",
+    key: "delivery_cost_shop",
     label: "Phí vận chuyển",
   },
   {
@@ -20,7 +20,7 @@ const listFee = [
     label: "Giảm giá",
   },
   {
-    key: "prepaid",
+    key: "paid",
     label: "Đã thanh toán",
   },
   {
@@ -29,34 +29,31 @@ const listFee = [
   },
 ];
 
-const defaultPrice = {
-  delivery_cost: "0",
-  discount: "0",
-  prepaid: "0",
-  surcharge: "0",
-};
-
 interface FormBoxPaymentProps
   extends ReturnType<typeof mapStateToProps>,
-    ReturnType<typeof mapDispatchToProps> {}
+    ReturnType<typeof mapDispatchToProps> {
+  order?: any;
+}
 
 function FormBoxPayment(props: FormBoxPaymentProps) {
   const { orderParams, createOrder } = props;
+
+  const defaultPrice = {
+    delivery_cost_shop: formatNumber(orderParams?.delivery_cost_shop || "0", "VND"),
+    discount: formatNumber("0", "VND"),
+    paid: formatNumber(orderParams?.paid || "0", "VND"),
+    surcharge: formatNumber(orderParams?.surcharge || "0", "VND"),
+  };
 
   const [afterDiscount, setAfterDiscount] = useState(0);
   const [needToPay, setNeedToPay] = useState(0);
   const [debt, setDebt] = useState(0);
   const [changePrice, setChangePrice] = useState<{
-    delivery_cost: string;
+    delivery_cost_shop: string;
     discount: string;
-    prepaid: string;
+    paid: string;
     surcharge: string;
-  }>({
-    delivery_cost: "0",
-    discount: "0",
-    prepaid: "0",
-    surcharge: "0",
-  });
+  }>(defaultPrice);
 
   useEffect(() => {
     calcPrice("TOTAL PRICE");
@@ -64,21 +61,19 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
     setNeedToPay(
       calcPrice("TOTAL PRICE") -
         (orderParams?.discount || 0) -
-        (orderParams?.prepaid || 0) +
-        (orderParams?.surcharge ||
-        0)
+        (orderParams?.paid || 0) +
+        (orderParams?.surcharge || 0)
     );
     setDebt(
       calcPrice("TOTAL PRICE") -
         (orderParams?.discount || 0) -
-        (orderParams?.prepaid || 0) +
-        (orderParams?.surcharge ||
-        0)
+        (orderParams?.paid || 0) +
+        (orderParams?.surcharge || 0)
     );
     if (orderParams.items?.length === 0) {
       setChangePrice(defaultPrice);
     }
-  }, [orderParams, changePrice])
+  }, [orderParams]);
 
   const notifyNoItems = _.debounce(() => {
     notification.warning({
@@ -95,7 +90,7 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
     {
       key: "DISCOUNT",
       label: "Giảm giá",
-      color: 'text-green-500'
+      color: "text-green-500",
     },
     {
       key: "AFTER DISCOUNT",
@@ -115,12 +110,12 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
       key: "DEBT",
       label: "Còn nợ",
       value: debt,
-      color: 'text-red-500'
+      color: "text-red-500",
     },
   ];
 
   const onChangePrice = (key: string, value: string) => {
-    if (!orderParams.items?.length) {
+    if (!orderParams.orderitems?.length) {
       setChangePrice(defaultPrice);
       notifyNoItems();
       return;
@@ -132,18 +127,18 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
   };
 
   const calcPrice = (field: string) => {
-    if (orderParams.items?.length === 0) {
+    if (orderParams?.orderitems?.length === 0) {
       createOrder({});
       return 0;
     } else {
       switch (field) {
         case "TOTAL PRICE":
           const total_price_product =
-            orderParams.items?.length > 0
+            orderParams?.orderitems?.length > 0
               ? calculateTotalPriceProduct(orderParams)
               : 0;
-          const delivery_cost = orderParams?.delivery_cost || 0;
-          const total_price = total_price_product + delivery_cost;
+          const delivery_cost_shop = orderParams?.delivery_cost_shop || 0;
+          const total_price = total_price_product + delivery_cost_shop;
           return total_price;
         case "DISCOUNT":
           return orderParams?.discount || 0;
@@ -153,16 +148,16 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
           return (
             orderParams?.total_price -
               orderParams?.discount -
-              orderParams?.prepaid +
+              orderParams?.paid +
               orderParams?.surcharge || 0
           );
         case "PAID":
-          return orderParams?.prepaid || 0;
+          return orderParams?.paid || 0;
         case "DEBT":
           return (
             orderParams?.total_price -
               orderParams?.discount -
-              orderParams?.prepaid +
+              orderParams?.paid +
               orderParams?.surcharge || 0
           );
         default:
@@ -201,7 +196,10 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
           return (
             <div className="flex justify-between" key={price.key}>
               <p className="w-1/2 font-medium">{price.label}</p>
-              <p className={`font-medium ${price.color}`}>{formatNumber(price.value || calcPrice(price.key))} <span className="font-bold">đ</span></p>
+              <p className={`font-medium ${price.color}`}>
+                {formatNumber(price.value || calcPrice(price.key))}{" "}
+                <span className="font-bold">đ</span>
+              </p>
             </div>
           );
         })}

@@ -1,0 +1,91 @@
+.order_modal_info.ant-modal-wrap {
+    overflow: hidden;
+}
+.order_modal_info .ant-modal-close {
+    top: 20px;
+    right: 16px;
+    height: 32px;
+    color: #101828;
+    border: 1px solid #d0d5dd;
+    width: 32px;
+}
+.order_modal_info .ant-modal-close span {
+    font-size: 20px;
+}
+.order_modal_info .ant-modal-header {
+    padding: 0px 16px;
+}
+.order_modal_info .ant-modal-header .ant-btn-icon-only .ant-btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.order_modal_info .ant-modal-header .ant-btn-icon-only .ant-btn-icon .anticon {
+    font-size: 20px;
+}
+.order_modal_info .ant-modal-header .order-title-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+}
+.order_modal_info .ant-modal-header .order-title-content .box-h1 {
+    max-width: 300px;
+    display: grid;
+    min-width: fit-content;
+}
+.order_modal_info .ant-modal-header .order-title-content .box-h2 {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+}
+.order_modal_info .ant-modal-header .order-title-content .box-h2 .header-tools {
+    display: flex;
+    align-items: center;
+    border-right: 1px solid #d0d5dd;
+    height: 34px;
+    padding-right: 24px;
+}
+.order_modal_info .ant-modal-header .order-title-content .box-h2 .ant-btn {
+    width: 32px;
+    height: 32px;
+}
+.order_modal_info .ant-modal-header .order-title-content .fulscreen-order-btn {
+    width: 76px;
+    margin-left: 8px;
+}
+.order_modal_info .ant-modal-header .order-title-content .fulscreen-order-btn .anticon {
+    font-size: 20px;
+    color: #101828;
+}
+.order_modal_info .ant-modal-content {
+    min-height: calc(100vh - 30px);
+}
+.order_modal_info .formbox-control {
+    font-size: 50px;
+    color: #bfbfbf;
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    line-height: 15;
+    height: 100%;
+}
+.order_modal_info .formbox-control:hover {
+    color: #fbfbfb;
+}
+.order_modal_info #formbox-left {
+    left: -50px;
+}
+.order_modal_info #formbox-right {
+    right: -50px;
+}
+.order_modal_info .ant-modal {
+    max-width: 1600px;
+    padding-bottom: 0px !important;
+    top: 10px;
+}
+.order_modal_info .ant-modal-content .ant-modal-body {
+    padding: 0;
+}

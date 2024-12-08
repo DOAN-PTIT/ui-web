@@ -3,10 +3,12 @@ import { AppDispatch, RootState } from "@/store";
 import { Input } from "antd";
 import { connect } from "react-redux";
 
-interface FormBoxNoteProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> {}
+interface FormBoxNoteProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> {
+  order?: any;
+}
 
 function FormBoxNote(props: FormBoxNoteProps) {
-  const { createOrder, orderParams } = props
+  const { createOrder, orderParams, order } = props
 
   return (
     <main className="rounded-lg bg-white p-5 shadow-sm">
@@ -15,6 +17,7 @@ function FormBoxNote(props: FormBoxNoteProps) {
         style={{ resize: "none", height: 180 }}
         className="bg-slate-100 border-none hover:bg-slate-100 focus:bg-white focus:border-blue-500"
         placeholder="Viết ghi chú cho đơn hàng"
+        defaultValue={order?.note}
         onChange={(e) => createOrder({ ...orderParams, note: e.target.value })}
       />
     </main>
