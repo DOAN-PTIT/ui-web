@@ -25,7 +25,7 @@ function FormBoxOrderInfo(props: FormBoxOrderInfoProps) {
   };
 
   return (
-    <main className="p-5 bg-white w-full rounded-lg shadow-lg">
+    <main className="p-5 bg-white w-full rounded-lg shadow-sm">
       <div className="mb-5 text-xl  font-bold">Thông tin</div>
       <div className="flex flex-col gap-3">
         <div className="flex justify-between">
@@ -33,12 +33,13 @@ function FormBoxOrderInfo(props: FormBoxOrderInfoProps) {
           <DatePicker
             className="w-[180px]"
             onChange={(date, datetime) => {
-              createOrder({ ...orderParams, createdAt: date.format("YYYY-MM-DD") });
+              createOrder({ ...orderParams, createdAt: date.format("YYYY-MM-DD HH:mm") });
             }}
             format="DD/MM/YYYY HH:mm"
             showHour
             showMinute
             showTime
+            variant="filled"
           />
         </div>
         <div className="flex justify-between">
@@ -47,10 +48,11 @@ function FormBoxOrderInfo(props: FormBoxOrderInfoProps) {
             onFocus={onFocusSelect}
             filterOption={false}
             onChange={(value) => {
-                createOrder({ ...orderParams, creator_id: value });
+                createOrder({ ...orderParams, shopuser_id: value });
             }}
             className="w-[180px]"
             loading={isLoading}
+            variant="filled"
             notFoundContent={
               isLoading ? <LoadingOutlined /> : <div>Không có nhân viên!</div>
             }

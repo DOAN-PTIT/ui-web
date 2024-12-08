@@ -9,7 +9,7 @@ function FormBoxNote(props: FormBoxNoteProps) {
   const { createOrder, orderParams } = props
 
   return (
-    <main className="rounded-lg bg-white p-5 shadow-lg">
+    <main className="rounded-lg bg-white p-5 shadow-sm">
       <div className="text-xl font-bold mb-5">Ghi chú</div>
       <Input.TextArea
         style={{ resize: "none", height: 180 }}

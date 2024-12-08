@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { formatNumber } from "@/utils/tools";
 import { DeleteOutlined } from "@ant-design/icons";
 import { Button, Empty, Input, Select, Tag } from "antd";
@@ -12,13 +12,15 @@ const currency = "VND";
 
 interface FormBoxProductProps
   extends ReturnType<typeof mapStateToProps>,
-    ReturnType<typeof mapDispatchToProps> {}
+    ReturnType<typeof mapDispatchToProps> {
+      setIsAtCounter: Dispatch<SetStateAction<boolean>>,
+      isAtCounter: boolean
+    }
 
 function FormBoxProduct(props: FormBoxProductProps) {
-  const { createOrder, orderParams } = props;
+  const { createOrder, orderParams, setIsAtCounter, isAtCounter } = props;
 
   const [selectedProduct, setSelectedProduct] = useState<[]>([]);
-  const [typeOfSale, setTypeOfSale] = useState("online");
   const [note, setNote] = useState<{ note: string; variation_id: any }[]>([]);
 
   useEffect(() => {
@@ -87,19 +89,19 @@ function FormBoxProduct(props: FormBoxProductProps) {
   };
 
   return (
-    <main className="flex flex-col gap-4 p-4 rounded-xl shadow-md bg-white w-full">
+    <main className="flex flex-col gap-4 p-4 rounded-xl shadow-sm bg-white w-full">
       <div className="flex justify-between">
         <h1 className="font-bold text-xl">Sản phẩm</h1>
         <div>
           <Select
-            defaultValue="online"
+            defaultValue={false}
             defaultActiveFirstOption
             className="w-[130px]"
-            onChange={(value) => setTypeOfSale(value)}
-            value={typeOfSale}
+            onChange={(value) => setIsAtCounter(value)}
+            value={isAtCounter}
           >
-            <Select.Option key="online">Online</Select.Option>
-            <Select.Option key="counter">Bán tại quầy</Select.Option>
+            <Select.Option value={false}>Online</Select.Option>
+            <Select.Option value={true}>Bán tại quầy</Select.Option>
           </Select>
         </div>
       </div>
