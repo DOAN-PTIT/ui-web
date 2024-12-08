@@ -18,6 +18,7 @@ import { AppDispatch, RootState } from "@/store";
 import { connect } from "react-redux";
 import apiClient from "@/service/auth";
 import "../../styles/global.css";
+import CustomerDetail from "./CustomerDetail";
 
 interface CustomerType {
   id: string;
@@ -37,6 +38,7 @@ interface CustomerProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
 function Customer(props: CustomerProps) {
   const { currentShop } = props;
   const [modalVisiable, setModalVisiable] = useState(false);
+  const [openCustomerDetail, setOpenCustomerDetail] = useState(false);
   const [listCustomer, setListCustomer] = useState<[]>([]);
   const [totalCustomer, setTotalCustomer] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -191,7 +193,9 @@ function Customer(props: CustomerProps) {
       console.log(error);
       notification.error({
         message: "Tạo khách hàng thất bại",
-        description: error.response.data.message.map((err: string) => `[${err}\n]`).join(";\n"),
+        description: Array.isArray(error.response?.data?.message)
+          ? error.response.data.message.map((err: string) => `[${err}\n]`).join(";\n")
+          : "Đã xảy ra lỗi không xác định.",
         duration: 5
       })
     })
@@ -212,7 +216,9 @@ function Customer(props: CustomerProps) {
       </Space>
     )
   }
-
+const handleOpen = (id:number) => {
+  setOpenCustomerDetail(true)
+}
   return (
     <Layout>
       <HeaderAction
@@ -224,6 +230,9 @@ function Customer(props: CustomerProps) {
         <ActionTools callBack={callBack} reloadCallBack={getListCustomer} />
         <Table
           columns={columns}
+          onRow={(e)=>({
+            onClick: ()=> handleOpen(e)
+          })}
           dataSource={getData()}
           virtual
           scroll={{ x: 2500, y: 500 }}
@@ -238,6 +247,7 @@ function Customer(props: CustomerProps) {
           loading={isLoading}
         />
       </Layout.Content>
+      <CustomerDetail open={openCustomerDetail}/>
       <Modal
         title={
           <div>
