@@ -60,7 +60,7 @@ interface MenuComponentProps extends ReturnType<typeof mapStateToProps>, ReturnT
 
 function Menu(props: MenuComponentProps) {
   const { currentShop } = props;
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const route = useRouter();
   const params = useParams();
   const pathName = usePathname().split("/");
