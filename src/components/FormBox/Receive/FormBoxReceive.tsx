@@ -1,14 +1,29 @@
+import CustomDatePicker from "@/components/CustomDatePicker";
 import { createOrder } from "@/reducer/order.reducer";
 import { AppDispatch, RootState } from "@/store";
 import { DatePicker, Input } from "antd";
+import moment from "moment";
 import { connect } from "react-redux";
 
 interface FormBoxReceiveProps
   extends ReturnType<typeof mapStateToProps>,
-    ReturnType<typeof mapDispatchToProps> {}
+    ReturnType<typeof mapDispatchToProps> {
+  order?: any;
+}
 
 function FormBoxReceive(props: FormBoxReceiveProps) {
-  const { createOrder, orderParams } = props;
+  const { createOrder, orderParams, order } = props;
+
+  const defaultValue = order?.estimated_delivery
+    ? moment(order?.estimated_delivery).utc()
+    : null;
+
+  const handleDateChange = (date, dateString) => {
+    createOrder({
+      ...orderParams,
+      estimated_delivery: date ? date.toISOString() : null,
+    });
+  };
 
   return (
     <main className="w-full bg-white p-5 rounded-lg shadow-sm">
@@ -16,18 +31,13 @@ function FormBoxReceive(props: FormBoxReceiveProps) {
       <div className="flex flex-col gap-4">
         <div className="flex justify-between">
           <p>Dự kiến nhận hàng</p>
-          <DatePicker
-            variant="filled"
+          <CustomDatePicker 
+            defaultValue={defaultValue}
             format={"DD/MM/YYYY HH:mm"}
-            showTime
             showHour
             showMinute
-            onChange={(date, dateTime) =>
-              createOrder({
-                ...orderParams,
-                estimated_delivery: date.format("YYYY-MM-DD"),
-              })
-            }
+            showTime
+            onChange={handleDateChange}
           />
         </div>
         <div>
@@ -35,6 +45,7 @@ function FormBoxReceive(props: FormBoxReceiveProps) {
             <Input
               variant="filled"
               placeholder="Tên người nhận"
+              defaultValue={order?.recipient_name}
               onChange={(value) =>
                 createOrder({
                   ...orderParams,
@@ -44,6 +55,7 @@ function FormBoxReceive(props: FormBoxReceiveProps) {
             />
             <Input
               variant="filled"
+              defaultValue={order?.recipient_phone_number}
               placeholder="SDT"
               onChange={(value) =>
                 createOrder({
@@ -56,6 +68,7 @@ function FormBoxReceive(props: FormBoxReceiveProps) {
           <Input
             placeholder="Địa chỉ nhận hàng"
             variant="filled"
+            defaultValue={order?.delivery_address}
             onChange={(value) =>
               createOrder({
                 ...orderParams,

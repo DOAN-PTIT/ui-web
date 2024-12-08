@@ -14,19 +14,27 @@ interface FormBoxProductProps
   extends ReturnType<typeof mapStateToProps>,
     ReturnType<typeof mapDispatchToProps> {
       setIsAtCounter: Dispatch<SetStateAction<boolean>>,
-      isAtCounter: boolean
+      isAtCounter: boolean,
+      order?: any
     }
 
 function FormBoxProduct(props: FormBoxProductProps) {
-  const { createOrder, orderParams, setIsAtCounter, isAtCounter } = props;
+  const { createOrder, orderParams, setIsAtCounter, isAtCounter, order } = props;
 
   const [selectedProduct, setSelectedProduct] = useState<[]>([]);
   const [note, setNote] = useState<{ note: string; variation_id: any }[]>([]);
 
   useEffect(() => {
+    if (order) {
+      const variations = order?.orderitems?.map((item:any) => item.variation) || [];
+      setSelectedProduct(variations);
+    }
+  }, [])
+
+  useEffect(() => {
     createOrder({
       ...orderParams,
-      items: selectedProduct.map((item: any) => {
+      orderitems: selectedProduct.map((item: any) => {
         const { orderAmount, ...variation_info } = item;
         const noteItem = note?.find(
           (note) => note.variation_id === item.id
@@ -41,7 +49,7 @@ function FormBoxProduct(props: FormBoxProductProps) {
         };
       }),
     });
-  }, [selectedProduct, note]);
+  }, [note, selectedProduct]);
 
   const onChangeAmountCurrentProduct = (
     currVariation: any,
@@ -199,7 +207,7 @@ function FormBoxProduct(props: FormBoxProductProps) {
             })}
           </div>
         ) : (
-          <div className="rounded-lg p-5 border">
+          <div className="rounded-lg p-5 border bg-white">
             <Empty description="Giỏ hàng trống" />
           </div>
         )}
