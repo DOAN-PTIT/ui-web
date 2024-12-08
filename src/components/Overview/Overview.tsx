@@ -64,7 +64,7 @@ interface OverviewProps
 
 function Overview(props: OverviewProps) {
   const { getCurrentUser, currentUser } = props;
-console.log(props)
+  console.log(props)
   const [listFBPages, setListFBPages] = useState<FBShopProps[]>([]);
   const [openModal, setOpenModal] = useState(false);
   const [isLoadingFbPage, setIsLoadingFbPage] = useState(false);
@@ -151,6 +151,7 @@ console.log(props)
   };
 
   const handleOk = async (param: { name: string; avatar: any }) => {
+    setIsLoading(true)
     if (!param.name || !param.avatar) {
       message.error("Thiếu hình đại diện");
       return;
@@ -160,7 +161,7 @@ console.log(props)
     createShopFormData.append("name", param.name);
     createShopFormData.append("avatar", param.avatar);
 
-    console.log("FormData Preview:", Array.from(createShopFormData.entries()));
+    // console.log("FormData Preview:", Array.from(createShopFormData.entries()));
 
     const url = `/user/create-shop`;
     try {
@@ -171,6 +172,7 @@ console.log(props)
             "Content-Type": "multipart/form-data",
           },
         })
+      setIsLoading(false)
       setOpenModal(false)
       message.success("Thêm cửa hàng thành công!")
       getListShop()
@@ -206,14 +208,15 @@ console.log(props)
     setOpenModal(false);
   };
   const handleDeleteShop = async (shopId: any) => {
+    setIsLoading(true)
     try {
+      setIsLoading(false)
       await apiClient.delete(`/shop/${shopId}`)
       message.success('Xóa cửa hàng thành công')
-      window.location.reload() 
+      getListShop()
     } catch (error) {
       console.log(error)
       message.error('Xóa cửa hàng thất bại')
-
     }
   }
   return (

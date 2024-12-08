@@ -216,7 +216,7 @@ function Customer(props: CustomerProps) {
       </Space>
     )
   }
-const handleOpen = (id:number) => {
+const handleOpen = (id:any) => {
   setOpenCustomerDetail(true)
 }
   return (
@@ -230,8 +230,8 @@ const handleOpen = (id:number) => {
         <ActionTools callBack={callBack} reloadCallBack={getListCustomer} />
         <Table
           columns={columns}
-          onRow={(e)=>({
-            onClick: ()=> handleOpen(e)
+          onRow={()=>({
+            onClick: ()=> handleOpen()
           })}
           dataSource={getData()}
           virtual
