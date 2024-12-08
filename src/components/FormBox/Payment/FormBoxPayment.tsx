@@ -95,6 +95,7 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
     {
       key: "DISCOUNT",
       label: "Giảm giá",
+      color: 'text-green-500'
     },
     {
       key: "AFTER DISCOUNT",
@@ -114,6 +115,7 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
       key: "DEBT",
       label: "Còn nợ",
       value: debt,
+      color: 'text-red-500'
     },
   ];
 
@@ -170,7 +172,7 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
   };
 
   return (
-    <main className="bg-white p-5 rounded-lg shadow-lg mb-5">
+    <main className="bg-white p-5 rounded-lg shadow-sm mb-5">
       <div className="font-bold text-xl mb-4">Thanh toán</div>
       <div className="flex flex-col gap-5">
         {listFee.map((fee) => {
@@ -180,7 +182,8 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
               <Input
                 defaultValue={0}
                 value={formatInputNumber(changePrice[fee.key], "VND")}
-                addonAfter={<span>₫</span>}
+                suffix="đ"
+                variant="filled"
                 onChange={(e) => {
                   setChangePrice({
                     ...changePrice,
@@ -193,12 +196,12 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
           );
         })}
       </div>
-      <div className="flex flex-col gap-5 bg-slate-200 p-5 mt-[12px] rounded-lg">
+      <div className="flex flex-col gap-5 bg-slate-100 p-5 mt-[12px] rounded-lg">
         {priceInfo.map((price) => {
           return (
             <div className="flex justify-between" key={price.key}>
-              <p className="w-1/2">{price.label}</p>
-              <p>{price.value || calcPrice(price.key)}</p>
+              <p className="w-1/2 font-medium">{price.label}</p>
+              <p className={`font-medium ${price.color}`}>{formatNumber(price.value || calcPrice(price.key))} <span className="font-bold">đ</span></p>
             </div>
           );
         })}

@@ -2,10 +2,7 @@ import _ from "lodash";
 import apiClient from "@/service/auth";
 import { AppDispatch, RootState } from "@/store";
 import { formatNumber } from "@/utils/tools";
-import {
-  CloseOutlined,
-  LoadingOutlined,
-} from "@ant-design/icons";
+import { CloseOutlined, LoadingOutlined } from "@ant-design/icons";
 import { DatePicker, Divider, notification, Select } from "antd";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { connect } from "react-redux";
@@ -24,13 +21,18 @@ function FormBoxCustomer(props: FormBoxCustomerProps) {
   const [searchField, setSearchField] = useState("");
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | undefined>(undefined);
+  const [selectedCustomer, setSelectedCustomer] = useState<
+    Customer | undefined
+  >(undefined);
 
   useEffect(() => {
     if (selectedCustomer) {
-      props.createOrder({ ...props.orderParams, add_customer: selectedCustomer });
+      props.createOrder({
+        ...props.orderParams,
+        add_customer: selectedCustomer,
+      });
     }
-  }, [selectedCustomer])
+  }, [selectedCustomer]);
 
   const handleSearchCustomer = useCallback(
     async (value: string) => {
@@ -67,22 +69,24 @@ function FormBoxCustomer(props: FormBoxCustomerProps) {
   const handleSelectedCustomer = (selectedId: any) => {
     const selected = customers.find((customer) => customer.id == selectedId);
     setSelectedCustomer(selected);
-  }
+  };
 
   const renderCustomerOptions = () => {
-    return customers.length > 0 ? customers.map((customer) => ({
-      label: (
-        <div className="flex gap-1">
-          <Avatar name={customer.name} size="30" round />
-          <div className="ml-3">
-            <p className="font-medium">{customer.name}</p>
-            <p>{customer.phone_number}</p>
-          </div>
-        </div>
-      ),
-      value: customer.id,
-    })) : []
-  }
+    return customers.length > 0
+      ? customers.map((customer) => ({
+          label: (
+            <div className="flex gap-1">
+              <Avatar name={customer.name} size="30" round />
+              <div className="ml-3">
+                <p className="font-medium">{customer.name}</p>
+                <p>{customer.phone_number}</p>
+              </div>
+            </div>
+          ),
+          value: customer.id,
+        }))
+      : [];
+  };
 
   const renderNotFoundContent = () => {
     return isLoading ? (
@@ -90,17 +94,22 @@ function FormBoxCustomer(props: FormBoxCustomerProps) {
     ) : (
       <div className="text-center">Không tìm thấy khách hàng</div>
     );
-  }
+  };
 
   const deboundSearch = useMemo(() => {
     return _.debounce(handleSearchCustomer, 800);
   }, [handleSearchCustomer]);
 
   return (
-    <main className="p-5 rounded-lg shadow-lg bg-white w-full">
+    <main className="p-5 rounded-lg shadow-sm bg-white w-full">
       <div className="mb-5 flex justify-between">
         <p className="text-xl font-bold">Khách hàng</p>
-        <Select value={selectedCustomer?.gender} placeholder="Giới tính" className="w-[120px]">
+        <Select
+          value={selectedCustomer?.gender}
+          placeholder="Giới tính"
+          className="w-[120px]"
+          variant="filled"
+        >
           <Select.Option key="MALE">Nam</Select.Option>
           <Select.Option key="FEMALE">Nữ</Select.Option>
         </Select>
@@ -116,6 +125,7 @@ function FormBoxCustomer(props: FormBoxCustomerProps) {
           onSearch={deboundSearch}
           onFocus={() => setSearchField("name")}
           filterOption={false}
+          variant="filled"
         />
         <Select
           placeholder="SDT"
@@ -125,6 +135,7 @@ function FormBoxCustomer(props: FormBoxCustomerProps) {
           value={selectedCustomer?.phone_number}
           notFoundContent={renderNotFoundContent()}
           showSearch
+          variant="filled"
         />
         <Select
           placeholder="Email"
@@ -134,12 +145,21 @@ function FormBoxCustomer(props: FormBoxCustomerProps) {
           notFoundContent={renderNotFoundContent()}
           value={selectedCustomer?.email}
           showSearch
+          variant="filled"
         />
-        <DatePicker placeholder="Ngày sinh" format="DD/MM/YYYY" value={selectedCustomer && moment(selectedCustomer?.date_of_birth)} />
+        <DatePicker
+          placeholder="Ngày sinh"
+          format="DD/MM/YYYY"
+          value={selectedCustomer && moment(selectedCustomer?.date_of_birth)}
+          variant="filled"
+        />
       </div>
       {selectedCustomer && (
         <div className="mt-3 border border-blue-600 bg-sky-100 p-4 rounded-md shadow-sm relative">
-          <CloseOutlined onClick={() => setSelectedCustomer(undefined)} className=" border-red-500 border bg-red-100 p-1 rounded-full text-[8px] absolute top-[-8px] right-[-8px] cursor-pointer" />
+          <CloseOutlined
+            onClick={() => setSelectedCustomer(undefined)}
+            className=" border-red-500 border bg-red-100 p-1 rounded-full text-[8px] absolute top-[-8px] right-[-8px] cursor-pointer"
+          />
           <div className="flex justify-between">
             <div className="w-1/2 flex gap-3">
               <Avatar name={selectedCustomer.name} size="40" round />
@@ -148,7 +168,9 @@ function FormBoxCustomer(props: FormBoxCustomerProps) {
                 <p className="text-blue-600">{selectedCustomer.phone_number}</p>
               </div>
             </div>
-            <div>{moment(selectedCustomer?.date_of_birth).format("DD/MM/YYYY")}</div>
+            <div>
+              {moment(selectedCustomer?.date_of_birth).format("DD/MM/YYYY")}
+            </div>
           </div>
           <Divider />
           <div className="flex justify-between">
@@ -167,7 +189,9 @@ function FormBoxCustomer(props: FormBoxCustomerProps) {
               </p>
               <p>
                 Lần cuối mua hàng:{" "}
-                <span className="font-bold">{selectedCustomer?.last_purchase}</span>
+                <span className="font-bold">
+                  {selectedCustomer?.last_purchase}
+                </span>
               </p>
             </div>
           </div>

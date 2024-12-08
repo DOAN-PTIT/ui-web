@@ -197,7 +197,7 @@ function Product(props: ProductProps) {
             pageSizeOptions: [10, 20, 30, 50, 100],
             size: "small",
           }}
-          scroll={{ x: 2500, y: 500 }}
+          scroll={{ x: 2500 }}
           size="small"
           loading={props.isLoading}
         />
