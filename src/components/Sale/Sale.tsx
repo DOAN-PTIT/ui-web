@@ -26,6 +26,7 @@ function Sale(props: SaleProps) {
   const { orderParams, currentUser, currentShop, createOrder } = props;
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isAtCounter, setIsAtCounter] = useState(false);
 
   useEffect(() => {
     if (!orderParams.creator_id) {
@@ -39,13 +40,14 @@ function Sale(props: SaleProps) {
     const params = {
       ...orderParams,
       paid: orderParams.prepaid,
-      shopuser_id: currentUser.id,
-      products_order: orderParams.items?.map(item => ({
+      shopuser_id: orderParams.shopuser_id ? orderParams.shopuser_id : currentUser.id,
+      products_order: orderParams.items?.map((item: any) => ({
         product_id: item.variation_info.product.id,
         quantity: item.quantity,
         variation_id: item.variation_id,
       })),
       delivery_cost_shop: orderParams.delivery_cost,
+      at_counter: isAtCounter,
       total_cost: calcOrderDebt(orderParams) + (orderParams.delivery_cost || 0),
     };
 
@@ -76,11 +78,11 @@ function Sale(props: SaleProps) {
   return (
     <Layout className="h-screen">
       <HeaderAction isShowSearch={false} title="Tạo hóa đơn" />
-      <Content className="bg-white rounded-xl overflow-auto overflow-x-hidden flex p-5 gap-5 w-full">
+      <Content className="bg-gray-200 rounded-xl overflow-auto overflow-x-hidden flex p-5 gap-5 w-full">
         <Row justify="space-between" className="w-full">
           <Col span={15}>
             <Row>
-              <FormBoxProduct />
+              <FormBoxProduct setIsAtCounter={setIsAtCounter} isAtCounter={isAtCounter} />
             </Row>
             <Row justify="space-between" className="mt-4">
               <Col span={11}>

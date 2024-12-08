@@ -6,6 +6,7 @@ const reducer = createSlice({
     initialState: {
         user: {
             access_token: "",
+            id: 0
         },
         isLoading: false
     },

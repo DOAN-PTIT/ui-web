@@ -4,12 +4,12 @@ import { AppDispatch, RootState } from "@/store";
 import {
   AuditOutlined,
   ContainerOutlined,
-  LeftCircleOutlined,
+  AppstoreOutlined,
   PieChartOutlined,
   ReconciliationOutlined,
   SettingOutlined,
   ShoppingCartOutlined,
-  UserOutlined
+  UserOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Menu as AntdMenu, Avatar, Layout } from "antd";
@@ -18,6 +18,13 @@ import { useState } from "react";
 import { connect } from "react-redux";
 
 const { Sider } = Layout;
+
+const backItem = {
+  key: "home",
+  label: "Bảng điểu khiển",
+  icon: <AppstoreOutlined />
+}
+
 const listItem = [
   {
     key: "dashbroad",
@@ -48,15 +55,12 @@ const listItem = [
     key: "settings",
     label: "Cấu hình",
     icon: <SettingOutlined />,
-  },
-  {
-    key: "home",
-    label: "Quay lại",
-    icon: <LeftCircleOutlined />,
-  },
+  }
 ];
 
-interface MenuComponentProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> { }
+interface MenuComponentProps
+  extends ReturnType<typeof mapStateToProps>,
+    ReturnType<typeof mapDispatchToProps> {}
 
 function Menu(props: MenuComponentProps) {
   const { currentShop } = props;
@@ -82,29 +86,47 @@ function Menu(props: MenuComponentProps) {
       collapsedWidth={60}
       collapsed={collapsed}
       onCollapse={(value) => setCollapsed(value)}
-
-      className="custom-sider min-h-fit bg-[#f2f4f7] bottom-0 top-0 ">
-      <div>
-        {params.id && (
-          <div className="flex items-center  gap-3 flex-col mt-3 mb-2">
-            <Avatar src={currentShop.avatar} icon={<UserOutlined />} size={collapsed ? 24 : 64} />
-            {!collapsed && (
-              <h1 className="text-[#101828] text-sm font-medium">{currentShop.name || "Chưa có tên"}</h1>
-            )}
-          </div>
-        )}
-        <AntdMenu
-          className="bg-[#f2f4f7] text-[#101828] !border-none justify-center "
-          defaultOpenKeys={['dashbroad']}
-          defaultSelectedKeys={['dashbroad']}
-          selectedKeys={[pathName[3]]}
-          items={params.id ? items : []}
-          theme="light"
-          mode="inline"
-
-        />
+      className="custom-sider min-h-fit bg-[#f2f4f7] bottom-0 top-0 h-full"
+    >
+      <div className="flex flex-col justify-between h-full">
+        <div>
+          {params.id && (
+            <div className="flex items-center  gap-3 flex-col mt-3 mb-2">
+              <Avatar
+                src={currentShop.avatar}
+                icon={<UserOutlined />}
+                size={collapsed ? 24 : 64}
+              />
+              {!collapsed && (
+                <h1 className="text-[#101828] text-sm font-medium">
+                  {currentShop.name || "Chưa có tên"}
+                </h1>
+              )}
+            </div>
+          )}
+          <AntdMenu
+            className="bg-[#f2f4f7] text-[#101828] !border-none justify-center "
+            defaultOpenKeys={["dashbroad"]}
+            defaultSelectedKeys={["dashbroad"]}
+            selectedKeys={[pathName[3]]}
+            items={params.id ? items : []}
+            theme="light"
+            mode="inline"
+          />
+        </div>
+        <div>
+          <AntdMenu
+            className="bg-[#f2f4f7] text-[#101828] !border-none justify-center"
+            defaultOpenKeys={["dashbroad"]}
+            defaultSelectedKeys={["dashbroad"]}
+            selectedKeys={["settings"]}
+            items={[backItem]}
+            onClick={() => route.push("/shop/overview")}
+            theme="light"
+            mode="inline"
+          />
+        </div>
       </div>
-
     </Sider>
   );
 }
@@ -112,12 +134,11 @@ function Menu(props: MenuComponentProps) {
 const mapStateToProps = (state: RootState) => {
   return {
     currentShop: state.shopReducer.shop,
-    
-  }
-}
+  };
+};
 
 const mapDispatchToProps = (dispatch: AppDispatch) => {
-  return {}
-}
+  return {};
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Menu);
