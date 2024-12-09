@@ -216,7 +216,7 @@ function Customer(props: CustomerProps) {
       </Space>
     )
   }
-const handleOpen = (id:any) => {
+const handleOpen = () => {
   setOpenCustomerDetail(true)
 }
   return (
@@ -247,7 +247,7 @@ const handleOpen = (id:any) => {
           loading={isLoading}
         />
       </Layout.Content>
-      <CustomerDetail open={openCustomerDetail}/>
+      <CustomerDetail open={openCustomerDetail} onCancel={()=>setOpenCustomerDetail(false)}/>
       <Modal
         title={
           <div>

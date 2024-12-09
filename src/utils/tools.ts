@@ -75,20 +75,20 @@ export const formatNumber = (
           /(\d)(?=(\d{3})+(?!\d))/g,
           `$1${floatChar == "." ? "," : "."}`
         )}${Math.abs(amount) % 100
-        ? prefix
-          ? floatChar +
-          (Math.abs(amount) % 100 > 9
-            ? Math.abs(amount) % 100
-            : "0" + (Math.abs(amount) % 100))
-          : floatChar +
-          ((Math.abs(amount) % 100) % 10
-            ? Math.abs(amount) % 100 > 9
+          ? prefix
+            ? floatChar +
+            (Math.abs(amount) % 100 > 9
               ? Math.abs(amount) % 100
-              : "0" + (Math.abs(amount) % 100)
-            : Math.floor((Math.abs(amount) % 100) / 10))
-        : prefix && !xctCurrencyList.includes(currency)
-          ? `${floatChar}00`
-          : ""
+              : "0" + (Math.abs(amount) % 100))
+            : floatChar +
+            ((Math.abs(amount) % 100) % 10
+              ? Math.abs(amount) % 100 > 9
+                ? Math.abs(amount) % 100
+                : "0" + (Math.abs(amount) % 100)
+              : Math.floor((Math.abs(amount) % 100) / 10))
+          : prefix && !xctCurrencyList.includes(currency)
+            ? `${floatChar}00`
+            : ""
       }`
       : amount
         .toString()
@@ -155,8 +155,8 @@ export const orderStatus = [
 
 export const calculateTotalPriceProduct = (order: Order) => {
   let totalPrice = 0;
-  if (order.items) {
-    order.items.forEach((item: OrderItems) => {
+  if (order?.items) {
+    order?.items.forEach((item: OrderItems) => {
       totalPrice += item.quantity * item.variation_info?.retail_price;
     });
   }
@@ -166,7 +166,7 @@ export const calculateTotalPriceProduct = (order: Order) => {
 
 export const calcOrderDebt = (order: Order) => {
   let totalPriceProduct = calculateTotalPriceProduct(order);
-  return totalPriceProduct - (order.discount || 0) - (order.prepaid || 0) + (order.surcharge || 0);
+  return totalPriceProduct - (order?.discount || 0) - (order?.prepaid || 0) + (order?.surcharge || 0);
 }
 
 export const fuzzySearch = (pattern, string) =>

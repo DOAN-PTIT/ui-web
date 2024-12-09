@@ -55,6 +55,7 @@ export interface ListShop {
   description: string;
   id: number;
   name: string;
+  is_deleted: boolean;
   updatedAt: string;
 }
 
@@ -75,7 +76,7 @@ function Overview(props: OverviewProps) {
     getListShop();
     getCurrentUser();
   }, []);
-
+  const filteredShops = dataListShop?.filter((shop) => shop.is_deleted === true);
   const route = useRouter();
   const searchParams = useSearchParams();
 
@@ -179,17 +180,6 @@ function Overview(props: OverviewProps) {
     } catch (error) {
       console.log("Error:", error)
     }
-    // return await apiClient
-    //   .post(url, createShopFormData, {
-    //     headers: {
-    //       Authorization: `Bearer ${accessToken}`,
-    //       "Content-Type": "multipart/form-data",
-    //     },
-    //   })
-    //   .then(message.success("Thêm cửa hàng thành công!"))
-    //   .then(() => setOpenModal(false))
-    //   .then(() => getListShop())
-    //   .catch((error) => console.log("Error:", error));
   };
 
 
@@ -259,56 +249,60 @@ function Overview(props: OverviewProps) {
               />
             </Space>
             <Space className="grid grid-cols-2 xl:grid-cols-3 gap-7 mx-auto h-full mt-10 justify-center max-w-fit ">
-              {dataListShop?.map((shop) => {
-                return (
-                  <Card
-                    key={shop.id}
-                    className="w-[300px] min-h-[250px]"
-                    title={
-                      <div className="p-5 text-center">
-                        <Avatar
-                          src={shop.avatar}
-                          icon={<UserOutlined />}
-                          size={80}
-                        />
-                        <h1 className="mt-4">{shop.name}</h1>
-                      </div>
-                    }
-                    actions={[
-                      <Tooltip key="edit" title="Cập nhật cửa hàng">
-                        <EditOutlined />
-                      </Tooltip>,
-                      <Tooltip key="delete" title="Xóa cửa hàng">
-                        <Popconfirm
-                          title="Xóa cửa hàng"
-                          description="Bạn chắc chắn muốn xóa?"
-                          onConfirm={() => handleDeleteShop(shop.id)}
-                          // onCancel={cancel}
-                          okText="Xóa"
-                          cancelText="Hủy"
+              {dataListShop
+                // ?.filter((i) => i.is_deleted === false)
+                .map((shop) => {
+                  return (
+                    <Card
+                      key={shop.id}
+                      className="w-[300px] min-h-[250px]"
+                      title={
+                        <div className="p-5 text-center">
+                          <Avatar
+                            src={shop.avatar}
+                            icon={<UserOutlined />}
+                            size={80}
+                          />
+                          <h1 className="mt-4">{shop.name}</h1>
+                        </div>
+                      }
+                      actions={[
+                        <Tooltip key="edit" title="Cập nhật cửa hàng">
+                          <EditOutlined />
+                        </Tooltip>,
+                        <Tooltip key="delete" title="Xóa cửa hàng">
+                          <Popconfirm
+                            title="Xóa cửa hàng"
+                            description="Bạn chắc chắn muốn xóa?"
+                            onConfirm={() => handleDeleteShop(shop.id)}
+                            // onCancel={cancel}
+                            okText="Xóa"
+                            cancelText="Hủy"
+                          >
+                            <DeleteOutlined />
+
+                          </Popconfirm>
+
+                        </Tooltip>,
+                        <Tooltip key="leave" title="Rời khỏi cửa hàng">
+                          <LoginOutlined />
+                        </Tooltip>,
+                      ]}
+                    >
+                      <div className="tag-role absolute top-2 opacity-90">shop</div>
+                      <div className="tag-bottom"></div>
+                      <div className="text-center">
+                        <p className="opacity-80 mb-4">{shop.description}</p>
+                        <Button
+                          onClick={() => handleClickAccess(shop.id)}
+                          icon={<LoginOutlined />}
                         >
-                          <DeleteOutlined />
-
-                        </Popconfirm>
-
-                      </Tooltip>,
-                      <Tooltip key="leave" title="Rời khỏi cửa hàng">
-                        <LoginOutlined />
-                      </Tooltip>,
-                    ]}
-                  >
-                    <div className="text-center">
-                      <p className="opacity-80 mb-4">{shop.description}</p>
-                      <Button
-                        onClick={() => handleClickAccess(shop.id)}
-                        icon={<LoginOutlined />}
-                      >
-                        Truy cập
-                      </Button>
-                    </div>
-                  </Card>
-                );
-              })}
+                          Truy cập
+                        </Button>
+                      </div>
+                    </Card>
+                  );
+                })}
             </Space>
             <Modal
               open={openIntegration}
@@ -333,6 +327,7 @@ function Overview(props: OverviewProps) {
                         }
                       >
                         <div className="p-1 text-center">
+                          <div className="absolute text-black" style={{ backgroundColor: 'rgb(233, 76, 101)' }}>Shop</div>
                           <Image
                             src={page.picture.data.url}
                             width={page.picture.data.width}

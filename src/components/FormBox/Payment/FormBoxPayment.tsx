@@ -75,7 +75,7 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
         (orderParams?.surcharge ||
         0)
     );
-    if (orderParams.items?.length === 0) {
+    if (orderParams?.items?.length === 0) {
       setChangePrice(defaultPrice);
     }
   }, [orderParams, changePrice])
@@ -132,14 +132,14 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
   };
 
   const calcPrice = (field: string) => {
-    if (orderParams.items?.length === 0) {
+    if (orderParams?.items?.length === 0) {
       createOrder({});
       return 0;
     } else {
       switch (field) {
         case "TOTAL PRICE":
           const total_price_product =
-            orderParams.items?.length > 0
+            orderParams?.items?.length > 0
               ? calculateTotalPriceProduct(orderParams)
               : 0;
           const delivery_cost = orderParams?.delivery_cost || 0;
