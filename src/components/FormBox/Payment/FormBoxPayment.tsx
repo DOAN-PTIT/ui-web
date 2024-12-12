@@ -54,6 +54,7 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
     paid: string;
     surcharge: string;
   }>(defaultPrice);
+  const {orderitems, shopuser, customer, ...res} = orderParams
 
   useEffect(() => {
     calcPrice("TOTAL PRICE");
@@ -73,7 +74,7 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
     if (orderParams.items?.length === 0) {
       setChangePrice(defaultPrice);
     }
-  }, [orderParams]);
+  }, [res]);
 
   const notifyNoItems = _.debounce(() => {
     notification.warning({
@@ -128,7 +129,7 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
 
   const calcPrice = (field: string) => {
     if (orderParams?.orderitems?.length === 0) {
-      createOrder({});
+      createOrder({})
       return 0;
     } else {
       switch (field) {
