@@ -1,4 +1,4 @@
-import { getListOrders } from "@/action/order.action";
+import { getListOrders, updateOrder } from "@/action/order.action";
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -38,6 +38,15 @@ const reducer = createSlice({
                 state.isLoading = false
             })
             .addCase(getListOrders.rejected, (state) => {
+                state.isLoading = false
+            })
+            .addCase(updateOrder.pending, (state) => {
+                state.isLoading = true
+            })
+            .addCase(updateOrder.fulfilled, (state) => {
+                state.isLoading = false
+            })
+            .addCase(updateOrder.rejected, (state) => {
                 state.isLoading = false
             })
     }

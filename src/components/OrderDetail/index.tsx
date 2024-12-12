@@ -21,6 +21,7 @@ import "@/styles/order_detail.css";
 import { formatNumber, orderStatus } from "@/utils/tools";
 import { createOrder } from "@/reducer/order.reducer";
 import Avatar from "react-avatar";
+import { updateOrder } from "@/action/order.action";
 
 interface OrderDetailProps
   extends ReturnType<typeof mapStateToProps>,
@@ -28,10 +29,19 @@ interface OrderDetailProps
   selectedRowKey: any;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  fetchOrder: () => Promise<void>;
 }
 
 function OrderDetail(props: OrderDetailProps) {
-  const { selectedRowKey, open, setOpen, currentShop, createOrder } = props;
+  const {
+    selectedRowKey,
+    open,
+    setOpen,
+    currentShop,
+    createOrder,
+    orderParams,
+    updateOrder,
+  } = props;
 
   const [isLoading, setIsLoading] = useState(false);
   const [orderDetail, setOrderDetail] = useState<any>({});
@@ -91,15 +101,49 @@ function OrderDetail(props: OrderDetailProps) {
     );
   };
 
+  const calcOrderTotalPrice = () => {
+    const totalCost = orderParams.orderitems?.reduce(
+      (acc: number, item: any) =>
+        acc + (item.variation?.retail_price || item.variation_info?.retail_price) * item.quantity,
+      0
+    );
+    const deliveryCostShop = orderParams?.delivery_cost_shop || 0;
+    const prePaid = orderParams?.paid || 0;
+    const surcharge = orderParams?.surcharge || 0;
+    return totalCost + deliveryCostShop - prePaid + surcharge;
+  };
+
+  const handleUpdateOrder = () => {
+    setIsLoading(true);
+    updateOrder(orderParams)
+      .then((res) => {
+        notification.success({
+          message: "Cập nhật đơn hàng thành công",
+          description: "Cập nhật đơn hàng thành công",
+        });
+        setOpen(false);
+        createOrder({});
+        props.fetchOrder();
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        const message = error?.response?.data?.message || "Lỗi không xác định";
+        notification.error({
+          message: "Cập nhật đơn hàng thất bại",
+          description: message,
+        });
+        setIsLoading(false);
+      });
+  };
+
   const renderFooter = () => {
     const status = orderStatus.find((item) => item.key == orderDetail.status);
+    const totalCost = calcOrderTotalPrice();
     return (
       <div className="flex justify-between items-center">
         <div className="text-[18px]">
           Cần thanh toán:{" "}
-          <span className="font-bold">
-            {formatNumber(orderDetail.total_cost, "VND")} đ
-          </span>
+          <span className="font-bold">{formatNumber(totalCost, "VND")} đ</span>
         </div>
         <div className="flex gap-4 items-center">
           {status && (
@@ -113,6 +157,8 @@ function OrderDetail(props: OrderDetailProps) {
             style={{ height: 50, width: 140 }}
             className="p-4 text-[16px]"
             type="primary"
+            onClick={handleUpdateOrder}
+            loading={isLoading}
           >
             Lưu
           </Button>
@@ -191,12 +237,14 @@ function OrderDetail(props: OrderDetailProps) {
 const mapStateToProps = (state: RootState) => {
   return {
     currentShop: state.shopReducer.shop,
+    orderParams: state.orderReducer.createOrder,
   };
 };
 
 const mapDispatchToProps = (dispatch: AppDispatch) => {
   return {
     createOrder: (order: any) => dispatch(createOrder(order)),
+    updateOrder: (order: any) => dispatch(updateOrder(order)),
   };
 };
 

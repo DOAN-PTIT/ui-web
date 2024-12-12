@@ -15,6 +15,7 @@ import "../../styles/global.css";
 import OrderDetail from "../OrderDetail";
 import { createOrder } from "@/reducer/order.reducer";
 import Avatar from "react-avatar";
+import apiClient from "@/service/auth";
 
 interface ColumnType {
   id: string;
@@ -36,7 +37,7 @@ interface OrderProps
     ReturnType<typeof mapDispatchToProps> {}
 
 function Order(props: OrderProps) {
-  const { isLoading, currentShop } = props;
+  const { currentShop } = props;
   const defaultParams = {
     page: 1,
     page_size: 30,
@@ -44,6 +45,7 @@ function Order(props: OrderProps) {
   };
 
   const [totalEntries, setTotalEntries] = useState();
+  const [isLoading, setIsLoading] = useState(false);
   const [orders, setOrders] = useState([]);
   const [params, setParams] = useState({ ...defaultParams });
   const [selectedRowKey, setSelectedRowKey] = useState([]);
@@ -52,11 +54,23 @@ function Order(props: OrderProps) {
   const route = useRouter();
 
   useEffect(() => {
-    props.getListOrders(params).then((res) => {
-      setTotalEntries(res.payload.totalEntries);
-      setOrders(res.payload.data);
-    });
+    getListOrders(params);
   }, []);
+
+  const getListOrders = async (params: any) => {
+    setIsLoading(true);
+    try {
+      const url = `shop/${params.shop_id}/orders`;
+      return await apiClient.get(url, { params }).then(res => {
+        setOrders(res.data.data);
+        setTotalEntries(res.data.totalEntries);
+        setIsLoading(false);
+      })
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+    }
+  }
 
   const columns: TableProps<ColumnType>["columns"] = [
     {
@@ -190,12 +204,6 @@ function Order(props: OrderProps) {
     );
   };
 
-  const getListOrders = async (params: any) => {
-    props.getListOrders(params).then((res) => {
-      setTotalEntries(res.payload.totalEntries);
-    });
-  };
-
   return (
     <Layout className={"h-full"}>
       <HeaderAction
@@ -238,7 +246,7 @@ function Order(props: OrderProps) {
           loading={isLoading}
         />
       </Content>
-      {open && <OrderDetail selectedRowKey={selectedRowKey} open={true} setOpen={setOpen} />}
+      {open && <OrderDetail selectedRowKey={selectedRowKey} open={true} setOpen={setOpen} fetchOrder={() => getListOrders(params)} />}
     </Layout>
   );
 }
