@@ -40,9 +40,10 @@ interface VariationProps {
   id: string;
   iamge: string;
   barcode: string;
-  salePrice: number;
+  retail_price: number;
   amount: number;
   index?: number;
+  price_at_counter?: number;
 }
 
 interface ProductDetailProps
@@ -65,7 +66,7 @@ function ProductDetail(props: ProductDetailProps) {
     modalVisiable,
     currentUser,
     selectedRowKeys,
-    setSelectedRowKeys
+    setSelectedRowKeys,
   } = props;
 
   const [createProductParams, setCreateProductParams] = useState<any>({});
@@ -77,6 +78,7 @@ function ProductDetail(props: ProductDetailProps) {
   const [listFacebookCatalog, setListFacebookCatalog] = useState<any[]>([]);
   const [selectedCatalog, setSelectedCatalog] = useState<any>();
   const [selectedProduct, setSelectedProduct] = useState<any>();
+  const [selectedVariation, setSelectedVariation] = useState<any>();
   const [isLoading, setIsLoading] = useState(false);
 
   interface VariationParam {
@@ -89,7 +91,6 @@ function ProductDetail(props: ProductDetailProps) {
   >([]);
 
   useEffect(() => {
-    console.log(selectedRowKeys);
     if (currentShop.fb_shop_id) {
       setIsFacebookShop(true);
     }
@@ -135,6 +136,18 @@ function ProductDetail(props: ProductDetailProps) {
       title: "Mẫu mã",
       width: 120,
       fixed: "left",
+      render: (text, record) => {
+        return (
+          <Input
+            name="variation_code"
+            defaultValue={text ? text : ""}
+            value={record.id}
+            onChange={(e) =>
+              onInputVariationChange("variation_code", e.target.value)
+            }
+          />
+        );
+      },
     },
     {
       key: "IMAGE",
@@ -154,23 +167,72 @@ function ProductDetail(props: ProductDetailProps) {
               className="cursor-pointer"
             />
           </>
-        )
+        );
       },
     },
     {
       key: "BARCODE",
       dataIndex: "barcode",
       title: "Mã vạch",
+      render: (text, record) => {
+        return (
+          <Input
+            name="barcode"
+            defaultValue={text}
+            value={record.barcode}
+            onChange={(e) => onInputVariationChange("barcode", e.target.value)}
+          />
+        );
+      },
     },
     {
       key: "SALE PRICE",
       dataIndex: "retail_price",
       title: "Giá bán",
+      render: (text, record) => {
+        return (
+          <Input
+            name="retail_price"
+            defaultValue={text}
+            value={record.retail_price}
+            onChange={(e) =>
+              onInputVariationChange("retail_price", e.target.value)
+            }
+          />
+        );
+      },
+    },
+    {
+      key: "PRICE AT COUNTER",
+      dataIndex: "price_at_counter",
+      title: "Giá bán tại quầy",
+      render: (text, record) => {
+        return (
+          <Input
+            name="price_at_counter"
+            defaultValue={text}
+            value={record.price_at_counter}
+            onChange={(e) =>
+              onInputVariationChange("price_at_counter", e.target.value)
+            }
+          />
+        );
+      },
     },
     {
       key: "AMOUNT",
       dataIndex: "amount",
       title: "Số lượng",
+      render: (text, record) => {
+        return (
+          <Input
+            name="amount"
+            defaultValue={text}
+            value={record.amount}
+            onChange={(e) => onInputVariationChange("amount", e.target.value)}
+          />
+        );
+      },
     },
   ];
 
@@ -230,6 +292,31 @@ function ProductDetail(props: ProductDetailProps) {
     }
   };
 
+  const handleUpdateProduct = async () => {
+    setIsLoading(true);
+    try {
+      const url = `/shop/${currentShop.id}/product/${createProductParams.id}/update`;
+      return await apiClient
+        .post(url, { ...createProductParams, variations: variationData })
+        .then((res) => {
+          setModalVisiable(false);
+          getListProduct({ shopId: currentShop.id, page: currentPage });
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.log(error);
+          setIsLoading(false);
+          setModalVisiable(false);
+          notification.error({
+            message: "Đã xảy ra lỗi khi cập nhật sản phẩm",
+            description: "Cập nhật sản phẩm không thành công. Vui lòng thử lại",
+          });
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const renderTitleVariation = () => {
     return (
       <div className="flex justify-between">
@@ -248,11 +335,12 @@ function ProductDetail(props: ProductDetailProps) {
   const handleAddVariationColumn = () => {
     const newVariationData = [...variationData];
     const newVariation = {
-      variation_code: <Input name="variation_code" />,
+      variation_code: "",
       image: "",
-      barcode: <Input name="barcode" />,
-      retail_price: <Input name="retail_price" />,
-      amount: <Input name="amount" />,
+      price_at_counter: 0,
+      barcode: "",
+      retail_price: 0,
+      amount: 0,
     } as never;
     newVariationData.unshift(newVariation);
 
@@ -354,6 +442,14 @@ function ProductDetail(props: ProductDetailProps) {
     setCreateProductParams((prev: any) => ({ ...prev, [key]: value }));
   };
 
+  const onInputVariationChange = (key: string, value: any) => {
+    const newVariationData = [...variationData];
+    const newVariation = newVariationData[selectedVariation];
+    newVariation[key] = value;
+    newVariationData[selectedVariation] = newVariation;
+    setVariationData(newVariationData);
+  };
+
   const handleCancel = () => {
     setIsOpenModal(false);
   };
@@ -383,6 +479,38 @@ function ProductDetail(props: ProductDetailProps) {
     );
   };
 
+  const renderFooter = () => {
+    return (
+      <div className="flex justify-end">
+        <Button
+          type="primary"
+          onClick={() => {
+            if (selectedRowKeys) {
+              handleUpdateProduct();
+            } else {
+              handleCreateProduct();
+            }
+          }}
+          className="mr-2"
+          loading={isLoading}
+        >
+          Lưu
+        </Button>
+        <Button
+          onClick={() => {
+            setModalVisiable(false);
+            setCreateVariationParams([]);
+            setCreateProductParams({});
+            setVariationData([]);
+            setSelectedRowKeys && setSelectedRowKeys(null);
+          }}
+        >
+          Hủy
+        </Button>
+      </div>
+    );
+  };
+
   return (
     <Modal
       title="Thiết lập sản phẩm"
@@ -395,14 +523,13 @@ function ProductDetail(props: ProductDetailProps) {
       }}
       style={{ top: 40 }}
       onCancel={() => {
-        console.log("bbb");
         setModalVisiable(false);
         setCreateVariationParams([]);
         setCreateProductParams({});
         setVariationData([]);
         setSelectedRowKeys && setSelectedRowKeys(null);
       }}
-      onOk={handleCreateProduct}
+      footer={renderFooter()}
     >
       <ModalUpLoad open={isOpenModal} onCancel={handleCancel} />
       <Layout className="p-5 h-[600px] overflow-y-scroll">
@@ -512,6 +639,7 @@ function ProductDetail(props: ProductDetailProps) {
                 return {
                   //current value
                   onClick: (e: ChangeEvent<HTMLInputElement>) => {
+                    setSelectedVariation(rowIndex);
                     handleUpdateStateCreateVariation(
                       rowIndex as number,
                       e.target.name,
