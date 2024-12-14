@@ -1,7 +1,7 @@
 "use client";
 
 import apiClient from "@/service/auth";
-import { getHostName } from "@/utils/tools";
+import { checkRole, colorRole, getHostName } from "@/utils/tools";
 import {
   DeleteOutlined,
   EditOutlined,
@@ -57,6 +57,7 @@ export interface ListShop {
   name: string;
   is_deleted: boolean;
   updatedAt: string;
+  user_role: string;
 }
 
 interface OverviewProps
@@ -209,8 +210,21 @@ function Overview(props: OverviewProps) {
       message.error('Xóa cửa hàng thất bại')
     }
   }
+
+
+  const colorBorderRole = (role: string) => {
+    if (role === 'owner') {
+      return 'border-t-red-800'
+    }
+    if (role === 'admin') {
+      return 'border-t-blue-800'
+    }
+    if (role === 'employee') {
+      return 'border-t-green-800'
+    }
+  }
   return (
-    <Layout className="w-full min-h-screen">
+    <Layout className="w-full min-h-screen ">
       <HeaderAction isShowSearch={false} title="Danh sách cửa hàng" />
       <LayoutStyled className="bg-slate-200">
         {isLoading ? (
@@ -289,8 +303,8 @@ function Overview(props: OverviewProps) {
                         </Tooltip>,
                       ]}
                     >
-                      <div className="tag-role absolute top-2 opacity-90">shop</div>
-                      <div className="tag-bottom"></div>
+                      <div className={`tag-role absolute top-2 opacity-90 bg-[${colorRole(shop.user_role)}]`}>{checkRole(shop.user_role)}</div>
+                      <div className={`tag-bottom ${colorBorderRole(shop.user_role)}`}></div>
                       <div className="text-center">
                         <p className="opacity-80 mb-4">{shop.description}</p>
                         <Button

@@ -1,7 +1,7 @@
 "use client"
 
 import { DeleteOutlined, FilterOutlined, PlusOutlined, UserOutlined } from "@ant-design/icons";
-import { Avatar, Breadcrumb, Button, DatePicker, Input, Layout, message, Popconfirm, Select, TimePicker } from "antd";
+import { Avatar, Badge, Breadcrumb, Button, DatePicker, Divider, Input, Layout, message, Popconfirm, Select, TimePicker, Tooltip } from "antd";
 import { useEffect, useState } from "react";
 import TitleH from "../Custom/TitleH";
 import HeaderAction from "../HeaderAction/HeaderAction";
@@ -14,6 +14,7 @@ import { AppDispatch, RootState } from "@/store";
 import { getListShopUser } from "@/action/shop.action";
 import dayjs from "dayjs";
 import moment from "moment";
+import { checkRole, colorRole } from "@/utils/tools";
 
 const { Content } = Layout
 const { Search } = Input;
@@ -28,8 +29,8 @@ interface User {
 }
 interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> { }
  function Personnel(props: PesonnelProps) {
-    const {employeeShop,getEmployeeShop} = props
-    console.log(props)
+    const {employeeShop,getEmployeeShop,shop} = props
+    // console.log(props)
     const dataRow = [
         {
             id: '1',
@@ -52,7 +53,7 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
     // const [dataPersonnel, setDataPersonnel] = useState<User[]>()
     const handleOpenActor = (id: any) => {
         setOpenActor(true);
-        localStorage.setItem('personId', id)
+        // localStorage.setItem('personId', id)
         setCheckId(id)
     }
     const showModal = () => {
@@ -61,7 +62,7 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
 
     const handleOk = () => {
         setIsModalOpen(false);
-        getEmployeeShop(shopId)
+        getEmployeeShop({shopId})
     };
 
     const handleCancel = () => {
@@ -69,16 +70,16 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
     };
 
 
-    const shopId = localStorage.getItem('shopId')
+    const shopId = shop.id
 
     const handleRemove = async (id: any) => {
-        console.log(id)
-        console.log(`/shop/${shopId}/employee/${id}/remove`)
+        // console.log(id)
+        // console.log(`/shop/${shopId}/employee/${id}/remove`)
 
         try {
             await apiClient.post(`/shop/${shopId}/employee/${id}/remove`)
             message.success('Xóa nhân viên thành công')
-            getEmployeeShop(shopId)
+            getEmployeeShop({shopId})
             
         } catch (error) {
             console.log(error)
@@ -117,20 +118,27 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                         </div>
                         <div className="p-4 ">
                             {employeeShop?.employees?.map(i => (
-                                <div key={i.id} className={`${checkId==i.id && openActor && 'bg-cyan-100'} rounded-lg flex items-center justify-between text-sm px-2 py-1 mb-1 hover:bg-cyan-100 cursor-pointer`}>
-                                    <div onClick={() => handleOpenActor(i.id)} className="flex w-full">
-                                        <Avatar src={i.avatar} icon={<UserOutlined />} alt="avt" className="mr-2 size-6" />
-                                        <div>{i.name}</div>
+                                <div key={i.id} >
+                                    <div className={`${checkId == i.id && openActor && 'bg-cyan-100'} rounded-lg flex items-center justify-between text-sm px-2 py-1 mb-1 hover:bg-cyan-100 cursor-pointer`}>
+                                        <div onClick={() => handleOpenActor(i.id)} className="flex w-full">
+                                            <Tooltip className={`flex items-center`} color={colorRole(i?.shopusers[0].role)} placement="topLeft" title={checkRole(i?.shopusers[0].role)} >
+                                                <Avatar src={i.avatar} icon={<UserOutlined />} alt="avt" className="mr-2 size-6" />
+                                                <div>{i.name}</div>
+
+                                            </Tooltip>
+                                        </div>
+                                        <Popconfirm
+                                            title="Xóa nhân viên"
+                                            description="Bạn chắc chắn muốn xóa nhân viên shop?"
+                                            onConfirm={() => handleRemove(i.id)}
+                                            okText="Yes"
+                                            cancelText="No"
+                                        >
+                                            <div><DeleteOutlined /></div>
+                                        </Popconfirm>
+
                                     </div>
-                                    <Popconfirm
-                                        title="Xóa nhân viên"
-                                        description="Bạn chắc chắn muốn xóa nhân viên shop?"
-                                        onConfirm={() => handleRemove(i.id)}
-                                        okText="Yes"
-                                        cancelText="No"
-                                    >
-                                        <div><DeleteOutlined /></div>
-                                    </Popconfirm>
+                                    <Divider className="my-1"/>
                                 </div>
                                 // <div key={i?.id || null}>
 
@@ -219,6 +227,7 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
 const mapStateToProps = (state: RootState) => {
     return {
         employeeShop: state.shopReducer.user,
+        shop: state.shopReducer.shop,
         loading:state.shopReducer.isLoading
     }
 }

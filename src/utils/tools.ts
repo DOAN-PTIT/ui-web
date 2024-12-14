@@ -223,3 +223,25 @@ export const fuzzyMatch = (pattern, string, options = {}) => {
 
   return null;
 };
+export const colorRole = (role: string) => {
+  if (role === 'owner') {
+    return '#ef4444'
+  }
+  if (role === 'admin') {
+    return '#3b82f6'
+  }
+  if (role === 'employee') {
+    return '#22c55e'
+  }
+}
+export const checkRole = (role: string) => {
+  if (role === 'owner') {
+    return 'Chủ'
+  }
+  if (role === 'admin') {
+    return 'Quản lý'
+  }
+  if (role === 'employee') {
+    return 'Nhân viên'
+  }
+}

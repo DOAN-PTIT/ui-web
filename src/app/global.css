@@ -32,7 +32,6 @@
     font-weight: 500;
     top: 12px;
     left: -8px;
-    background-color: #f5222d;
     border-radius: 0px 4px 4px 0px;
     line-height: 20px;
 }
@@ -43,7 +42,7 @@
     left: -8px;
     width: 0;
     height: 0;
-    border-top: 4px solid #941c30;
+    border-top: 4px solid;
     border-left: 8px solid rgba(0, 0, 0, 0);
 }
 
