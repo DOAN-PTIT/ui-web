@@ -10,7 +10,7 @@ export const LayoutStyled = tw.div`
 
 export const marginStyle = (className: string) => {
   const collapsed = useAppSelector((state) => state.shopReducer.collapsed);
-  const plus = collapsed ? 80 : 200;
+  const plus = collapsed ? 60 : 200;
   return (
     <style jsx global>
       {`
