@@ -12,7 +12,7 @@ interface ProductSearchBarProps
   extends ReturnType<typeof mapStateToProps>,
     ReturnType<typeof mapDispatchToProps> {
   setSelectedProduct: Dispatch<any>,
-  selectedProduct: []
+  selectedProduct: any[]
 }
 
 const { Option } = Select;
@@ -21,7 +21,7 @@ const deboundTime = 800;
 function ProductSearchBar(props: ProductSearchBarProps) {
   const { currentShop, selectedProduct, setSelectedProduct } = props;
 
-  const [searchProductResult, setSearchProductResult] = useState<[]>([]);
+  const [searchProductResult, setSearchProductResult] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchRef = useRef(0);
@@ -70,7 +70,7 @@ function ProductSearchBar(props: ProductSearchBarProps) {
       cloneSelectedProduct.push(selected);
     } else {
       notification.warning({
-        message: "Sản phẩm đã tồn tại trong đơn hàng",
+        message: "Sản phẩm đã tồn tại",
         description: "Vui lòng chọn sản phẩm khác",
       })
     }

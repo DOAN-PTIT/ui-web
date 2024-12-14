@@ -225,3 +225,25 @@ export const fuzzyMatch = (pattern, string, options = {}) => {
 
   return null;
 };
+
+export const getPromotionType = {
+  1: {
+    label: "Khuyến mãi chung",
+    color: "orange"
+  },
+  2: {
+    label: "Khuyến mãi theo mã đơn hàng",
+    color: "blue"
+  },
+}
+
+export const getPromotionStatus = {
+  1: {
+    label: "Đang diễn ra",
+    color: "green"
+  },
+  0: {
+    label: "Đã kết thúc",
+    color: "red"
+  },
+}

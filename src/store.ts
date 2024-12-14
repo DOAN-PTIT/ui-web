@@ -3,6 +3,7 @@ import { thunk } from 'redux-thunk';
 import rootReducer from './redux-reducer';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+import { useDispatch, useSelector } from 'react-redux';
 
 const persistConfig = {
     key: 'root',
@@ -26,7 +27,11 @@ declare global {
     }
 }
 
-window.reduxStore = store
+if (typeof window !== 'undefined') {
+    window.reduxStore = store;
+}
 
 export type AppDispatch = typeof store.dispatch
 export type RootState = ReturnType<typeof store.getState>
+export const useAppDispatch = useDispatch.withTypes<AppDispatch>()
+export const useAppSelector = useSelector.withTypes<RootState>()

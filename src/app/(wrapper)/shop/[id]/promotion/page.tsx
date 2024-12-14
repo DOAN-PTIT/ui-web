@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import Product from "@/components/Product/Product";
+import Promotion from "@/components/Promotion";
 import { marginStyle } from "@/styles/layoutStyle";
 
-export default function ProductPage() {
+export default function PromotionPage() {
   return (
     <>
-      <Product />
+      <Promotion />
       {marginStyle("go_shop_container")}
     </>
   );

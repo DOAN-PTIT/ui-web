@@ -1,5 +1,6 @@
 "use client";
 
+import { handleCollapsed } from "@/reducer/shop.reducer";
 import { AppDispatch, RootState } from "@/store";
 import {
   AuditOutlined,
@@ -11,6 +12,7 @@ import {
   ShoppingCartOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+import { SealPercent } from "@phosphor-icons/react";
 import type { MenuProps } from "antd";
 import { Menu as AntdMenu, Avatar, Layout } from "antd";
 import { useParams, usePathname, useRouter } from "next/navigation";
@@ -52,6 +54,11 @@ const listItem = [
     icon: <ContainerOutlined />,
   },
   {
+    key: "promotion",
+    label: "Khuyến mãi",
+    icon: <SealPercent size={18} />
+  },
+  {
     key: "settings",
     label: "Cấu hình",
     icon: <SettingOutlined />,
@@ -63,8 +70,9 @@ interface MenuComponentProps
     ReturnType<typeof mapDispatchToProps> {}
 
 function Menu(props: MenuComponentProps) {
+  const { handleCollapsed, collapsed } = props;
+
   const { currentShop } = props;
-  const [collapsed, setCollapsed] = useState(false);
   const route = useRouter();
   const params = useParams();
   const pathName = usePathname().split("/");
@@ -85,8 +93,8 @@ function Menu(props: MenuComponentProps) {
       collapsible
       collapsedWidth={60}
       collapsed={collapsed}
-      onCollapse={(value) => setCollapsed(value)}
-      className="custom-sider min-h-fit bg-[#f2f4f7] bottom-0 top-0 h-full"
+      onCollapse={(value) => handleCollapsed(value)}
+      className="custom-sider fixed z-298989 bg-[#f2f4f7] bottom-0 top-0 h-screen"
     >
       <div className="flex flex-col justify-between h-full">
         <div>
@@ -105,7 +113,7 @@ function Menu(props: MenuComponentProps) {
             </div>
           )}
           <AntdMenu
-            className="bg-[#f2f4f7] text-[#101828] !border-none justify-center "
+            className="bg-[#f2f4f7] text-[#101828] !border-none justify-center"
             defaultOpenKeys={["dashbroad"]}
             defaultSelectedKeys={["dashbroad"]}
             selectedKeys={[pathName[3]]}
@@ -134,11 +142,14 @@ function Menu(props: MenuComponentProps) {
 const mapStateToProps = (state: RootState) => {
   return {
     currentShop: state.shopReducer.shop,
+    collapsed: state.shopReducer.collapsed,
   };
 };
 
 const mapDispatchToProps = (dispatch: AppDispatch) => {
-  return {};
+  return {
+    handleCollapsed: (value: boolean) => dispatch(handleCollapsed(value)),
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Menu);

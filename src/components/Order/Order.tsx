@@ -46,7 +46,7 @@ function Order(props: OrderProps) {
 
   const [totalEntries, setTotalEntries] = useState();
   const [isLoading, setIsLoading] = useState(false);
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<any[]>([]);
   const [params, setParams] = useState({ ...defaultParams });
   const [selectedRowKey, setSelectedRowKey] = useState([]);
   const [open, setOpen] = useState(false);
