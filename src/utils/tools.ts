@@ -157,24 +157,51 @@ export const orderStatus = [
 export const calculateTotalPriceProduct = (order: Order) => {
   let totalPrice = 0;
   if (order?.orderitems) {
-    order?.orderitems.forEach((item: OrderItems) => {
+    order?.orderitems.forEach((item: any) => {
       const variation_info = item.variation_info || item.variation;
-      totalPrice += item.quantity * variation_info?.retail_price;
+      const discountPromotion = calcPromotionProduct(variation_info, item.quantity);
+      totalPrice += item.quantity * variation_info?.retail_price - discountPromotion;
     });
   }
 
   return totalPrice || 0;
 };
 
-export const calcOrderDebt = (order: Order) => {
+export const calcOrderDebt = (order: any) => {
   let totalPriceProduct = calculateTotalPriceProduct(order);
-  return totalPriceProduct - (order?.discount || 0) - (order?.prepaid || 0) + (order?.surcharge || 0);
+  return totalPriceProduct - (order.total_discount || 0) - (order.paid || 0) + (order.surcharge || 0);
 }
 
-export const fuzzySearch = (pattern, string) =>
+export const calcPromotionProduct = (variation: any, quantity = 1) => {
+  const promotionItem = variation?.promotion_item
+  let discountPromotion = 0;
+
+  if (promotionItem) {
+    const isDiscountPercent = promotionItem?.is_discount_percent;
+    const discount = promotionItem?.discount;
+    const maxDiscount = promotionItem?.max_discount;
+    const totalOrder = variation?.retail_price * (variation?.orderAmount || 1);
+    const discountValue = isDiscountPercent
+      ? (totalOrder * discount) / 100
+      : discount;
+    discountPromotion = Math.min(discountValue, maxDiscount);
+  }
+
+  return discountPromotion * quantity;
+}
+
+export const calcTotalOrderPrice = (order: any) => {
+  let total_price = 0
+  if (order) {
+    total_price = calcOrderDebt(order) + (order.delivery_cost_shop || 0);
+  }
+  return total_price
+}
+
+export const fuzzySearch = (pattern: string, string: string) =>
   fuzzyMatch(pattern, string) !== null;
 
-export const fuzzyMatch = (pattern, string, options = {}) => {
+export const fuzzyMatch = (pattern: string, string: string, options = {} as any) => {
   const notConvert = options.notConvert;
   pattern = pattern || "";
   string = string || "";

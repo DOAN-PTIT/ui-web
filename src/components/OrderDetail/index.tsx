@@ -18,7 +18,7 @@ import FormBoxPayment from "../FormBox/Payment/FormBoxPayment";
 import FormBoxProduct from "../FormBox/Product/FormBoxProduct";
 import FormBoxReceive from "../FormBox/Receive/FormBoxReceive";
 import "@/styles/order_detail.css";
-import { formatNumber, orderStatus } from "@/utils/tools";
+import { calcTotalOrderPrice, formatNumber, orderStatus } from "@/utils/tools";
 import { createOrder } from "@/reducer/order.reducer";
 import Avatar from "react-avatar";
 import { updateOrder } from "@/action/order.action";
@@ -101,18 +101,6 @@ function OrderDetail(props: OrderDetailProps) {
     );
   };
 
-  const calcOrderTotalPrice = () => {
-    const totalCost = orderParams.orderitems?.reduce(
-      (acc: number, item: any) =>
-        acc + (item.variation?.retail_price || item.variation_info?.retail_price) * item.quantity,
-      0
-    );
-    const deliveryCostShop = orderParams?.delivery_cost_shop || 0;
-    const prePaid = orderParams?.paid || 0;
-    const surcharge = orderParams?.surcharge || 0;
-    return totalCost + deliveryCostShop - prePaid + surcharge;
-  };
-
   const handleUpdateOrder = () => {
     setIsLoading(true);
     updateOrder(orderParams)
@@ -138,7 +126,7 @@ function OrderDetail(props: OrderDetailProps) {
 
   const renderFooter = () => {
     const status = orderStatus.find((item) => item.key == orderDetail.status);
-    const totalCost = calcOrderTotalPrice();
+    const totalCost = calcTotalOrderPrice(orderDetail);
     return (
       <div className="flex justify-between items-center">
         <div className="text-[18px]">
