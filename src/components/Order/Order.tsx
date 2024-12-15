@@ -27,7 +27,7 @@ interface ColumnType {
   totalPrice: number;
   insertedAt: string;
   updatedAt: string;
-  discount: string;
+  total_discount: string;
 }
 
 const { Content } = Layout;
@@ -123,7 +123,7 @@ function Order(props: OrderProps) {
     },
     {
       key: "DISCOUNT",
-      dataIndex: "discount",
+      dataIndex: "total_discount",
       title: "Giảm giá",
     },
     {
@@ -181,7 +181,7 @@ function Order(props: OrderProps) {
         totalPrice: `${formatNumber(order.total_cost)} đ`,
         insertedAt: moment(order.createdAt).format("DD/MM/YYYY HH:mm"),
         updatedAt: moment(order.createdAt).format("DD/MM/YYYY HH:mm"),
-        discount: 0,
+        total_discount: 0,
       };
     });
   };

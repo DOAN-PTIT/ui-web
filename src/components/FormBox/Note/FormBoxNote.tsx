@@ -14,8 +14,9 @@ function FormBoxNote(props: FormBoxNoteProps) {
     <main className="rounded-lg bg-white p-5 shadow-sm">
       <div className="text-xl font-bold mb-5">Ghi chú</div>
       <Input.TextArea
+      variant="filled"
         style={{ resize: "none", height: 180 }}
-        className="bg-slate-100 border-none hover:bg-slate-100 focus:bg-white focus:border-blue-500"
+        className="border focus:border-blue-500"
         placeholder="Viết ghi chú cho đơn hàng"
         defaultValue={order?.note}
         onChange={(e) => createOrder({ ...orderParams, note: e.target.value })}

@@ -5,7 +5,7 @@ const initialState = {
     isLoading: false,
     createOrder: {
         delivery_company: "",
-        discount_percent: 0,
+        total_discount: 0,
         tracking_number: "",
         delivery_cost: 0,
         total_cost: 0,
@@ -20,7 +20,7 @@ const reducer = createSlice({
         createOrder: (state, action) => {
             const defaultOrder = {
                 delivery_company: "",
-                discount_percent: 0,
+                total_discount: 0,
                 tracking_number: "",
                 delivery_cost: action.payload.delivery_cost_shop || 0,
                 total_cost: action.payload.total_cost || 0,
