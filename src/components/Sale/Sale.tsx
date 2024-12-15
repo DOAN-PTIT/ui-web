@@ -55,8 +55,6 @@ function Sale(props: SaleProps) {
       at_counter: isAtCounter,
       total_cost: calcTotalOrderPrice(orderParams),
     };
-    console.log(params);
-    return
 
     delete params.orderitems;
     delete params.prepaid;

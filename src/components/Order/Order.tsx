@@ -181,7 +181,7 @@ function Order(props: OrderProps) {
         totalPrice: `${formatNumber(order.total_cost)} đ`,
         insertedAt: moment(order.createdAt).format("DD/MM/YYYY HH:mm"),
         updatedAt: moment(order.createdAt).format("DD/MM/YYYY HH:mm"),
-        total_discount: 0,
+        total_discount: order.total_discount || 0,
       };
     });
   };
