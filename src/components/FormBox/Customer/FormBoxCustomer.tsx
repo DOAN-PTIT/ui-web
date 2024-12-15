@@ -133,20 +133,24 @@ function FormBoxCustomer(props: FormBoxCustomerProps) {
           placeholder="SDT"
           onSearch={deboundSearch}
           onFocus={() => setSearchField("phone_number")}
+          onSelect={handleSelectedCustomer}
           options={renderCustomerOptions()}
           value={selectedCustomer?.phone_number}
           notFoundContent={renderNotFoundContent()}
           showSearch
+          filterOption={false}
           variant="filled"
         />
         <Select
           placeholder="Email"
           onSearch={deboundSearch}
           onFocus={() => setSearchField("email")}
+          onSelect={handleSelectedCustomer}
           options={renderCustomerOptions()}
           notFoundContent={renderNotFoundContent()}
           value={selectedCustomer?.email}
           showSearch
+          filterOption={false}
           variant="filled"
         />
         <DatePicker
