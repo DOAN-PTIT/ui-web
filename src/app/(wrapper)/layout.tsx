@@ -28,7 +28,7 @@ export default function WrapperLayout({
           <div>
             <Menu />
           </div>
-          <div className="w-full h-screen overflow-hidden">{children}</div>
+          <div className="w-full go_shop_container min-h-screen overflow-hidden">{children}</div>
         </ReduxProvider>
       </body>
     </html>

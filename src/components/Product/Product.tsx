@@ -35,6 +35,7 @@ interface ProductProps
 function Product(props: ProductProps) {
   const [modalVisiable, setModalVisiable] = useState(false);
   const [isSyncFBCatalog, setIsSyncFBCatalog] = useState(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<any>(null);
 
   const {
     getListProduct,
@@ -56,8 +57,8 @@ function Product(props: ProductProps) {
       fixed: "left",
       width: "10%",
       render: (text, record) => {
-        return <span className="font-medium">{text}</span>
-      }
+        return <span className="font-medium">{text}</span>;
+      },
     },
     {
       key: "PRODUCT NAME",
@@ -66,8 +67,8 @@ function Product(props: ProductProps) {
       fixed: "left",
       width: "10%",
       render: (text, record) => {
-        return <span className="font-medium">{text}</span>
-      }
+        return <span className="font-medium">{text}</span>;
+      },
     },
     {
       key: "IMAGE",
@@ -76,48 +77,48 @@ function Product(props: ProductProps) {
       fixed: "left",
       width: "8%",
       render: (text, record) => {
-        return <Image src={text} width={80} />
-      }
+        return <Image src={text} width={80} />;
+      },
     },
     {
       key: "TOTAL AMOUNT",
       dataIndex: "totalAmount",
       title: "Tổng số lượng",
       render: (text, record) => {
-        return <span className="font-medium">{text}</span>
-      }
+        return <span className="font-medium">{text}</span>;
+      },
     },
     {
       key: "TOTAL VARIATION",
       dataIndex: "totalVariation",
       title: "Tổng số mẫu mã",
       render: (text, record) => {
-        return <span className="font-medium">{text}</span>
-      }
+        return <span className="font-medium">{text}</span>;
+      },
     },
     {
       key: "SALE  PRICE",
       dataIndex: "salePrice",
       title: "Giá bán",
       render: (text, record) => {
-        return <span className="font-medium">{text}</span>
-      }
+        return <span className="font-medium">{text}</span>;
+      },
     },
     {
       key: "IMPORTED PRICE",
       dataIndex: "importedPrice",
       title: "Giá nhập",
       render: (text, record) => {
-        return <span className="font-medium">{text}</span>
-      }
+        return <span className="font-medium">{text}</span>;
+      },
     },
     {
       key: "NOTE",
       dataIndex: "note",
       title: "Ghi chú",
       render: (text, record) => {
-        return <span className="font-medium">{text}</span>
-      }
+        return <span className="font-medium">{text}</span>;
+      },
     },
   ];
 
@@ -137,7 +138,7 @@ function Product(props: ProductProps) {
   const getData: () => TableProps<ProductType>["dataSource"] = () => {
     return listProduct?.products
       ? listProduct?.products.map((product: any) => {
-        const firstVariation = product?.variations[0];
+          const firstVariation = product?.variations[0];
           const totalAmount = product?.variations.reduce(
             (total: number, variation: any) => total + (variation?.amount || 0),
             0
@@ -145,16 +146,23 @@ function Product(props: ProductProps) {
           const totalVariation = product?.variations?.length || 0;
           // sale Price will get about variation min - max
           const maxSalePrice = Math.max(
-            ...product?.variations?.map((variation: any) => variation?.retail_price)
+            ...product?.variations?.map(
+              (variation: any) => variation?.retail_price
+            )
           );
           const minSalePrice = Math.min(
-            ...product?.variations?.map((variation: any) => variation?.retail_price)
+            ...product?.variations?.map(
+              (variation: any) => variation?.retail_price
+            )
           );
           let salePrice;
           if (maxSalePrice == minSalePrice) {
             salePrice = `${formatNumber(maxSalePrice, "VND")} đ`;
           } else {
-            salePrice = `${formatNumber(minSalePrice, "VND")} đ - ${formatNumber(maxSalePrice,"VND")} đ`;
+            salePrice = `${formatNumber(
+              minSalePrice,
+              "VND"
+            )} đ - ${formatNumber(maxSalePrice, "VND")} đ`;
           }
 
           return {
@@ -189,6 +197,15 @@ function Product(props: ProductProps) {
           columns={columns}
           dataSource={getData()}
           virtual
+          onRow={(record, rowIndex) => {
+            return {
+              onClick: (event) => {
+                setModalVisiable(true);
+                setSelectedRowKeys(record.id);
+              },
+              style: { cursor: "pointer" },
+            };
+          }}
           pagination={{
             total: props.totalPage ? props.totalPage : 0,
             pageSize: 30,
@@ -202,11 +219,15 @@ function Product(props: ProductProps) {
           loading={props.isLoading}
         />
       </Layout.Content>
-      <ProductDetail
-        modalVisiable={modalVisiable}
-        typeView="create"
-        setModalVisiable={setModalVisiable}
-      />
+      {modalVisiable && (
+        <ProductDetail
+          modalVisiable={modalVisiable}
+          typeView="create"
+          setModalVisiable={setModalVisiable}
+          selectedRowKeys={selectedRowKeys}
+          setSelectedRowKeys={setSelectedRowKeys}
+        />
+      )}
       <SyncProductFacebookShop
         open={isSyncFBCatalog}
         setOpen={setIsSyncFBCatalog}

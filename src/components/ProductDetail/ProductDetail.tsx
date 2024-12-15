@@ -17,6 +17,7 @@ import {
   notification,
   Row,
   Select,
+  Spin,
   Switch,
   Table,
   TableProps,
@@ -33,14 +34,16 @@ import { connect } from "react-redux";
 import defaultImage from "../../assets/default.png";
 import { ModalUpLoad } from "./ModalUpload";
 import axios from "axios";
+import apiClient from "@/service/auth";
 
 interface VariationProps {
   id: string;
   iamge: string;
   barcode: string;
-  salePrice: number;
+  retail_price: number;
   amount: number;
   index?: number;
+  price_at_counter?: number;
 }
 
 interface ProductDetailProps
@@ -49,7 +52,8 @@ interface ProductDetailProps
   typeView: string;
   modalVisiable: boolean;
   setModalVisiable: Dispatch<SetStateAction<boolean>>;
-  product?: any;
+  selectedRowKeys?: any;
+  setSelectedRowKeys?: Dispatch<SetStateAction<any>>;
 }
 
 function ProductDetail(props: ProductDetailProps) {
@@ -61,6 +65,8 @@ function ProductDetail(props: ProductDetailProps) {
     setModalVisiable,
     modalVisiable,
     currentUser,
+    selectedRowKeys,
+    setSelectedRowKeys,
   } = props;
 
   const [createProductParams, setCreateProductParams] = useState<any>({});
@@ -71,6 +77,9 @@ function ProductDetail(props: ProductDetailProps) {
   const [isLoadingCatalog, setIsLoadingCatalog] = useState(false);
   const [listFacebookCatalog, setListFacebookCatalog] = useState<any[]>([]);
   const [selectedCatalog, setSelectedCatalog] = useState<any>();
+  const [selectedProduct, setSelectedProduct] = useState<any>();
+  const [selectedVariation, setSelectedVariation] = useState<any>();
+  const [isLoading, setIsLoading] = useState(false);
 
   interface VariationParam {
     index: number;
@@ -85,7 +94,8 @@ function ProductDetail(props: ProductDetailProps) {
     if (currentShop.fb_shop_id) {
       setIsFacebookShop(true);
     }
-  }, [currentShop.fb_shop_id]);
+    selectedRowKeys && handleGetProduct();
+  }, [currentShop.fb_shop_id, selectedRowKeys]);
 
   const handleDeleteVariationColumn = (index: any) => {
     const indexSelectedColumn = variationData.findIndex(
@@ -97,13 +107,47 @@ function ProductDetail(props: ProductDetailProps) {
     setVariationData(newVariationData);
   };
 
+  const handleGetProduct = async () => {
+    setIsLoading(true);
+    try {
+      const url = `/shop/${currentShop.id}/product/${selectedRowKeys}`;
+      await apiClient
+        .get(url)
+        .then((res) => {
+          const data = res.data;
+          setSelectedProduct(data);
+          setCreateProductParams(data);
+          setVariationData(data.variations);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.log(error);
+          setIsLoading(false);
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const columnsVariation: TableProps<VariationProps>["columns"] = [
     {
       key: "ID",
-      dataIndex: "id",
+      dataIndex: "variation_code",
       title: "Mẫu mã",
       width: 120,
       fixed: "left",
+      render: (text, record) => {
+        return (
+          <Input
+            name="variation_code"
+            defaultValue={text ? text : ""}
+            value={record.id}
+            onChange={(e) =>
+              onInputVariationChange("variation_code", e.target.value)
+            }
+          />
+        );
+      },
     },
     {
       key: "IMAGE",
@@ -111,21 +155,84 @@ function ProductDetail(props: ProductDetailProps) {
       title: "Hình ảnh",
       width: 120,
       fixed: "left",
+      render: (text, record) => {
+        const url = text || defaultImage.src;
+        return (
+          <>
+            <Image
+              alt=""
+              onClick={() => setIsOpenModal(true)}
+              src={url}
+              preview={false}
+              className="cursor-pointer"
+            />
+          </>
+        );
+      },
     },
     {
       key: "BARCODE",
       dataIndex: "barcode",
       title: "Mã vạch",
+      render: (text, record) => {
+        return (
+          <Input
+            name="barcode"
+            defaultValue={text}
+            value={record.barcode}
+            onChange={(e) => onInputVariationChange("barcode", e.target.value)}
+          />
+        );
+      },
     },
     {
       key: "SALE PRICE",
-      dataIndex: "salePrice",
+      dataIndex: "retail_price",
       title: "Giá bán",
+      render: (text, record) => {
+        return (
+          <Input
+            name="retail_price"
+            defaultValue={text}
+            value={record.retail_price}
+            onChange={(e) =>
+              onInputVariationChange("retail_price", e.target.value)
+            }
+          />
+        );
+      },
+    },
+    {
+      key: "PRICE AT COUNTER",
+      dataIndex: "price_at_counter",
+      title: "Giá bán tại quầy",
+      render: (text, record) => {
+        return (
+          <Input
+            name="price_at_counter"
+            defaultValue={text}
+            value={record.price_at_counter}
+            onChange={(e) =>
+              onInputVariationChange("price_at_counter", e.target.value)
+            }
+          />
+        );
+      },
     },
     {
       key: "AMOUNT",
       dataIndex: "amount",
       title: "Số lượng",
+      render: (text, record) => {
+        return (
+          <Input
+            name="amount"
+            defaultValue={text}
+            value={record.amount}
+            onChange={(e) => onInputVariationChange("amount", e.target.value)}
+          />
+        );
+      },
     },
   ];
 
@@ -185,6 +292,31 @@ function ProductDetail(props: ProductDetailProps) {
     }
   };
 
+  const handleUpdateProduct = async () => {
+    setIsLoading(true);
+    try {
+      const url = `/shop/${currentShop.id}/product/${createProductParams.id}/update`;
+      return await apiClient
+        .post(url, { ...createProductParams, variations: variationData })
+        .then((res) => {
+          setModalVisiable(false);
+          getListProduct({ shopId: currentShop.id, page: currentPage });
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.log(error);
+          setIsLoading(false);
+          setModalVisiable(false);
+          notification.error({
+            message: "Đã xảy ra lỗi khi cập nhật sản phẩm",
+            description: "Cập nhật sản phẩm không thành công. Vui lòng thử lại",
+          });
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const renderTitleVariation = () => {
     return (
       <div className="flex justify-between">
@@ -203,21 +335,12 @@ function ProductDetail(props: ProductDetailProps) {
   const handleAddVariationColumn = () => {
     const newVariationData = [...variationData];
     const newVariation = {
-      id: <Input name="variation_code" />,
-      image: (
-        <>
-          <Image
-            alt=""
-            onClick={() => setIsOpenModal(true)}
-            src={defaultImage.src}
-            preview={false}
-            className="cursor-pointer"
-          />
-        </>
-      ),
-      barcode: <Input name="barcode" />,
-      salePrice: <Input name="retail_price" />,
-      amount: <Input name="amount" />,
+      variation_code: "",
+      image: "",
+      price_at_counter: 0,
+      barcode: "",
+      retail_price: 0,
+      amount: 0,
     } as never;
     newVariationData.unshift(newVariation);
 
@@ -319,6 +442,14 @@ function ProductDetail(props: ProductDetailProps) {
     setCreateProductParams((prev: any) => ({ ...prev, [key]: value }));
   };
 
+  const onInputVariationChange = (key: string, value: any) => {
+    const newVariationData = [...variationData];
+    const newVariation = newVariationData[selectedVariation];
+    newVariation[key] = value;
+    newVariationData[selectedVariation] = newVariation;
+    setVariationData(newVariationData);
+  };
+
   const handleCancel = () => {
     setIsOpenModal(false);
   };
@@ -348,6 +479,38 @@ function ProductDetail(props: ProductDetailProps) {
     );
   };
 
+  const renderFooter = () => {
+    return (
+      <div className="flex justify-end">
+        <Button
+          type="primary"
+          onClick={() => {
+            if (selectedRowKeys) {
+              handleUpdateProduct();
+            } else {
+              handleCreateProduct();
+            }
+          }}
+          className="mr-2"
+          loading={isLoading}
+        >
+          Lưu
+        </Button>
+        <Button
+          onClick={() => {
+            setModalVisiable(false);
+            setCreateVariationParams([]);
+            setCreateProductParams({});
+            setVariationData([]);
+            setSelectedRowKeys && setSelectedRowKeys(null);
+          }}
+        >
+          Hủy
+        </Button>
+      </div>
+    );
+  };
+
   return (
     <Modal
       title="Thiết lập sản phẩm"
@@ -363,116 +526,139 @@ function ProductDetail(props: ProductDetailProps) {
         setModalVisiable(false);
         setCreateVariationParams([]);
         setCreateProductParams({});
+        setVariationData([]);
+        setSelectedRowKeys && setSelectedRowKeys(null);
       }}
-      onOk={handleCreateProduct}
+      footer={renderFooter()}
     >
       <ModalUpLoad open={isOpenModal} onCancel={handleCancel} />
       <Layout className="p-5 h-[600px] overflow-y-scroll">
-        <Row justify="space-between" className="mb-5">
-          <Col span={12} className="bg-white rounded-lg shadow-sm">
-            <Form layout="vertical" className="p-6">
-              <Form.Item name="custom_id" label="Mã sản phẩm" required>
-                <Input
-                  placeholder="Mã sản phẩm"
-                  name="custom_id"
-                  onChange={(e) =>
-                    onInputChange("product_code", e.target.value)
-                  }
-                />
-              </Form.Item>
-              <Form.Item name="product_name" label="Tên sản phẩm" required>
-                <Input
-                  placeholder="Tên sản phẩm"
-                  name="product_name"
-                  onChange={(e) => onInputChange("name", e.target.value)}
-                />
-              </Form.Item>
-              <Form.Item name="product_note" label="Ghi chú">
-                <Input.TextArea
-                  placeholder="Ghi chú"
-                  name="product_note"
-                  onChange={(e) => onInputChange("description", e.target.value)}
-                />
-              </Form.Item>
-            </Form>
-          </Col>
-          <Col span={11} className="h-fit">
-            <Form
-              layout="vertical"
-              className="p-6 bg-white rounded-lg shadow-sm"
-            >
-              <Form.Item name="product_tag" label="Thẻ">
-                <Select
-                  options={[]}
-                  placeholder="Thẻ"
-                  onChange={(value) => onInputChange("product_tag", value)}
-                />
-              </Form.Item>
-              <Form.Item label="Nhà cung cấp">
-                <Select
-                  options={[]}
-                  placeholder="Nhà cung cấp"
-                  onChange={(value) => onInputChange("supplier", value)}
-                />
-              </Form.Item>
-            </Form>
-            <div className="mt-4">
-              <Tooltip
-                className="flex gap-3 items-center"
-                title={
-                  !isFacebookShop &&
-                  "Chức năng này chỉ dành cho những shop được đồng bộ từ Facebook"
-                }
-              >
-                <Switch
-                  disabled={!isFacebookShop}
-                  loading={isLoadingCatalog}
-                  checked={selectedCatalog ? true : false}
-                  onChange={(e) => e && getFBCatalog()}
-                />
-                <p
-                  className={`${
-                    isFacebookShop ? "opacity-100" : "opacity-50"
-                  } font-medium`}
+        {isLoading ? (
+          <div className="flex items-center justify-center gap-4 h-full w-full">
+            <div>Chờ chút bạn nhé....</div>
+            <Spin />
+          </div>
+        ) : (
+          <>
+            <Row justify="space-between" className="mb-5">
+              <Col span={12} className="bg-white rounded-lg shadow-sm">
+                <Form
+                  layout="vertical"
+                  className="p-6"
+                  initialValues={{
+                    custom_id: selectedProduct && selectedProduct?.product_code,
+                    product_name: selectedProduct && selectedProduct?.name,
+                    product_note:
+                      selectedProduct && selectedProduct?.description,
+                  }}
                 >
-                  Đồng bộ sản phẩm này đến Facebook Shop
-                </p>
-              </Tooltip>
-            </div>
-          </Col>
-        </Row>
-        {renderModalCatalog()}
-        <Table
-          pagination={{
-            size: "small",
-            onChange: (page) => setCurrentPage(page),
-          }}
-          scroll={{ x: 1200, y: 500 }}
-          className="shadow-sm"
-          columns={columnsVariation}
-          dataSource={getDataVariation()}
-          title={renderTitleVariation}
-          onRow={(record, rowIndex): any => {
-            return {
-              //current value
-              onClick: (e: ChangeEvent<HTMLInputElement>) => {
-                handleUpdateStateCreateVariation(
-                  rowIndex as number,
-                  e.target.name,
-                  e.target.value
-                );
-              },
-              // previous value
-              onBlur: (e: ChangeEvent<HTMLInputElement>) => {
-                handleUpdateStateCreateVariation(
-                  rowIndex as number,
-                  e.target.name,
-                  e.target.value
-                );
-              },
-            };
-          }}
-        />
+                  <Form.Item name="custom_id" label="Mã sản phẩm" required>
+                    <Input
+                      placeholder="Mã sản phẩm"
+                      name="custom_id"
+                      onChange={(e) =>
+                        onInputChange("product_code", e.target.value)
+                      }
+                    />
+                  </Form.Item>
+                  <Form.Item name="product_name" label="Tên sản phẩm" required>
+                    <Input
+                      placeholder="Tên sản phẩm"
+                      name="product_name"
+                      onChange={(e) => onInputChange("name", e.target.value)}
+                    />
+                  </Form.Item>
+                  <Form.Item name="product_note" label="Ghi chú">
+                    <Input.TextArea
+                      placeholder="Ghi chú"
+                      name="product_note"
+                      onChange={(e) =>
+                        onInputChange("description", e.target.value)
+                      }
+                    />
+                  </Form.Item>
+                </Form>
+              </Col>
+              <Col span={11} className="h-fit">
+                <Form
+                  layout="vertical"
+                  className="p-6 bg-white rounded-lg shadow-sm"
+                >
+                  <Form.Item name="product_tag" label="Thẻ">
+                    <Select
+                      options={[]}
+                      placeholder="Thẻ"
+                      onChange={(value) => onInputChange("product_tag", value)}
+                    />
+                  </Form.Item>
+                  <Form.Item label="Nhà cung cấp">
+                    <Select
+                      options={[]}
+                      placeholder="Nhà cung cấp"
+                      onChange={(value) => onInputChange("supplier", value)}
+                    />
+                  </Form.Item>
+                </Form>
+                <div className="mt-4">
+                  <Tooltip
+                    className="flex gap-3 items-center"
+                    title={
+                      !isFacebookShop &&
+                      "Chức năng này chỉ dành cho những shop được đồng bộ từ Facebook"
+                    }
+                  >
+                    <Switch
+                      disabled={!isFacebookShop}
+                      loading={isLoadingCatalog}
+                      checked={selectedCatalog ? true : false}
+                      onChange={(e) => e && getFBCatalog()}
+                    />
+                    <p
+                      className={`${
+                        isFacebookShop ? "opacity-100" : "opacity-50"
+                      } font-medium`}
+                    >
+                      Đồng bộ sản phẩm này đến Facebook Shop
+                    </p>
+                  </Tooltip>
+                </div>
+              </Col>
+            </Row>
+            {renderModalCatalog()}
+            <Table
+              pagination={{
+                size: "small",
+                onChange: (page) => setCurrentPage(page),
+              }}
+              scroll={{ x: 1200, y: 500 }}
+              className="shadow-sm"
+              columns={columnsVariation}
+              dataSource={getDataVariation()}
+              title={renderTitleVariation}
+              onRow={(record, rowIndex): any => {
+                return {
+                  //current value
+                  onClick: (e: ChangeEvent<HTMLInputElement>) => {
+                    setSelectedVariation(rowIndex);
+                    handleUpdateStateCreateVariation(
+                      rowIndex as number,
+                      e.target.name,
+                      e.target.value
+                    );
+                  },
+                  // previous value
+                  onBlur: (e: ChangeEvent<HTMLInputElement>) => {
+                    handleUpdateStateCreateVariation(
+                      rowIndex as number,
+                      e.target.name,
+                      e.target.value
+                    );
+                  },
+                };
+              }}
+            />
+          </>
+        )}
       </Layout>
     </Modal>
   );

@@ -13,17 +13,19 @@ import { createOrder } from "@/reducer/order.reducer";
 
 interface FormBoxCustomerProps
   extends ReturnType<typeof mapStateToProps>,
-    ReturnType<typeof mapDispatchToProps> {}
+    ReturnType<typeof mapDispatchToProps> {
+      order?: any;
+    }
 
 function FormBoxCustomer(props: FormBoxCustomerProps) {
-  const { currentShop } = props;
+  const { currentShop, order } = props;
 
   const [searchField, setSearchField] = useState("");
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<
     Customer | undefined
-  >(undefined);
+  >(order?.customer || undefined);
 
   useEffect(() => {
     if (selectedCustomer) {
@@ -184,13 +186,13 @@ function FormBoxCustomer(props: FormBoxCustomerProps) {
               <p>
                 Tổng số đơn đã mua:{" "}
                 <span className="font-bold text-green-500">
-                  {selectedCustomer?.total_order}
+                  {selectedCustomer?.total_order || 0}
                 </span>
               </p>
               <p>
                 Lần cuối mua hàng:{" "}
                 <span className="font-bold">
-                  {selectedCustomer?.last_purchase}
+                  {selectedCustomer?.last_purchase || 0}
                 </span>
               </p>
             </div>

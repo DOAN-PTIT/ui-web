@@ -1,4 +1,4 @@
-import { getListOrders } from "@/action/order.action";
+import { getListOrders, updateOrder } from "@/action/order.action";
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -22,9 +22,9 @@ const reducer = createSlice({
                 delivery_company: "",
                 discount_percent: 0,
                 tracking_number: "",
-                delivery_cost: 0,
-                total_cost: 0,
-                surcharge: 0,
+                delivery_cost: action.payload.delivery_cost_shop || 0,
+                total_cost: action.payload.total_cost || 0,
+                surcharge: action.payload.surcharge || 0,
             }
             state.createOrder = { ...defaultOrder, ...action.payload }
         }
@@ -38,6 +38,15 @@ const reducer = createSlice({
                 state.isLoading = false
             })
             .addCase(getListOrders.rejected, (state) => {
+                state.isLoading = false
+            })
+            .addCase(updateOrder.pending, (state) => {
+                state.isLoading = true
+            })
+            .addCase(updateOrder.fulfilled, (state) => {
+                state.isLoading = false
+            })
+            .addCase(updateOrder.rejected, (state) => {
                 state.isLoading = false
             })
     }

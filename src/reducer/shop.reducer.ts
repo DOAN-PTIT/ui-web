@@ -20,7 +20,8 @@ const reducer = createSlice({
             }]
 
         },
-        isLoading: false
+        isLoading: false,
+        collapsed: false
     },
     reducers: {
         setShop: (state, action) => {
@@ -28,6 +29,9 @@ const reducer = createSlice({
         },
         setIsLoading: (state, action) => {
             state.isLoading = action.payload
+        },
+        handleCollapsed: (state, action) => {
+            state.collapsed = action.payload
         }
     },
     extraReducers: (builder) => {
@@ -56,6 +60,6 @@ const reducer = createSlice({
     }
 })
 
-export const { setShop, setIsLoading } = reducer.actions
+export const { setShop, setIsLoading, handleCollapsed } = reducer.actions
 const shopReducer = reducer.reducer
 export default shopReducer

@@ -48,3 +48,15 @@ export const getListProductFBShop = createAsyncThunk(
       .catch((error) => console.log(error));
   }
 )
+
+export const getProduct = createAsyncThunk(
+  "product/getProduct",
+  async (data: any) => {
+    const { shop_id, product_id } = data
+    const url = `/shop/product/${shop_id}/product/${product_id}`;
+    return await apiClient
+      .get(url)
+      .then((res) => res.data)
+      .catch((error) => console.log(error));
+  }
+)

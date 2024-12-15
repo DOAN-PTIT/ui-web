@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { formatNumber } from "@/utils/tools";
 import { DeleteOutlined } from "@ant-design/icons";
-import { Button, Empty, Input, Select, Tag } from "antd";
+import { Button, Empty, Input, notification, Select, Tag } from "antd";
 import ProductSearchBar from "@/components/ProductSearchBar/ProductSearchBar";
 import Image from "next/image";
 import { AppDispatch, RootState } from "@/store";
@@ -14,19 +14,27 @@ interface FormBoxProductProps
   extends ReturnType<typeof mapStateToProps>,
     ReturnType<typeof mapDispatchToProps> {
       setIsAtCounter: Dispatch<SetStateAction<boolean>>,
-      isAtCounter: boolean
+      isAtCounter: boolean,
+      order?: any
     }
 
 function FormBoxProduct(props: FormBoxProductProps) {
-  const { createOrder, orderParams, setIsAtCounter, isAtCounter } = props;
+  const { createOrder, orderParams, setIsAtCounter, isAtCounter, order } = props;
 
-  const [selectedProduct, setSelectedProduct] = useState<[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<[]>(order?.orderitems?.map((item:any) => item.variation) || []);
   const [note, setNote] = useState<{ note: string; variation_id: any }[]>([]);
+
+  // useEffect(() => {
+  //   if (order) {
+  //     const variations = order?.orderitems?.map((item:any) => item.variation) || [];
+  //     setSelectedProduct(variations);
+  //   }
+  // }, [])
 
   useEffect(() => {
     createOrder({
       ...orderParams,
-      items: selectedProduct.map((item: any) => {
+      orderitems: selectedProduct.map((item: any) => {
         const { orderAmount, ...variation_info } = item;
         const noteItem = note?.find(
           (note) => note.variation_id === item.id
@@ -41,7 +49,7 @@ function FormBoxProduct(props: FormBoxProductProps) {
         };
       }),
     });
-  }, [selectedProduct, note]);
+  }, [note, selectedProduct]);
 
   const onChangeAmountCurrentProduct = (
     currVariation: any,
@@ -62,9 +70,16 @@ function FormBoxProduct(props: FormBoxProductProps) {
   };
 
   const handleDeleteProduct = (index: number) => {
-    setSelectedProduct((prevState: any) => {
-      return prevState.filter((_: any, i: number) => i !== index);
-    });
+      setSelectedProduct((prevState: any) => {
+        if (prevState.length === 1) {
+          notification.warning({
+            message: "Không thể xóa",
+            description: "Phải có ít nhất 1 sản phẩm trong đơn hàng",
+          });
+          return prevState;
+        }
+        return prevState.filter((_: any, i: number) => i !== index);
+      });
   };
 
   const onChangeNoteOrderItem = (variation_id: any, noteItem: string) => {
@@ -112,12 +127,12 @@ function FormBoxProduct(props: FormBoxProductProps) {
       <div className="bg-slate-100 p-5 rounded-lg">
         <div className="gap-6 font-medium text-md mb-4">
           <span className="mr-5">
-            Số lượng sản phẩm: {selectedProduct.length}
+            Số lượng sản phẩm: {selectedProduct?.length}
           </span>
         </div>
-        {selectedProduct.length > 0 ? (
+        {selectedProduct?.length > 0 ? (
           <div className="flex flex-col gap-3">
-            {selectedProduct.map((variation: any, index: number) => {
+            {selectedProduct?.map((variation: any, index: number) => {
               return (
                 <div
                   key={variation?.id}
@@ -199,7 +214,7 @@ function FormBoxProduct(props: FormBoxProductProps) {
             })}
           </div>
         ) : (
-          <div className="rounded-lg p-5 border">
+          <div className="rounded-lg p-5 border bg-white">
             <Empty description="Giỏ hàng trống" />
           </div>
         )}

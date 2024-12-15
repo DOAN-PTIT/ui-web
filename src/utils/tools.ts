@@ -1,3 +1,4 @@
+import moment from "moment";
 import { Order, OrderItems } from "./type";
 
 export const intCurrencyList = [
@@ -155,9 +156,10 @@ export const orderStatus = [
 
 export const calculateTotalPriceProduct = (order: Order) => {
   let totalPrice = 0;
-  if (order?.items) {
-    order?.items.forEach((item: OrderItems) => {
-      totalPrice += item.quantity * item.variation_info?.retail_price;
+  if (order?.orderitems) {
+    order?.orderitems.forEach((item: OrderItems) => {
+      const variation_info = item.variation_info || item.variation;
+      totalPrice += item.quantity * variation_info?.retail_price;
     });
   }
 
@@ -233,5 +235,25 @@ export const checkRole = (role: string) => {
   }
   if (role === 'employee') {
     return 'Nhân viên'
-  }
+  }}
+export const getPromotionType = {
+  1: {
+    label: "Khuyến mãi chung",
+    color: "orange"
+  },
+  2: {
+    label: "Khuyến mãi theo mã đơn hàng",
+    color: "blue"
+  },
+}
+
+export const getPromotionStatus = {
+  1: {
+    label: "Đang diễn ra",
+    color: "green"
+  },
+  0: {
+    label: "Đã kết thúc",
+    color: "red"
+  },
 }

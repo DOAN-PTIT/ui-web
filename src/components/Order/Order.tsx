@@ -12,6 +12,10 @@ import { useEffect, useState } from "react";
 import moment from "moment";
 import { formatNumber, orderStatus } from "@/utils/tools";
 import "../../styles/global.css";
+import OrderDetail from "../OrderDetail";
+import { createOrder } from "@/reducer/order.reducer";
+import Avatar from "react-avatar";
+import apiClient from "@/service/auth";
 
 interface ColumnType {
   id: string;
@@ -33,7 +37,7 @@ interface OrderProps
     ReturnType<typeof mapDispatchToProps> {}
 
 function Order(props: OrderProps) {
-  const { isLoading, currentShop } = props;
+  const { currentShop } = props;
   const defaultParams = {
     page: 1,
     page_size: 30,
@@ -41,17 +45,32 @@ function Order(props: OrderProps) {
   };
 
   const [totalEntries, setTotalEntries] = useState();
-  const [orders, setOrders] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [orders, setOrders] = useState<any[]>([]);
   const [params, setParams] = useState({ ...defaultParams });
+  const [selectedRowKey, setSelectedRowKey] = useState([]);
+  const [open, setOpen] = useState(false);
 
   const route = useRouter();
 
   useEffect(() => {
-    props.getListOrders(params).then((res) => {
-      setTotalEntries(res.payload.totalEntries);
-      setOrders(res.payload.data);
-    });
+    getListOrders(params);
   }, []);
+
+  const getListOrders = async (params: any) => {
+    setIsLoading(true);
+    try {
+      const url = `shop/${params.shop_id}/orders`;
+      return await apiClient.get(url, { params }).then(res => {
+        setOrders(res.data.data);
+        setTotalEntries(res.data.totalEntries);
+        setIsLoading(false);
+      })
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+    }
+  }
 
   const columns: TableProps<ColumnType>["columns"] = [
     {
@@ -59,17 +78,29 @@ function Order(props: OrderProps) {
       dataIndex: "id",
       title: "ID",
       fixed: "left",
-      width: 200,
+      width: 80,
+      render: (id: number) => {
+        return <span className="text-blue-500 font-medium">{id}</span>;
+      }
     },
     {
       key: "PRODUCT",
       dataIndex: "product",
       title: "Sản phẩm",
+      render: (product: any) => {
+        return <span className="font-medium">{product}</span>
+      }
     },
     {
       key: "CUSTOMER",
       dataIndex: "customer",
       title: "Khách hàng",
+      render: (customer: any) => {
+        return <div>
+          <Avatar name={customer.name} size="25" round={true} />
+          <span className="ml-2">{customer.name}</span>
+        </div>
+      }
     },
     {
       key: "ADDRESS",
@@ -143,11 +174,11 @@ function Order(props: OrderProps) {
         product: order?.orderitems
           .map((variation: any) => variation.variation.product.name)
           .join("; "),
-        customer: order?.customer?.name || "",
+        customer: order?.customer,
         phoneNumber: order?.customer?.phone_number || "",
         address: order?.customer?.address || "",
         status: 1,
-        totalPrice: formatNumber(order.total_cost),
+        totalPrice: `${formatNumber(order.total_cost)} đ`,
         insertedAt: moment(order.createdAt).format("DD/MM/YYYY HH:mm"),
         updatedAt: moment(order.createdAt).format("DD/MM/YYYY HH:mm"),
         discount: 0,
@@ -155,9 +186,14 @@ function Order(props: OrderProps) {
     });
   };
 
+  const handleRowClick = (record: any) => {
+    setSelectedRowKey(record.id);
+    setOpen(true);
+  }
+
   const renderTableFooter = () => {
     const totalPrice = orders.reduce((acc, order) => {
-      return acc + order.total_cost;
+      return acc + order?.total_cost;
     }, 0)
     return (
       <Row>
@@ -168,31 +204,31 @@ function Order(props: OrderProps) {
     );
   };
 
-  const getListOrders = async (params: any) => {
-    props.getListOrders(params).then((res) => {
-      setTotalEntries(res.payload.totalEntries);
-    });
-  };
-
   return (
-    <Layout className={"h-screen order__container"}>
+    <Layout className={"h-full"}>
       <HeaderAction
         title="Đơn hàng"
         isShowSearch={true}
         inputPlaholder="Tìm kiếm đơn hàng"
       />
-      <Content className="content bg-gray-200 rounded-tl-xl p-5">
+      <Content className="content bg-gray-200 rounded-tl-xl p-5 order__table__container">
         <ActionTools
           callBack={() => route.push("sale")}
           reloadCallBack={() => getListOrders(params)}
         />
         <Table
           columns={columns}
-          rootClassName={"order__table__container"}
-          style={{ height: "calc(100vh - 248px)" }}
           dataSource={getData()}
           footer={() => renderTableFooter()}
           virtual
+          onRow={(record) => {
+            return {
+              onClick: () => {
+                handleRowClick(record);
+              },
+              style: { cursor: "pointer" },
+            }
+          }}
           pagination={{
             defaultPageSize: 30,
             total: totalEntries,
@@ -205,11 +241,12 @@ function Order(props: OrderProps) {
               }
             },
           }}
-          scroll={{ x: 2880, y: 'calc(100vh - 250px)' }}
+          scroll={{ x: 2880 }}
           size="small"
           loading={isLoading}
         />
       </Content>
+      {open && <OrderDetail selectedRowKey={selectedRowKey} open={true} setOpen={setOpen} fetchOrder={() => getListOrders(params)} />}
     </Layout>
   );
 }
@@ -228,6 +265,7 @@ const mapDispatchToProps = (dispatch: AppDispatch) => {
       page_size: number;
       shop_id: number;
     }) => dispatch(getListOrders(params)),
+    createOrder: (order: any) => dispatch(createOrder(order)),
   };
 };
 

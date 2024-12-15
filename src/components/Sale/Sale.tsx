@@ -39,19 +39,19 @@ function Sale(props: SaleProps) {
     const url = `/shop/${currentShop.id}/order/create`;
     const params = {
       ...orderParams,
-      paid: orderParams.prepaid,
+      paid: orderParams.paid,
       shopuser_id: orderParams.shopuser_id ? orderParams.shopuser_id : currentUser.id,
-      products_order: orderParams.items?.map((item: any) => ({
+      products_order: orderParams.orderitems?.map((item: any) => ({
         product_id: item.variation_info.product.id,
         quantity: item.quantity,
         variation_id: item.variation_id,
       })),
-      delivery_cost_shop: orderParams.delivery_cost,
+      delivery_cost_shop: orderParams.delivery_cost_shop,
       at_counter: isAtCounter,
       total_cost: calcOrderDebt(orderParams) + (orderParams.delivery_cost || 0),
     };
 
-    delete params.items;
+    delete params.orderitems;
     delete params.prepaid;
     delete params.delivery_cost;
     delete params.discount;

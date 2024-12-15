@@ -11,3 +11,14 @@ export const getListOrders = createAsyncThunk(
       .catch((error) => console.log(error));
   }
 );
+
+export const updateOrder = createAsyncThunk(
+  "order/updateOrder",
+  async (params: any) => {
+    const url = `shop/${params.shop_id}/order/${params.id}`;
+    return await apiClient
+      .post(url, params)
+      .then((res) => res.data)
+      .catch((error) => console.log(error));
+  }
+)
