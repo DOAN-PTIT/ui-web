@@ -18,7 +18,7 @@ import FormBoxPayment from "../FormBox/Payment/FormBoxPayment";
 import FormBoxProduct from "../FormBox/Product/FormBoxProduct";
 import FormBoxReceive from "../FormBox/Receive/FormBoxReceive";
 import "@/styles/order_detail.css";
-import { calcTotalOrderPrice, formatNumber, orderStatus } from "@/utils/tools";
+import { calcOrderDebt, calcTotalOrderPrice, formatNumber, orderStatus } from "@/utils/tools";
 import { createOrder } from "@/reducer/order.reducer";
 import Avatar from "react-avatar";
 import { updateOrder } from "@/action/order.action";
@@ -46,6 +46,7 @@ function OrderDetail(props: OrderDetailProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [orderDetail, setOrderDetail] = useState<any>({});
   const [isAtCounter, setIsAtCounter] = useState(false);
+  const [promotionsCanBeActive, setPromotionsCanBeActive] = useState<any>([]);
 
   useEffect(() => {
     getOrderDetail();
@@ -100,6 +101,31 @@ function OrderDetail(props: OrderDetailProps) {
       </div>
     );
   };
+
+  const findDiscountCanBeActice = async () => {
+    try {
+      const url = `shop/${currentShop.id}/promotions/promotion-can-be-active`;
+      return await apiClient
+        .get(url, {
+          params: {
+            total_price: calcOrderDebt(orderParams) + (orderParams.delivery_cost || 0),
+            order_total: orderParams.orderitems?.length || 0,
+            type: 2,
+          },
+        })
+        .then((res) => {
+          setPromotionsCanBeActive(res.data);
+        })
+        .catch((err) => {
+          notification.error({
+            message: "Lỗi",
+            description: "Lỗi không xác định",
+          })
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const handleUpdateOrder = () => {
     setIsLoading(true);
@@ -186,25 +212,27 @@ function OrderDetail(props: OrderDetailProps) {
         </div>
       ) : (
         <div className="bg-gray-200 rounded-xl flex p-5 gap-5 w-full">
-          <Row justify="space-between" className="w-full">
+          <Row justify="space-between" className="w-full" gutter={16}>
             <Col span={15}>
               <Row>
                 <FormBoxProduct
                   setIsAtCounter={setIsAtCounter}
                   isAtCounter={isAtCounter}
                   order={orderDetail}
+                  findDiscountCanBeActice={findDiscountCanBeActice}
+                  promotionsCanBeActive={promotionsCanBeActive}
                 />
               </Row>
-              <Row justify="space-between" className="mt-4">
-                <Col span={11}>
+              <Row justify="space-between" className="mt-4" gutter={16}>
+                <Col span={12}>
                   <FormBoxPayment order={orderDetail} />
                 </Col>
-                <Col span={11}>
+                <Col span={12}>
                   <FormBoxNote order={orderDetail} />
                 </Col>
               </Row>
             </Col>
-            <Col span={8} className="flex flex-col gap-4">
+            <Col span={9} className="flex flex-col gap-4">
               <Row>
                 <FormBoxOrderInfo order={orderDetail} />
               </Row>
