@@ -59,6 +59,21 @@ const listItem = [
     icon: <SealPercent size={18} />
   },
   {
+    key: "report",
+    label: "Báo cáo",
+    icon: <PieChartOutlined />,
+    children: [
+      {
+        key: "report/revenue",
+        label: "Doanh thu",
+      },
+      {
+        key: "report/order-report",
+        label: "Đơn hàng",
+      }
+    ]
+  },
+  {
     key: "settings",
     label: "Cấu hình",
     icon: <SettingOutlined />,
@@ -70,23 +85,28 @@ interface MenuComponentProps
     ReturnType<typeof mapDispatchToProps> {}
 
 function Menu(props: MenuComponentProps) {
-  const { handleCollapsed, collapsed } = props;
+  const { handleCollapsed, collapsed, currentShop } = props;
 
-  const { currentShop } = props;
   const route = useRouter();
   const params = useParams();
   const pathName = usePathname().split("/");
+  const [selectedKeys, setSelectedKeys] = useState(["dashbroad"]);
 
-  const items: MenuProps["items"] = listItem.map((item) => ({
-    key: item.key,
-    label: item.label,
-    icon: item.icon,
-    onClick: () => {
-      return item.key === "home"
-        ? route.push("/shop/overview")
-        : route.push(`/shop/${params.id[0]}/${item.key}`);
-    },
-  }));
+  const items: MenuProps["items"] = listItem.map((item) => {
+    return {
+      key: item.key,
+      label: item.label,
+      icon: item.icon,
+      onClick: (e) => {
+        if (e.key === "report") return;
+        setSelectedKeys([e.key]);
+        return item.key === "home"
+          ? route.push("/shop/overview")
+          : route.push(`/shop/${currentShop.id}/${e.key}`);
+      },
+      children: item.children
+    }
+  });
 
   return (
     <Sider
@@ -116,7 +136,7 @@ function Menu(props: MenuComponentProps) {
             className="bg-[#f2f4f7] text-[#101828] !border-none justify-center"
             defaultOpenKeys={["dashbroad"]}
             defaultSelectedKeys={["dashbroad"]}
-            selectedKeys={[pathName[3]]}
+            selectedKeys={selectedKeys}
             items={params.id ? items : []}
             theme="light"
             mode="inline"
