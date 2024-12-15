@@ -2,6 +2,7 @@ import _ from "lodash";
 import { createOrder } from "@/reducer/order.reducer";
 import { AppDispatch, RootState } from "@/store";
 import {
+  calcOrderDebt,
   calcPromotionProduct,
   calculateTotalPriceProduct,
   formatInputNumber,
@@ -45,7 +46,7 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
       orderParams?.delivery_cost_shop || "0",
       "VND"
     ),
-    total_discount: formatNumber("0", "VND"),
+    // total_discount: formatNumber("0", "VND"),
     paid: formatNumber(orderParams?.paid || "0", "VND"),
     surcharge: formatNumber(orderParams?.surcharge || "0", "VND"),
   };
@@ -53,29 +54,22 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
   const [afterDiscount, setAfterDiscount] = useState(0);
   const [needToPay, setNeedToPay] = useState(0);
   const [debt, setDebt] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [totalDiscount, setTotalDiscount] = useState(0);
   const [changePrice, setChangePrice] = useState<{
     delivery_cost_shop: string;
-    total_discount: string;
+    // total_discount: string;
     paid: string;
     surcharge: string;
   }>(defaultPrice);
   const { orderitems, shopuser, customer, ...res } = orderParams;
 
   useEffect(() => {
-    calcPrice("TOTAL PRICE");
-    setAfterDiscount(calcPrice("TOTAL PRICE") - orderParams?.total_discount || 0);
-    setNeedToPay(
-      calcPrice("TOTAL PRICE") -
-        (orderParams?.total_discount || 0) -
-        (orderParams?.paid || 0) +
-        (orderParams?.surcharge || 0)
-    );
-    setDebt(
-      calcPrice("TOTAL PRICE") -
-        (orderParams?.total_discount || 0) -
-        (orderParams?.paid || 0) +
-        (orderParams?.surcharge || 0)
-    );
+    setTotalPrice(calcPrice("TOTAL PRICE"));
+    setTotalDiscount(calcPrice("DISCOUNT"));
+    setAfterDiscount(calcPrice("AFTER DISCOUNT"));
+    setNeedToPay(calcPrice("NEED TO PAY"));
+    setDebt(calcPrice("DEBT"));
     if (orderParams?.items?.length === 0) {
       setChangePrice(defaultPrice);
     }
@@ -87,41 +81,6 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
       description: "Vui lòng chọn sản phẩm trước khi thay đổi giá",
     });
   }, 500);
-
-  const priceInfo = [
-    {
-      key: "TOTAL PRICE",
-      label: "Tổng tiền",
-    },
-    {
-      key: "DISCOUNT",
-      label: "Giảm giá",
-      color: "text-green-500",
-      hasDivider: true,
-    },
-    {
-      key: "AFTER DISCOUNT",
-      label: "Sau giảm giá",
-      value: afterDiscount,
-      hasDivider: true,
-    },
-    {
-      key: "NEED TO PAY",
-      label: "Cần thanh toán",
-      value: needToPay,
-    },
-    {
-      key: "PAID",
-      label: "Đã thanh toán",
-      hasDivider: true,
-    },
-    {
-      key: "DEBT",
-      label: "Còn nợ",
-      value: debt,
-      color: "text-red-500",
-    },
-  ];
 
   const onChangePrice = (key: string, value: string) => {
     if (!orderParams.orderitems?.length) {
@@ -152,10 +111,12 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
         case "DISCOUNT":
           return orderParams?.total_discount || 0;
         case "AFTER DISCOUNT":
-          return orderParams?.total_price - orderParams?.total_discount || 0;
+          console.log(orderParams);
+          return orderParams?.total_cost - orderParams?.total_discount || 0;
         case "NEED TO PAY":
+
           return (
-            orderParams?.total_price -
+            orderParams?.total_cost -
               orderParams?.total_discount -
               orderParams?.paid +
               orderParams?.surcharge || 0
@@ -164,7 +125,7 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
           return orderParams?.paid || 0;
         case "DEBT":
           return (
-            orderParams?.total_price -
+            orderParams?.total_cost -
               orderParams?.total_discount -
               orderParams?.paid +
               orderParams?.surcharge || 0
@@ -174,6 +135,43 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
       }
     }
   };
+
+  const priceInfo = [
+    {
+      key: "TOTAL PRICE",
+      label: "Tổng tiền",
+      value: totalPrice,
+    },
+    {
+      key: "DISCOUNT",
+      label: "Giảm giá",
+      color: "text-green-500",
+      hasDivider: true,
+      value: totalDiscount,
+    },
+    {
+      key: "AFTER DISCOUNT",
+      label: "Sau giảm giá",
+      value: afterDiscount,
+      hasDivider: true,
+    },
+    {
+      key: "NEED TO PAY",
+      label: "Cần thanh toán",
+      value: calcOrderDebt(orderParams) + (orderParams?.paid || 0),
+    },
+    {
+      key: "PAID",
+      label: "Đã thanh toán",
+      hasDivider: true,
+    },
+    {
+      key: "DEBT",
+      label: "Còn nợ",
+      color: "text-red-500",
+      value: calcOrderDebt(orderParams),
+    },
+  ];
 
   return (
     <main className="bg-white p-5 rounded-lg shadow-sm mb-5">

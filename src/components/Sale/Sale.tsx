@@ -37,7 +37,7 @@ function Sale(props: SaleProps) {
   }, []);
 
   const handleCreateOrder = async () => {
-    setIsLoading(true);
+    // setIsLoading(true);
     const url = `/shop/${currentShop.id}/order/create`;
 
     const params = {
@@ -53,7 +53,7 @@ function Sale(props: SaleProps) {
       })),
       delivery_cost_shop: orderParams.delivery_cost_shop,
       at_counter: isAtCounter,
-      total_cost: calcOrderDebt(orderParams) + (orderParams.delivery_cost || 0),
+      total_cost: calcTotalOrderPrice(orderParams),
     };
 
     delete params.orderitems;
@@ -146,7 +146,7 @@ function Sale(props: SaleProps) {
         <div className="text-xl font-medium">
           Cần thanh toán:{" "}
           {formatNumber(
-            calcTotalOrderPrice(orderParams)
+            calcOrderDebt(orderParams)
           )}{" "}
           đ
         </div>

@@ -2,6 +2,9 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
   calcOrderDebt,
   calcPromotionProduct,
+  calcTotalDiscountOrder,
+  calcTotalDiscountProduct,
+  calcTotalOrderPrice,
   formatNumber,
 } from "@/utils/tools";
 import { DeleteOutlined, LoadingOutlined } from "@ant-design/icons";
@@ -48,25 +51,28 @@ function FormBoxProduct(props: FormBoxProductProps) {
     order?.orderitems?.map((item: any) => item.variation) || []
   );
   const [note, setNote] = useState<{ note: string; variation_id: any }[]>([]);
-  const [promotionsSelected, setPromotionsSelected] = useState<any>([]);
 
   useEffect(() => {
+    const updatedOrderItems = selectedProduct.map((item: any) => {
+      const { orderAmount, ...variation_info } = item;
+      const noteItem = note?.find(
+        (note) => note.variation_id === item.id
+      )?.note;
+
+      return {
+        variation_id: item.id,
+        quantity: orderAmount || 1,
+        advance_promotion: item.promotion,
+        note: noteItem,
+        variation_info,
+      };
+    });
+
     createOrder({
       ...orderParams,
-      orderitems: selectedProduct.map((item: any) => {
-        const { orderAmount, ...variation_info } = item;
-        const noteItem = note?.find(
-          (note) => note.variation_id === item.id
-        )?.note;
-
-        return {
-          variation_id: item.id,
-          quantity: orderAmount || 1,
-          advance_promotion: item.promotion,
-          note: noteItem,
-          variation_info,
-        };
-      }),
+      orderitems: updatedOrderItems,
+      total_cost: calcTotalOrderPrice({ ...orderParams, orderitems: updatedOrderItems }),
+      total_discount: calcTotalDiscountOrder({ ...orderParams, orderitems: updatedOrderItems }),
     });
   }, [note, selectedProduct]);
 
@@ -174,7 +180,7 @@ function FormBoxProduct(props: FormBoxProductProps) {
       const discount = promotionOrderRange?.discount;
       const isDiscountPercent = promotionOrderRange?.is_discount_percent;
       const maxDiscount = promotionOrderRange?.max_discount;
-      const totalOrder = calcOrderDebt(orderParams);
+      const totalOrder = calcTotalOrderPrice(orderParams);
       const discountValue = isDiscountPercent
         ? (totalOrder * discount) / 100
         : discount;
@@ -182,13 +188,13 @@ function FormBoxProduct(props: FormBoxProductProps) {
       if (!existPromotion) {
         createOrder({
           ...orderParams,
-          total_discount: discountValueWithMax,
+          total_discount: orderParams.total_discount + discountValueWithMax,
           promotion,
         });
       } else {
         createOrder({
           ...orderParams,
-          total_discount: 0,
+          total_discount: orderParams.total_discount - discountValueWithMax,
           promotion: null,
         });
       }
@@ -215,6 +221,7 @@ function FormBoxProduct(props: FormBoxProductProps) {
       <ProductSearchBar
         setSelectedProduct={setSelectedProduct}
         selectedProduct={selectedProduct}
+
       />
       <div className="bg-gray-100 p-5 rounded-lg">
         <div className="gap-6 font-medium text-md mb-4">
