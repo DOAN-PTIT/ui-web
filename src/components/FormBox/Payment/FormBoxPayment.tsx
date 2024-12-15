@@ -76,7 +76,7 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
         (orderParams?.paid || 0) +
         (orderParams?.surcharge || 0)
     );
-    if (orderParams.items?.length === 0) {
+    if (orderParams?.items?.length === 0) {
       setChangePrice(defaultPrice);
     }
   }, [res]);

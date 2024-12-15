@@ -146,7 +146,6 @@ function Sale(props: SaleProps) {
         <div className="text-xl font-medium">
           Cần thanh toán:{" "}
           {formatNumber(
-            // calcOrderDebt(orderParams) + (orderParams.delivery_cost_shop || 0)
             calcTotalOrderPrice(orderParams)
           )}{" "}
           đ

@@ -144,10 +144,11 @@ export default function Genaral() {
                             onChange={(value) => setFormData(prev => ({ ...prev, language: value }))}
                         />
                         <TitleLabel title='Múi giờ:' />
-                        <Input
+                        <Select
                             className='w-full mb-4'
                             value={formData.time_zone}
-                            onChange={(e) => setFormData(prev => ({ ...prev, time_zone: e.target.value }))}
+                            options={[{ value: `${formData.time_zone}`}]}
+                            // onChange={(e) => setFormData(prev => ({ ...prev, time_zone: e.target.value }))}
                         />
                         <TitleLabel title='Địa chỉ:' />
                         <Input
