@@ -92,7 +92,6 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
 
     return (
         <Layout >
-
             <HeaderAction
                 title="Cấu hình"
                 isShowSearch={true}
@@ -102,7 +101,7 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                 <Breadcrumb.Item href={`/shop/${shopId}/settings`}>Nhân viên</Breadcrumb.Item>
                 <Breadcrumb.Item className="mt-3 text-sm text-[#0050b3] font-medium">Danh sách nhân viên</Breadcrumb.Item>
             </Breadcrumb>
-            <LayoutStyled className="">
+            <LayoutStyled className="p-0">
                 <div className="grid grid-cols-10 w-full gap-4">
                     <div className="col-span-3 rounded-lg bg-white min-h-screen">
                         <div className="p-4 text-base font-semibold">Danh sách nhân viên</div>
@@ -121,7 +120,7 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                                 <div key={i.id} >
                                     <div className={`${checkId == i.id && openActor && 'bg-cyan-100'} rounded-lg flex items-center justify-between text-sm px-2 py-1 mb-1 hover:bg-cyan-100 cursor-pointer`}>
                                         <div onClick={() => handleOpenActor(i.id)} className="flex w-full">
-                                            <Tooltip className={`flex items-center`} color={colorRole(i?.shopusers[0].role)} placement="topLeft" title={checkRole(i?.shopusers[0].role)} >
+                                            <Tooltip className={`flex items-center`} placement="topLeft" title={checkRole(i?.shopusers[0].role)} >
                                                 <Avatar src={i.avatar} icon={<UserOutlined />} alt="avt" className="mr-2 size-6" />
                                                 <div>{i.name}</div>
 

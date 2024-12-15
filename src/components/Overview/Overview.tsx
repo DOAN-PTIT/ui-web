@@ -211,7 +211,17 @@ function Overview(props: OverviewProps) {
     }
   }
 
-
+  const colorRole = (role: string) => {
+    if (role === 'owner') {
+      return 'bg-red-500'
+    }
+    if (role === 'admin') {
+      return 'bg-blue-500'
+    }
+    if (role === 'employee') {
+      return 'bg-green-500'
+    }
+  }
   const colorBorderRole = (role: string) => {
     if (role === 'owner') {
       return 'border-t-red-800'
@@ -303,7 +313,7 @@ function Overview(props: OverviewProps) {
                         </Tooltip>,
                       ]}
                     >
-                      <div className={`tag-role absolute top-2 opacity-90 bg-[${colorRole(shop.user_role)}]`}>{checkRole(shop.user_role)}</div>
+                      <div className={`tag-role absolute top-2 opacity-90 ${colorRole(shop.user_role)}`}>{checkRole(shop.user_role)}</div>
                       <div className={`tag-bottom ${colorBorderRole(shop.user_role)}`}></div>
                       <div className="text-center">
                         <p className="opacity-80 mb-4">{shop.description}</p>
