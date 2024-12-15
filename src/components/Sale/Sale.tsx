@@ -109,7 +109,7 @@ function Sale(props: SaleProps) {
       <Footer className="bg-white flex justify-between items-center mt-4 shadow-2xl rounded-tr-2xl rounded-tl-2xl">
         <div className="text-xl font-medium">
           Cần thanh toán:{" "}
-          {formatNumber(calcOrderDebt(orderParams) + (orderParams.delivery_cost || 0))} đ
+          {formatNumber(calcOrderDebt(orderParams) + (orderParams?.delivery_cost || 0))} đ
         </div>
         <Button
           onClick={handleCreateOrder}

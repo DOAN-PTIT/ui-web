@@ -13,6 +13,7 @@ import TitleLabel from '../Custom/TitleLabel';
 import HeaderAction from "../HeaderAction/HeaderAction";
 import PassModel from './Modal/ModelPass';
 import dayjs from 'dayjs';
+import { UserOutlined } from '@ant-design/icons';
 
 const { Content, Sider } = Layout;
 interface Profile {
@@ -119,14 +120,6 @@ function Settings() {
         }
     };
     const beforeUpload = (file: any) => {
-        // console.log("File structure:", file);
-
-        // if (file.originFileObj) {
-        //     console.log("Using originFileObj:", file.originFileObj);
-        // } else {
-        //     console.log("Using file directly:", file);
-        // }
-
         handleUpload(file.originFileObj || file);
         return false;
     };
@@ -199,7 +192,7 @@ function Settings() {
 
                         <div className="col-span-1 rounded-lg p-5 mb-2 sm:grid-cols-1 lg:grid-cols-3 bg-white">
                             <div className="flex">
-                                <Avatar size={80} src={avatarUrl || dataProfile?.avatar} /> {/* Hiển thị avatar mới */}
+                                <Avatar size={80} src={avatarUrl || dataProfile?.avatar} icon={<UserOutlined />} /> {/* Hiển thị avatar mới */}
                                 <div className='ml-2'>
                                     <div className='text-base font-medium'>{dataProfile?.name}</div>
                                     <TitleLabel title={dataProfile?.email} />

@@ -18,6 +18,7 @@ import { AppDispatch, RootState } from "@/store";
 import { connect } from "react-redux";
 import apiClient from "@/service/auth";
 import "../../styles/global.css";
+import CustomerDetail from "./CustomerDetail";
 
 interface CustomerType {
   id: string;
@@ -37,10 +38,13 @@ interface CustomerProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
 function Customer(props: CustomerProps) {
   const { currentShop } = props;
   const [modalVisiable, setModalVisiable] = useState(false);
+  const [openCustomerDetail, setOpenCustomerDetail] = useState(false);
+  const [idCustomerDetaild,setIdCustomerDetail] = useState<number>()
   const [listCustomer, setListCustomer] = useState<[]>([]);
   const [totalCustomer, setTotalCustomer] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [dataCustomer, setDataCustomer] = useState()
   const [createCustomerParams, setCreateCustomerParams] = useState({
     name: "",
     phone_number: "",
@@ -212,7 +216,20 @@ function Customer(props: CustomerProps) {
       </Space>
     )
   }
-
+const handleOpen = (id:number) => {
+  setOpenCustomerDetail(true)
+  setIdCustomerDetail(id)
+  fetchCustomerDetail(id)
+  console.log(id)
+}
+  const fetchCustomerDetail = async (id:any) => {
+    try {
+      const res = await apiClient.get(`/shop/${currentShop.id}/customer/${id}/detail`)
+      setDataCustomer(res.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
   return (
     <Layout>
       <HeaderAction
@@ -224,6 +241,9 @@ function Customer(props: CustomerProps) {
         <ActionTools callBack={callBack} reloadCallBack={getListCustomer} />
         <Table
           columns={columns}
+          onRow={(record:any)=>({
+            onClick: () => handleOpen(record.id)
+          })}
           dataSource={getData()}
           virtual
           scroll={{ x: 2500, y: 500 }}
@@ -238,6 +258,7 @@ function Customer(props: CustomerProps) {
           loading={isLoading}
         />
       </Layout.Content>
+      <CustomerDetail data={dataCustomer} open={openCustomerDetail} onCancel={()=>setOpenCustomerDetail(false)}/>
       <Modal
         title={
           <div>

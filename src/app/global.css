@@ -7,17 +7,54 @@
     margin: 0;
     box-sizing: border-box;
 }
-.custom-sider .ant-layout-sider-trigger{
+
+.custom-sider .ant-layout-sider-trigger {
     @apply bg-gray-100
 }
+
 .custom-sider .anticon-right {
     @apply text-zinc-900
-
 }
+
 .custom-sider .anticon-left {
     @apply text-zinc-900
-
 }
-.change-password .ant-modal-content{
+
+.change-password .ant-modal-content {
     @apply !pb-0;
+}
+
+.tag-role {
+    padding: 2px 8px;
+    color: #fff;
+    position: absolute;
+    font-size: 12px;
+    font-weight: 500;
+    top: 12px;
+    left: -8px;
+    border-radius: 0px 4px 4px 0px;
+    line-height: 20px;
+}
+
+.tag-bottom {
+    position: absolute;
+    top: 32px;
+    left: -8px;
+    width: 0;
+    height: 0;
+    border-top: 4px solid;
+    border-left: 8px solid rgba(0, 0, 0, 0);
+}
+
+.modal-detail .ant-modal-content {
+    @apply !p-0
+}
+
+.modal-detail .ant-modal-close {
+    top: 24px;
+    right: 16px;
+    height: 32px;
+    color: #101828;
+    border: 1px solid #d0d5dd;
+    width: 32px;
 }

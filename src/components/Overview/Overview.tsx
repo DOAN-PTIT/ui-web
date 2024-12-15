@@ -1,7 +1,7 @@
 "use client";
 
 import apiClient from "@/service/auth";
-import { getHostName } from "@/utils/tools";
+import { checkRole, colorRole, getHostName } from "@/utils/tools";
 import {
   DeleteOutlined,
   EditOutlined,
@@ -55,7 +55,9 @@ export interface ListShop {
   description: string;
   id: number;
   name: string;
+  is_deleted: boolean;
   updatedAt: string;
+  user_role: string;
 }
 
 interface OverviewProps
@@ -64,7 +66,7 @@ interface OverviewProps
 
 function Overview(props: OverviewProps) {
   const { getCurrentUser, currentUser } = props;
-console.log(props)
+  console.log(props)
   const [listFBPages, setListFBPages] = useState<FBShopProps[]>([]);
   const [openModal, setOpenModal] = useState(false);
   const [isLoadingFbPage, setIsLoadingFbPage] = useState(false);
@@ -75,7 +77,7 @@ console.log(props)
     getListShop();
     getCurrentUser();
   }, []);
-
+  const filteredShops = dataListShop?.filter((shop) => shop.is_deleted === true);
   const route = useRouter();
   const searchParams = useSearchParams();
 
@@ -151,6 +153,7 @@ console.log(props)
   };
 
   const handleOk = async (param: { name: string; avatar: any }) => {
+    setIsLoading(true)
     if (!param.name || !param.avatar) {
       message.error("Thiếu hình đại diện");
       return;
@@ -160,7 +163,7 @@ console.log(props)
     createShopFormData.append("name", param.name);
     createShopFormData.append("avatar", param.avatar);
 
-    console.log("FormData Preview:", Array.from(createShopFormData.entries()));
+    // console.log("FormData Preview:", Array.from(createShopFormData.entries()));
 
     const url = `/user/create-shop`;
     try {
@@ -171,23 +174,13 @@ console.log(props)
             "Content-Type": "multipart/form-data",
           },
         })
+      setIsLoading(false)
       setOpenModal(false)
       message.success("Thêm cửa hàng thành công!")
       getListShop()
     } catch (error) {
       console.log("Error:", error)
     }
-    // return await apiClient
-    //   .post(url, createShopFormData, {
-    //     headers: {
-    //       Authorization: `Bearer ${accessToken}`,
-    //       "Content-Type": "multipart/form-data",
-    //     },
-    //   })
-    //   .then(message.success("Thêm cửa hàng thành công!"))
-    //   .then(() => setOpenModal(false))
-    //   .then(() => getListShop())
-    //   .catch((error) => console.log("Error:", error));
   };
 
 
@@ -206,18 +199,42 @@ console.log(props)
     setOpenModal(false);
   };
   const handleDeleteShop = async (shopId: any) => {
+    setIsLoading(true)
     try {
+      setIsLoading(false)
       await apiClient.delete(`/shop/${shopId}`)
       message.success('Xóa cửa hàng thành công')
-      window.location.reload() 
+      getListShop()
     } catch (error) {
       console.log(error)
       message.error('Xóa cửa hàng thất bại')
+    }
+  }
 
+  const colorRole = (role: string) => {
+    if (role === 'owner') {
+      return 'bg-red-500'
+    }
+    if (role === 'admin') {
+      return 'bg-blue-500'
+    }
+    if (role === 'employee') {
+      return 'bg-green-500'
+    }
+  }
+  const colorBorderRole = (role: string) => {
+    if (role === 'owner') {
+      return 'border-t-red-800'
+    }
+    if (role === 'admin') {
+      return 'border-t-blue-800'
+    }
+    if (role === 'employee') {
+      return 'border-t-green-800'
     }
   }
   return (
-    <Layout className="w-full min-h-screen">
+    <Layout className="w-full min-h-screen ">
       <HeaderAction isShowSearch={false} title="Danh sách cửa hàng" />
       <LayoutStyled className="bg-slate-200">
         {isLoading ? (
@@ -256,56 +273,60 @@ console.log(props)
               />
             </Space>
             <Space className="grid grid-cols-2 xl:grid-cols-3 gap-7 mx-auto h-full mt-10 justify-center max-w-fit ">
-              {dataListShop?.map((shop) => {
-                return (
-                  <Card
-                    key={shop.id}
-                    className="w-[300px] min-h-[250px]"
-                    title={
-                      <div className="p-5 text-center">
-                        <Avatar
-                          src={shop.avatar}
-                          icon={<UserOutlined />}
-                          size={80}
-                        />
-                        <h1 className="mt-4">{shop.name}</h1>
-                      </div>
-                    }
-                    actions={[
-                      <Tooltip key="edit" title="Cập nhật cửa hàng">
-                        <EditOutlined />
-                      </Tooltip>,
-                      <Tooltip key="delete" title="Xóa cửa hàng">
-                        <Popconfirm
-                          title="Xóa cửa hàng"
-                          description="Bạn chắc chắn muốn xóa?"
-                          onConfirm={() => handleDeleteShop(shop.id)}
-                          // onCancel={cancel}
-                          okText="Xóa"
-                          cancelText="Hủy"
+              {dataListShop
+                // ?.filter((i) => i.is_deleted === false)
+                .map((shop) => {
+                  return (
+                    <Card
+                      key={shop.id}
+                      className="w-[300px] min-h-[250px]"
+                      title={
+                        <div className="p-5 text-center">
+                          <Avatar
+                            src={shop.avatar}
+                            icon={<UserOutlined />}
+                            size={80}
+                          />
+                          <h1 className="mt-4">{shop.name}</h1>
+                        </div>
+                      }
+                      actions={[
+                        <Tooltip key="edit" title="Cập nhật cửa hàng">
+                          <EditOutlined />
+                        </Tooltip>,
+                        <Tooltip key="delete" title="Xóa cửa hàng">
+                          <Popconfirm
+                            title="Xóa cửa hàng"
+                            description="Bạn chắc chắn muốn xóa?"
+                            onConfirm={() => handleDeleteShop(shop.id)}
+                            // onCancel={cancel}
+                            okText="Xóa"
+                            cancelText="Hủy"
+                          >
+                            <DeleteOutlined />
+
+                          </Popconfirm>
+
+                        </Tooltip>,
+                        <Tooltip key="leave" title="Rời khỏi cửa hàng">
+                          <LoginOutlined />
+                        </Tooltip>,
+                      ]}
+                    >
+                      <div className={`tag-role absolute top-2 opacity-90 ${colorRole(shop.user_role)}`}>{checkRole(shop.user_role)}</div>
+                      <div className={`tag-bottom ${colorBorderRole(shop.user_role)}`}></div>
+                      <div className="text-center">
+                        <p className="opacity-80 mb-4">{shop.description}</p>
+                        <Button
+                          onClick={() => handleClickAccess(shop.id)}
+                          icon={<LoginOutlined />}
                         >
-                          <DeleteOutlined />
-
-                        </Popconfirm>
-
-                      </Tooltip>,
-                      <Tooltip key="leave" title="Rời khỏi cửa hàng">
-                        <LoginOutlined />
-                      </Tooltip>,
-                    ]}
-                  >
-                    <div className="text-center">
-                      <p className="opacity-80 mb-4">{shop.description}</p>
-                      <Button
-                        onClick={() => handleClickAccess(shop.id)}
-                        icon={<LoginOutlined />}
-                      >
-                        Truy cập
-                      </Button>
-                    </div>
-                  </Card>
-                );
-              })}
+                          Truy cập
+                        </Button>
+                      </div>
+                    </Card>
+                  );
+                })}
             </Space>
             <Modal
               open={openIntegration}
@@ -330,6 +351,7 @@ console.log(props)
                         }
                       >
                         <div className="p-1 text-center">
+                          <div className="absolute text-black" style={{ backgroundColor: 'rgb(233, 76, 101)' }}>Shop</div>
                           <Image
                             src={page.picture.data.url}
                             width={page.picture.data.width}
