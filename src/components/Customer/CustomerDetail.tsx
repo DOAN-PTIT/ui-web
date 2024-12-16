@@ -118,12 +118,13 @@ export default function CustomerDetail({ open, onCancel, onOk,data }: { open: bo
                                 Lịch sử mua hàng
                             </div>
                         )}
+                        dataSource={data?.order.order}
                         columns={columns}
                         footer={()=> (
                             <div>
                                 <div className="flex">
                                     <div className="mr-1">Đã mua: </div>
-                                    <div className="font-medium">{data?.order.count} lần</div>
+                                    <div className="font-medium">{data?.order.count +' lần'} </div>
                                 </div>
                             </div>
                         )}

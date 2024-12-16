@@ -195,7 +195,9 @@ function Customer(props: CustomerProps) {
       console.log(error);
       notification.error({
         message: "Tạo khách hàng thất bại",
-        description: error.response.data?.message?.map((err: string) => `[${err}\n]`).join(";\n"),
+        description: Array.isArray(error.response?.data?.message)
+          ? error.response.data.message.join("; ")
+          : error.response?.data?.message || "Đã xảy ra lỗi không xác định.",
         duration: 5
       })
     })
