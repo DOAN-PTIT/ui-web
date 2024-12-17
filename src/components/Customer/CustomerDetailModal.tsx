@@ -1,13 +1,39 @@
-import apiClient from "@/service/auth";
 import { UserOutlined } from "@ant-design/icons";
 import { Avatar, Button, DatePicker, Divider, Empty, Input, Modal, Select, Spin, Table, TableProps } from "antd";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
-import CustomDatePicker from "../CustomDatePicker";
 import moment from "moment";
+import { useEffect, useState } from "react";
 
 export default function CustomerDetail({ open, onCancel, data, loading }: { open: boolean, onCancel: () => void,data:any ,loading:boolean}) {
-    // const [dataCustomer,setDataCustomer] = useState()
+    
+    const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
+    const handleExpand = (expanded: boolean, record: any) => {
+        setExpandedRowKeys((prevKeys) => {
+            const rowKey = record?.id; 
+            if (!rowKey) return prevKeys;
+            if (expanded) {
+                return [rowKey];
+            } else {
+                return prevKeys.filter((key) => key !== rowKey);
+            }
+        });
+    };
+
+    const expandedRowRender = (record: any) => (
+        <Table
+            columns={[
+                { title: 'ID sản phẩm', dataIndex: 'id', key: 'id' },
+                { title: 'Tên sản phẩm', dataIndex: 'product', key: 'product', render: (product) => product?.name || "N/A" },
+                { title: 'Giá', dataIndex: 'retail_price', key: 'retail_price', render: (_, item) => formatCurrency(item?.variation?.retail_price || 0) },
+                { title: 'Số lượng', dataIndex: 'quantity', key: 'quantity' },
+                { title: 'Tổng tiền', key: 'cost', render: (_, item) => formatCurrency(item?.quantity * item?.variation?.retail_price || 0) },
+            ]}
+            dataSource={record?.orderitems || []} 
+            pagination={false}
+          
+        />
+    );
+
     const columns: TableProps["columns"] = [
         {
             key: "STT",
@@ -22,12 +48,10 @@ export default function CustomerDetail({ open, onCancel, data, loading }: { open
             title: "Sản phẩm",
             fixed: "left",
             width: 180,
-            render: (_,i)=>(
-                <div> {i?.orderitems && Array.isArray(i?.orderitems) ? (
-                    i?.orderitems.map((item: any) => item?.name).join(", ")
-                ) : (
-                    "Chưa có sản phẩm"
-                )}</div>
+            render: (_, record) => (
+                <div>
+                    {record?.orderitems?.map((item: any) => item?.product?.name).join(", ") || "N/A"}
+                </div>
             )
         },
         
@@ -102,6 +126,9 @@ export default function CustomerDetail({ open, onCancel, data, loading }: { open
         }
         return `${new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount)}`;
     };
+    const ListName = (data:any)=> {
+        return data?.orderitems?.map((i:any)=>i.product.name)
+    }
     return (
         <Modal open={open} closable footer={false} onCancel={onCancel} className="modal-detail !w-5/6">
             <Spin spinning={loading}>
@@ -175,6 +202,7 @@ export default function CustomerDetail({ open, onCancel, data, loading }: { open
                     <div className="w-2/3 rounded-lg bg-white">
                         <Table
                             className="bottom-0 cursor-pointer"
+                            rowKey="id"
                             bordered
                             scroll={{y:300}}
                             locale={{ emptyText: <Empty description="Trống"/>}}
@@ -184,7 +212,12 @@ export default function CustomerDetail({ open, onCancel, data, loading }: { open
                                 </div>
                             )}
                             pagination={{pageSize:5}}
-                            dataSource={data?.orders?.orders}
+                            dataSource={data?.orders?.orders||[]}
+                            expandable={{
+                                expandedRowRender,
+                                expandedRowKeys,
+                                onExpand: handleExpand,
+                            }}
                             columns={columns}
                             footer={()=> (
                                 <div className="flex gap-6 !rounded-none">
