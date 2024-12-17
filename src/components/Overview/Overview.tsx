@@ -210,7 +210,18 @@ function Overview(props: OverviewProps) {
       message.error('Xóa cửa hàng thất bại')
     }
   }
-
+  const handleLeaveShop = async (shopId: any) => {
+    setIsLoading(true)
+    try {
+      setIsLoading(false)
+      await apiClient.get(`/shop/${shopId}/leave`)
+      message.success('Rời khỏi cửa hàng thành công')
+      getListShop()
+    } catch (error) {
+      console.log(error)
+      message.error('Rời khỏi cửa hàng thất bại')
+    }
+  }
   const colorRole = (role: string) => {
     if (role === 'owner') {
       return 'bg-red-500'
@@ -309,7 +320,15 @@ function Overview(props: OverviewProps) {
 
                         </Tooltip>,
                         <Tooltip key="leave" title="Rời khỏi cửa hàng">
-                          <LoginOutlined />
+                          <Popconfirm
+                            title="Rời khỏi cửa hàng"
+                            description="Bạn chắc chắn muốn rời khỏi cửa hàng?"
+                            onConfirm={() => handleLeaveShop(shop.id)}
+                            okText="Rời khỏi"
+                            cancelText="Hủy"
+                          >
+                            <LoginOutlined />
+                          </Popconfirm>
                         </Tooltip>,
                       ]}
                     >

@@ -15,6 +15,7 @@ import {
   Form,
   Input,
   Row,
+  message,
   notification,
 } from "antd";
 import Image from "next/image";
@@ -55,6 +56,7 @@ function LoginComponent() {
         saveTokenWithExpiration(token);
         localStorage.setItem("refreshToken", refreshToken);
         route.push("/shop/overview");
+        message.success('Đăng nhập thành công!')
       })
       .catch((error: any) => {
         const res = error.response.data.message;

@@ -21,9 +21,13 @@ const ChartProduct = (props: ChartProductProps) => {
 
   const columns = [
     {
-        title: "ID",
-        dataIndex: "key",
-        key: "key",
+        title: "STT",
+        dataIndex: "STT",
+        key: "stt",
+      render: (_: any, __: any, index: number) => {
+        return <span className="text-blue-500 font-medium">{index + 1}</span>;
+      }
+
     },
     {
       title: "Tên sản phẩm",

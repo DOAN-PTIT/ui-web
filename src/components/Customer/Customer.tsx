@@ -2,7 +2,7 @@
 
 import moment from "moment";
 import Avatar from "react-avatar";
-import { Layout, Modal, Table, Input, Divider, DatePicker, Space, Button, message, notification } from "antd";
+import { Layout, Modal, Table, Input, Divider, DatePicker, Space, Button, message, notification, Spin } from "antd";
 import HeaderAction from "../HeaderAction/HeaderAction";
 import ActionTools from "../ActionTools/ActionTools";
 import type { TableProps } from "antd";
@@ -18,7 +18,7 @@ import { AppDispatch, RootState } from "@/store";
 import { connect } from "react-redux";
 import apiClient from "@/service/auth";
 import "../../styles/global.css";
-import CustomerDetail from "./CustomerDetail";
+import CustomerDetail from "./CustomerDetailModal";
 
 interface CustomerType {
   id: string;
@@ -33,16 +33,17 @@ interface CustomerType {
   phoneNumber: string;
 }
 
-interface CustomerProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> {}
+interface CustomerProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> { }
 
 function Customer(props: CustomerProps) {
   const { currentShop } = props;
   const [modalVisiable, setModalVisiable] = useState(false);
   const [openCustomerDetail, setOpenCustomerDetail] = useState(false);
-  const [idCustomerDetaild,setIdCustomerDetail] = useState<number>()
+  const [idCustomerDetaild, setIdCustomerDetail] = useState<number>()
   const [listCustomer, setListCustomer] = useState<[]>([]);
   const [totalCustomer, setTotalCustomer] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingCustomer, setIsLoadingCustomer] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [dataCustomer, setDataCustomer] = useState()
   const [createCustomerParams, setCreateCustomerParams] = useState({
@@ -58,11 +59,12 @@ function Customer(props: CustomerProps) {
 
   const columns: TableProps<CustomerType>["columns"] = [
     {
-      key: "ID",
-      dataIndex: "id",
-      title: "ID",
+      key: "STT",
+      dataIndex: "stt",
+      title: "STT",
       fixed: "left",
       width: 180,
+      render: (_: any, __: any, index: number) => index + 1,
     },
     {
       key: "CUSTOMER NAME",
@@ -148,7 +150,7 @@ function Customer(props: CustomerProps) {
 
   const getData: () => TableProps<CustomerType>["dataSource"] = () => {
     return listCustomer.length > 0 ?
-      listCustomer.map((customer: any)  => ({
+      listCustomer.map((customer: any) => ({
         id: customer.id,
         customerName: customer.name,
         dateOfBirth: moment(customer.date_of_birth).format("DD/MM/YYYY"),
@@ -160,45 +162,47 @@ function Customer(props: CustomerProps) {
         referralCode: customer.referral_code,
         phoneNumber: customer.phone_number
       }))
-    : []
+      : []
   };
 
   const getListCustomer = async () => {
     setIsLoading(true);
     const url = `shop/${currentShop.id}/customer/all?page=${currentPage}&&sortBy=CREATED_AT_DESC`;
     return await apiClient
-    .get(url)
-    .then((res) => {
-      setIsLoading(false);
-      setListCustomer(res.data.customers);
-      setTotalCustomer(res.data.totalCount);
-      return res.data;
-    })
-    .catch((err) => {
-      setIsLoading(false);
-      console.log(err);
-    });
+      .get(url)
+      .then((res) => {
+        setIsLoading(false);
+        setListCustomer(res.data.customers);
+        setTotalCustomer(res.data.totalCount);
+        return res.data;
+      })
+      .catch((err) => {
+        setIsLoading(false);
+        console.log(err);
+      });
   }
 
   const handleCreateShopCustomer = async () => {
     setIsLoading(true);
     const url = `shop/${currentShop.id}/customer/add`;
     return await apiClient
-    .post(url, createCustomerParams)
-    .then((res) => {
-      setIsLoading(false);
-      setModalVisiable(false);
-      getListCustomer();
-      return res.data;
-    })
-    .catch(error => {
-      console.log(error);
-      notification.error({
-        message: "Tạo khách hàng thất bại",
-        description: error.response.data?.message?.map((err: string) => `[${err}\n]`).join(";\n"),
-        duration: 5
+      .post(url, createCustomerParams)
+      .then((res) => {
+        setIsLoading(false);
+        setModalVisiable(false);
+        getListCustomer();
+        return res.data;
       })
-    })
+      .catch(error => {
+        console.log(error);
+        notification.error({
+          message: "Tạo khách hàng thất bại",
+          description: Array.isArray(error.response?.data?.message)
+            ? error.response.data.message.join("; ")
+            : error.response?.data?.message || "Đã xảy ra lỗi không xác định.",
+          duration: 5
+        })
+      })
   }
 
   const onInputChange = (which: string, value: string = "") => {
@@ -216,16 +220,18 @@ function Customer(props: CustomerProps) {
       </Space>
     )
   }
-const handleOpen = (id:number) => {
-  setOpenCustomerDetail(true)
-  setIdCustomerDetail(id)
-  fetchCustomerDetail(id)
-  console.log(id)
-}
-  const fetchCustomerDetail = async (id:any) => {
+  const handleOpen = (id: number) => {
+    setOpenCustomerDetail(true)
+    setIdCustomerDetail(id)
+    fetchCustomerDetail(id)
+    console.log(id)
+  }
+  const fetchCustomerDetail = async (id: any) => {
+    setIsLoadingCustomer(true)
     try {
       const res = await apiClient.get(`/shop/${currentShop.id}/customer/${id}/detail`)
       setDataCustomer(res.data)
+      setIsLoadingCustomer(false)
     } catch (error) {
       console.log(error)
     }
@@ -240,8 +246,9 @@ const handleOpen = (id:number) => {
       <Layout.Content className="p-5 h-screen bg-gray-200 rounded-tl-xl order__table__container">
         <ActionTools callBack={callBack} reloadCallBack={getListCustomer} />
         <Table
+          className="cursor-pointer"
           columns={columns}
-          onRow={(record:any)=>({
+          onRow={(record: any) => ({
             onClick: () => handleOpen(record.id)
           })}
           dataSource={getData()}
@@ -258,7 +265,9 @@ const handleOpen = (id:number) => {
           loading={isLoading}
         />
       </Layout.Content>
-      <CustomerDetail data={dataCustomer} open={openCustomerDetail} onCancel={()=>setOpenCustomerDetail(false)}/>
+      {/* <Spin spinning={isLoadingCustomer}> */}
+        <CustomerDetail loading={isLoadingCustomer} data={dataCustomer} open={openCustomerDetail} onCancel={() => setOpenCustomerDetail(false)} />
+      {/* </Spin> */}
       <Modal
         title={
           <div>
@@ -286,7 +295,7 @@ const handleOpen = (id:number) => {
           <Divider />
           <div className="flex">
             <PhoneOutlined className="mr-5" />
-            <Input name="phone_number" placeholder="Số điện thoai" onChange={(e) => onInputChange("phone_number", e.target.value)} />
+            <Input name="phone_number" placeholder="Số điện thoại" onChange={(e) => onInputChange("phone_number", e.target.value)} />
           </div>
           <Divider />
           <div className="flex">

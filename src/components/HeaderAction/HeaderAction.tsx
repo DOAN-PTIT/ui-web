@@ -1,5 +1,5 @@
 "use client";
-import { RootState } from "@/store";
+import { AppDispatch, RootState } from "@/store";
 import {
   LogoutOutlined,
   SettingOutlined,
@@ -10,17 +10,20 @@ import { Avatar, Dropdown, Input, Layout, Menu, message, Spin } from "antd";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 
 interface HeaderActionProps {
   title: string;
   isShowSearch: boolean;
   inputPlaholder?: string;
+  onSearch?: (value: string, filters?: Record<string, any>) => void;
 }
 
 function HeaderAction(props: HeaderActionProps) {
-  const { isShowSearch, title, inputPlaholder } = props;
+  const { isShowSearch, title, inputPlaholder, onSearch } = props;
   const router = useRouter();
   const [loading, setLoading] = useState(false)
+  const {avatar} = useSelector((state:RootState)=> state.userReducer.user)
   async function logout() {
     setLoading(true)
     try {
@@ -87,11 +90,16 @@ function HeaderAction(props: HeaderActionProps) {
       <Layout.Header className="flex items-center justify-between px-2 h-12 bg-slate-100">
         <div className="flex items-center w-1/2">
           <div className="w-1/3 text-xl font-bold">{title}</div>
-          {isShowSearch && <Input placeholder={inputPlaholder} />}
+          {isShowSearch && (
+            <Input
+              placeholder={inputPlaholder}
+              onPressEnter={(e) => onSearch?.((e.target as HTMLInputElement).value)} 
+            />
+          )}
         </div>
 
         <Dropdown overlay={<Menu items={items} />} trigger={['click']}>
-          <Avatar className="cursor-pointer mr-2" icon={<UserOutlined />} />
+        <Avatar className="cursor-pointer mr-2" src={avatar} icon={<UserOutlined />} />
         </Dropdown>
       </Layout.Header>
 

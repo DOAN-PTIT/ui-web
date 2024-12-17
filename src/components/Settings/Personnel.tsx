@@ -1,20 +1,19 @@
 "use client"
 
+import { getListShopUser } from "@/action/shop.action";
+import apiClient from "@/service/auth";
+import { AppDispatch, RootState } from "@/store";
+import { LayoutStyled } from "@/styles/layoutStyle";
+import { checkRole } from "@/utils/tools";
 import { DeleteOutlined, FilterOutlined, PlusOutlined, UserOutlined } from "@ant-design/icons";
-import { Avatar, Badge, Breadcrumb, Button, DatePicker, Divider, Input, Layout, message, Popconfirm, Select, TimePicker, Tooltip } from "antd";
+import { Avatar, Breadcrumb, Button, DatePicker, Divider, Input, Layout, message, Popconfirm, Select, Tooltip } from "antd";
+import moment from "moment";
 import { useEffect, useState } from "react";
+import { connect } from "react-redux";
 import TitleH from "../Custom/TitleH";
 import HeaderAction from "../HeaderAction/HeaderAction";
 import AuthCard from "./components/Card";
 import ModalAddCustomer from "./components/ModalAddCustomer";
-import apiClient from "@/service/auth";
-import { LayoutStyled } from "@/styles/layoutStyle";
-import { connect, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/store";
-import { getListShopUser } from "@/action/shop.action";
-import dayjs from "dayjs";
-import moment from "moment";
-import { checkRole, colorRole } from "@/utils/tools";
 
 const { Content } = Layout
 const { Search } = Input;
@@ -55,6 +54,7 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
         setOpenActor(true);
         // localStorage.setItem('personId', id)
         setCheckId(id)
+        // changeRoleUser()
     }
     const showModal = () => {
         setIsModalOpen(true);
@@ -85,9 +85,17 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
             console.log(error)
         }
     }
+    // const changeRoleUser = async ()=> {
+    //     try {
+    //         return await apiClient.get(`shop/${shopId}/employee/${checkId}/role?role=admin`)
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
     useEffect(() => {
         // fetchListPersonnel()
         getEmployeeShop({shopId})
+        
     }, [])
 
     return (
@@ -163,11 +171,11 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                                                 <div className="flex items-center">
                                                     <div className="flex">
                                                         <div className="text-sm font-medium">Email: </div>
-                                                        <div className="mx-2 text-sm">{i.id}</div>
+                                                        <div className="mx-2 text-sm italic text-blue-700">{i.email}</div>
                                                     </div>
                                                     <div className="flex">
                                                         <div className="text-sm font-medium">SĐT: </div>
-                                                        <div className="mx-2 text-sm">{i.id}</div>
+                                                        <div className="mx-2 text-sm italic text-blue-700">{i.phone_number}</div>
                                                     </div>
                                                 </div>
                                             </div>
