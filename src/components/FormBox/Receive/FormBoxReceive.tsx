@@ -38,6 +38,7 @@ function FormBoxReceive(props: FormBoxReceiveProps) {
             showMinute
             showTime
             onChange={handleDateChange}
+            variant="filled"
           />
         </div>
         <div>

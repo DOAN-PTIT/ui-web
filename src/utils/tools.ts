@@ -71,32 +71,33 @@ export const formatNumber = (
       typeof currency != "undefined" &&
       currency
       ? `${Math.floor(amount / 100)
-        .toString()
-        .replace(
-          /(\d)(?=(\d{3})+(?!\d))/g,
-          `$1${floatChar == "." ? "," : "."}`
-        )}${Math.abs(amount) % 100
-          ? prefix
-            ? floatChar +
-            (Math.abs(amount) % 100 > 9
-              ? Math.abs(amount) % 100
-              : "0" + (Math.abs(amount) % 100))
-            : floatChar +
-            ((Math.abs(amount) % 100) % 10
-              ? Math.abs(amount) % 100 > 9
-                ? Math.abs(amount) % 100
-                : "0" + (Math.abs(amount) % 100)
-              : Math.floor((Math.abs(amount) % 100) / 10))
-          : prefix && !xctCurrencyList.includes(currency)
+          .toString()
+          .replace(
+            /(\d)(?=(\d{3})+(?!\d))/g,
+            `$1${floatChar == "." ? "," : "."}`
+          )}${
+          Math.abs(amount) % 100
+            ? prefix
+              ? floatChar +
+                (Math.abs(amount) % 100 > 9
+                  ? Math.abs(amount) % 100
+                  : "0" + (Math.abs(amount) % 100))
+              : floatChar +
+                ((Math.abs(amount) % 100) % 10
+                  ? Math.abs(amount) % 100 > 9
+                    ? Math.abs(amount) % 100
+                    : "0" + (Math.abs(amount) % 100)
+                  : Math.floor((Math.abs(amount) % 100) / 10))
+            : prefix && !xctCurrencyList.includes(currency)
             ? `${floatChar}00`
             : ""
-      }`
+        }`
       : amount
-        .toString()
-        .replace(
-          /(\d)(?=(\d{3})+(?!\d))/g,
-          `$1${floatChar == "." ? "," : "."}`
-        )
+          .toString()
+          .replace(
+            /(\d)(?=(\d{3})+(?!\d))/g,
+            `$1${floatChar == "." ? "," : "."}`
+          )
     : amount;
   return minusChar + amount;
 };
@@ -151,13 +152,13 @@ export const orderStatus = [
     key: 5,
     value: "Đã hủy",
     color: "red",
-  }
-]
+  },
+];
 
 export const calculateTotalPriceProduct = (order: Order) => {
   let totalPrice = 0;
   if (order?.orderitems) {
-    order?.orderitems.forEach((item: OrderItems) => {
+    order?.orderitems.forEach((item: any) => {
       const variation_info = item.variation_info || item.variation;
       totalPrice += item.quantity * variation_info?.retail_price;
     });
@@ -166,15 +167,94 @@ export const calculateTotalPriceProduct = (order: Order) => {
   return totalPrice || 0;
 };
 
-export const calcOrderDebt = (order: Order) => {
-  let totalPriceProduct = calculateTotalPriceProduct(order);
-  return totalPriceProduct - (order?.discount || 0) - (order?.prepaid || 0) + (order?.surcharge || 0);
-}
+export const calcTotalPriceProductAfterDiscount = (order: Order) => {
+  let totalPrice = 0;
+  if (order?.orderitems) {
+    order?.orderitems.forEach((item: any) => {
+      const variation_info = item.variation_info || item.variation;
+      const discount = calcPromotionProduct(variation_info, item.quantity);
+      totalPrice += item.quantity * variation_info?.retail_price - discount;
+    });
+  }
 
-export const fuzzySearch = (pattern, string) =>
+  return totalPrice || 0;
+};
+
+export const calcOrderDebt = (order: any) => {
+  let totalPriceOrder = calcTotalOrderPrice(order);
+  return totalPriceOrder - (order.total_discount || 0);
+};
+
+export const calcTotalDiscountProduct = (order: Order) => {
+  let totalDiscount = 0;
+  if (order?.orderitems) {
+    order?.orderitems.forEach((item: any) => {
+      const variation_info = item.variation_info || item.variation;
+      totalDiscount += calcPromotionProduct(variation_info, item.quantity);
+    });
+  }
+
+  return totalDiscount || 0;
+};
+
+export const calcTotalDiscountOrder = (orderParams: any) => {
+  const promotion = orderParams?.promotion;
+
+  let discountValueWithMax = 0;
+  const promotionOrderRange = promotion?.order_range;
+  if (promotionOrderRange) {
+    const discount = promotionOrderRange?.discount;
+    const isDiscountPercent = promotionOrderRange?.is_discount_percent;
+    const maxDiscount = promotionOrderRange?.max_discount;
+    const totalOrder = calcTotalOrderPrice(orderParams);
+    const discountValue = isDiscountPercent
+      ? (totalOrder * discount) / 100
+      : discount;
+    discountValueWithMax = Math.min(discountValue, maxDiscount);
+  }
+
+  return discountValueWithMax + calcTotalDiscountProduct(orderParams);
+};
+
+export const calcPromotionProduct = (variation: any, quantity = 1) => {
+  const promotionItem = variation?.promotion_item;
+  let discountPromotion = 0;
+
+  if (promotionItem) {
+    const isDiscountPercent = promotionItem?.is_discount_percent;
+    const discount = promotionItem?.discount;
+    const maxDiscount = promotionItem?.max_discount;
+    const totalOrder = variation?.retail_price * (variation?.orderAmount || 1);
+    const discountValue = isDiscountPercent
+      ? (totalOrder * discount) / 100
+      : discount;
+    discountPromotion = Math.min(discountValue, maxDiscount);
+  }
+
+  return discountPromotion * quantity;
+};
+
+export const calcTotalOrderPrice = (order: any) => {
+  let total_price = 0;
+  if (order) {
+    total_price =
+      calculateTotalPriceProduct(order) +
+      (order.delivery_cost_shop || 0) +
+      (order.surcharge || 0) -
+      (order.paid || 0);
+  }
+  console.log(total_price);
+  return total_price;
+};
+
+export const fuzzySearch = (pattern: string, string: string) =>
   fuzzyMatch(pattern, string) !== null;
 
-export const fuzzyMatch = (pattern, string, options = {}) => {
+export const fuzzyMatch = (
+  pattern: string,
+  string: string,
+  options = {} as any
+) => {
   const notConvert = options.notConvert;
   pattern = pattern || "";
   string = string || "";
@@ -227,33 +307,34 @@ export const fuzzyMatch = (pattern, string, options = {}) => {
 };
 
 export const checkRole = (role: string) => {
-  if (role === 'owner') {
-    return 'Chủ'
+  if (role === "owner") {
+    return "Chủ";
   }
-  if (role === 'admin') {
-    return 'Quản lý'
+  if (role === "admin") {
+    return "Quản lý";
   }
-  if (role === 'employee') {
-    return 'Nhân viên'
-  }}
+  if (role === "employee") {
+    return "Nhân viên";
+  }
+};
 export const getPromotionType = {
   1: {
     label: "Khuyến mãi chung",
-    color: "orange"
+    color: "orange",
   },
   2: {
     label: "Khuyến mãi theo mã đơn hàng",
-    color: "blue"
+    color: "blue",
   },
-}
+};
 
 export const getPromotionStatus = {
   1: {
     label: "Đang diễn ra",
-    color: "green"
+    color: "green",
   },
   0: {
     label: "Đã kết thúc",
-    color: "red"
+    color: "red",
   },
-}
+};

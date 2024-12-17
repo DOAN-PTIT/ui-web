@@ -1,9 +1,13 @@
+import apiClient from "@/service/auth";
+import { AppDispatch, RootState } from "@/store";
+import { formatNumber } from "@/utils/tools";
 import {
   CheckSquareOffset,
   Coins,
   Globe,
   Storefront,
 } from "@phosphor-icons/react";
+import { Spin } from "antd";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,7 +17,9 @@ import {
   PointElement,
   LineElement,
 } from "chart.js";
+import { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
+import { connect } from "react-redux";
 
 ChartJS.register(
   CategoryScale,
@@ -24,27 +30,65 @@ ChartJS.register(
   LineElement
 );
 
-const ChartRevenue = () => {
-  const labels = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-  ];
+interface ChartRevenueProps
+  extends ReturnType<typeof mapStateToProps>,
+    ReturnType<typeof mapDispatchToProps> {}
+
+const ChartRevenue = (props: ChartRevenueProps) => {
+  const { currentShop } = props;
+
+  const [loading, setLoading] = useState(false);
+  const [boxData, setBoxData] = useState({
+    counter: {
+      amount: 0,
+      order: 0,
+    },
+    online: {
+      amount: 0,
+      order: 0,
+    },
+    total: {
+      amount: 0,
+      order: 0,
+    },
+  });
+  const [chartData, setChartData] = useState({
+    labels: [],
+    data: [],
+  });
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   const data = {
-    labels: labels,
+    labels: chartData.labels,
     datasets: [
       {
-        label: "My First Dataset",
-        data: [65, 59, 80, 81, 56, 55, 40],
+        label: "Doanh thu",
+        data: chartData.data,
         fill: false,
         borderColor: "rgb(75, 192, 192)",
         tension: 0.1,
       },
     ],
+  };
+
+  const getData = async () => {
+    setLoading(true);
+    try {
+      const url = `shop/${currentShop.id}/day-chart`;
+      return await apiClient
+        .get(url)
+        .then((res) => {
+          setLoading(false);
+          setBoxData(res.data.box);
+          setChartData(res.data.chart);
+        })
+        .catch((err) => console.log(err));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const renderBoxTotal = () => {
@@ -59,11 +103,13 @@ const ChartRevenue = () => {
         <div className="flex flex-col gap-3 mt-2">
           <p className="">
             Doanh thu: &nbsp;&nbsp;&nbsp;{" "}
-            <span className="font-bold mr-4">0đ</span>
+            <span className="font-bold mr-4">
+              {formatNumber(boxData.total.amount)} đ
+            </span>
           </p>
           <p className="">
             Đơn chốt: &nbsp;&nbsp;&nbsp;{" "}
-            <span className="font-bold mr-4">0</span>
+            <span className="font-bold mr-4">{boxData.total.order}</span>
           </p>
         </div>
       </div>
@@ -82,11 +128,15 @@ const ChartRevenue = () => {
         <div className="flex flex-col gap-3 mt-2">
           <p className="">
             Doanh thu: &nbsp;&nbsp;&nbsp;{" "}
-            <span className="font-bold mr-4">0đ</span>
+            <span className="font-bold mr-4">
+              {formatNumber(boxData.online.amount)} đ
+            </span>
           </p>
           <p className="">
             Đơn chốt: &nbsp;&nbsp;&nbsp;{" "}
-            <span className="font-bold mr-4">0</span>
+            <span className="font-bold mr-4">
+              {formatNumber(boxData.online.order)}
+            </span>
           </p>
         </div>
       </div>
@@ -105,11 +155,15 @@ const ChartRevenue = () => {
         <div className="flex flex-col gap-3 mt-2">
           <p className="">
             Doanh thu: &nbsp;&nbsp;&nbsp;{" "}
-            <span className="font-bold mr-4">0đ</span>
+            <span className="font-bold mr-4">
+              {formatNumber(boxData.counter.amount)} đ
+            </span>
           </p>
           <p className="">
             Đơn chốt: &nbsp;&nbsp;&nbsp;{" "}
-            <span className="font-bold mr-4">0</span>
+            <span className="font-bold mr-4">
+              {formatNumber(boxData.counter.order)}
+            </span>
           </p>
         </div>
       </div>
@@ -119,12 +173,29 @@ const ChartRevenue = () => {
   return (
     <div className="flex justify-between gap-3">
       <div className="w-2/3 p-4 rounded-md bg-white">
-        <div className="grid grid-cols-3 gap-3">
-          {renderBoxTotal()}
-          {renderBoxOnline()}
-          {renderBoxAtCounter()}
-        </div>
-        <Line data={data} />
+        {loading ? (
+          <div className="flex w-full h-full items-center justify-center">
+            <Spin />
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-3 gap-3 mb-3">
+              {renderBoxTotal()}
+              {renderBoxOnline()}
+              {renderBoxAtCounter()}
+            </div>
+            <Line
+              data={data}
+              options={{
+                plugins: {
+                  legend: {
+                    display: false,
+                  },
+                },
+              }}
+            />
+          </>
+        )}
       </div>
       <div className="w-1/3 bg-white p-4 rounded-md">
         <div className="text-[18px] font-bold">
@@ -150,4 +221,14 @@ const ChartRevenue = () => {
   );
 };
 
-export default ChartRevenue;
+const mapStateToProps = (state: RootState) => {
+  return {
+    currentShop: state.shopReducer.shop,
+  };
+};
+
+const mapDispatchToProps = (dispatch: AppDispatch) => {
+  return {};
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ChartRevenue);

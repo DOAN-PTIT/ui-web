@@ -47,3 +47,5 @@ export type Customer = {
     gender: "MALE" | "FEMALE";
     total_purchase?: number;
 }
+
+export type DisplayChart = "year" | "month"

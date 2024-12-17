@@ -1,7 +1,24 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { formatNumber } from "@/utils/tools";
-import { DeleteOutlined } from "@ant-design/icons";
-import { Button, Empty, Input, notification, Select, Tag } from "antd";
+import {
+  calcOrderDebt,
+  calcPromotionProduct,
+  calcTotalDiscountOrder,
+  calcTotalDiscountProduct,
+  calcTotalOrderPrice,
+  formatNumber,
+} from "@/utils/tools";
+import { DeleteOutlined, LoadingOutlined } from "@ant-design/icons";
+import {
+  Button,
+  Empty,
+  Input,
+  notification,
+  Popover,
+  Select,
+  Spin,
+  Tag,
+  Tooltip,
+} from "antd";
 import ProductSearchBar from "@/components/ProductSearchBar/ProductSearchBar";
 import Image from "next/image";
 import { AppDispatch, RootState } from "@/store";
@@ -13,41 +30,49 @@ const currency = "VND";
 interface FormBoxProductProps
   extends ReturnType<typeof mapStateToProps>,
     ReturnType<typeof mapDispatchToProps> {
-      setIsAtCounter: Dispatch<SetStateAction<boolean>>,
-      isAtCounter: boolean,
-      order?: any
-    }
+  setIsAtCounter: Dispatch<SetStateAction<boolean>>;
+  isAtCounter: boolean;
+  order?: any;
+  findDiscountCanBeActice?: () => Promise<void>;
+  promotionsCanBeActive?: any[];
+}
 
 function FormBoxProduct(props: FormBoxProductProps) {
-  const { createOrder, orderParams, setIsAtCounter, isAtCounter, order } = props;
+  const {
+    createOrder,
+    orderParams,
+    setIsAtCounter,
+    isAtCounter,
+    order,
+    promotionsCanBeActive,
+  } = props;
 
-  const [selectedProduct, setSelectedProduct] = useState<[]>(order?.orderitems?.map((item:any) => item.variation) || []);
+  const [selectedProduct, setSelectedProduct] = useState<[]>(
+    order?.orderitems?.map((item: any) => item.variation) || []
+  );
   const [note, setNote] = useState<{ note: string; variation_id: any }[]>([]);
 
-  // useEffect(() => {
-  //   if (order) {
-  //     const variations = order?.orderitems?.map((item:any) => item.variation) || [];
-  //     setSelectedProduct(variations);
-  //   }
-  // }, [])
-
   useEffect(() => {
+    const updatedOrderItems = selectedProduct.map((item: any) => {
+      const { orderAmount, ...variation_info } = item;
+      const noteItem = note?.find(
+        (note) => note.variation_id === item.id
+      )?.note;
+
+      return {
+        variation_id: item.id,
+        quantity: orderAmount || 1,
+        advance_promotion: item.promotion,
+        note: noteItem,
+        variation_info,
+      };
+    });
+
     createOrder({
       ...orderParams,
-      orderitems: selectedProduct.map((item: any) => {
-        const { orderAmount, ...variation_info } = item;
-        const noteItem = note?.find(
-          (note) => note.variation_id === item.id
-        )?.note;
-
-        return {
-          variation_id: item.id,
-          quantity: orderAmount || 1,
-          advance_promotion: item.promotion,
-          note: noteItem,
-          variation_info,
-        };
-      }),
+      orderitems: updatedOrderItems,
+      total_cost: calcTotalOrderPrice({ ...orderParams, orderitems: updatedOrderItems }),
+      total_discount: calcTotalDiscountOrder({ ...orderParams, orderitems: updatedOrderItems }),
     });
   }, [note, selectedProduct]);
 
@@ -70,16 +95,16 @@ function FormBoxProduct(props: FormBoxProductProps) {
   };
 
   const handleDeleteProduct = (index: number) => {
-      setSelectedProduct((prevState: any) => {
-        if (prevState.length === 1) {
-          notification.warning({
-            message: "Không thể xóa",
-            description: "Phải có ít nhất 1 sản phẩm trong đơn hàng",
-          });
-          return prevState;
-        }
-        return prevState.filter((_: any, i: number) => i !== index);
-      });
+    setSelectedProduct((prevState: any) => {
+      if (prevState.length === 1) {
+        notification.warning({
+          message: "Không thể xóa",
+          description: "Phải có ít nhất 1 sản phẩm trong đơn hàng",
+        });
+        return prevState;
+      }
+      return prevState.filter((_: any, i: number) => i !== index);
+    });
   };
 
   const onChangeNoteOrderItem = (variation_id: any, noteItem: string) => {
@@ -97,9 +122,82 @@ function FormBoxProduct(props: FormBoxProductProps) {
         });
       });
     } else {
-      setNote((prevState: { note: string; variation_id: any }[] | undefined) => {
-        return [...(prevState || []), { note: noteItem, variation_id: variation_id }];
-      });
+      setNote(
+        (prevState: { note: string; variation_id: any }[] | undefined) => {
+          return [
+            ...(prevState || []),
+            { note: noteItem, variation_id: variation_id },
+          ];
+        }
+      );
+    }
+  };
+
+  const renderPromotionCanBeActive = () => {
+    return promotionsCanBeActive && promotionsCanBeActive.length > 0 ? (
+      promotionsCanBeActive.map((promotion) => {
+        return renderPromotionActive(promotion, "");
+      })
+    ) : (
+      <Empty description="Không tìm thấy khuyến mãi phù hợp" />
+    );
+  };
+
+  const renderPromotionActive = (promotion: any, color: string) => {
+    const isDiscountPercent = promotion?.order_range?.is_discount_percent;
+    const title = isDiscountPercent
+      ? `Khuyến mãi ${
+          promotion?.order_range?.discount
+        }% trên tổng hoá đơn. Tối đa ${formatNumber(
+          promotion?.order_range?.max_discount,
+          currency
+        )} đ`
+      : `Khuyến mãi ${formatNumber(
+          promotion?.order_range?.discount,
+          currency
+        )} trên tổng hoá đơn`;
+
+    return (
+      <Tooltip title={title}>
+        <Tag
+          className="cursor-pointer"
+          onClick={() => handleActicePromotion(promotion)}
+          color={color}
+        >
+          {promotion?.name}
+        </Tag>
+      </Tooltip>
+    );
+  };
+
+  const handleActicePromotion = (promotion: any) => {
+    const existPromotion =
+      orderParams && orderParams?.promotion?.id === promotion?.id;
+
+    let discountValueWithMax = 0;
+    const promotionOrderRange = promotion?.order_range;
+    if (promotionOrderRange) {
+      const discount = promotionOrderRange?.discount;
+      const isDiscountPercent = promotionOrderRange?.is_discount_percent;
+      const maxDiscount = promotionOrderRange?.max_discount;
+      const totalOrder = calcTotalOrderPrice(orderParams);
+      const discountValue = isDiscountPercent
+        ? (totalOrder * discount) / 100
+        : discount;
+      discountValueWithMax = Math.min(discountValue, maxDiscount);
+      if (!existPromotion) {
+        createOrder({
+          ...orderParams,
+          total_discount: orderParams.total_discount + discountValueWithMax,
+          promotion,
+        });
+      } else {
+        createOrder({
+          ...orderParams,
+          total_discount: orderParams.total_discount - discountValueWithMax,
+          promotion: null,
+        });
+      }
     }
   };
 
@@ -123,8 +221,9 @@ function FormBoxProduct(props: FormBoxProductProps) {
       <ProductSearchBar
         setSelectedProduct={setSelectedProduct}
         selectedProduct={selectedProduct}
+
       />
-      <div className="bg-slate-100 p-5 rounded-lg">
+      <div className="bg-gray-100 p-5 rounded-lg">
         <div className="gap-6 font-medium text-md mb-4">
           <span className="mr-5">
             Số lượng sản phẩm: {selectedProduct?.length}
@@ -199,14 +298,23 @@ function FormBoxProduct(props: FormBoxProductProps) {
                     <div>
                       KM:{" "}
                       <a className="font-medium text-blue-500">
-                        {formatNumber(variation?.promotion, currency)} ₫
+                        {formatNumber(
+                          calcPromotionProduct(
+                            variation,
+                            variation?.orderAmount || 1
+                          ),
+                          currency
+                        )}{" "}
+                        ₫
                       </a>
                     </div>
                     <Input
                       variant="filled"
                       className="w-[180px]"
                       placeholder="Ghi chú cho sản phẩm này"
-                      onChange={(e) => onChangeNoteOrderItem(variation.id, e.target.value)}
+                      onChange={(e) =>
+                        onChangeNoteOrderItem(variation.id, e.target.value)
+                      }
                     />
                   </div>
                 </div>
@@ -219,6 +327,20 @@ function FormBoxProduct(props: FormBoxProductProps) {
           </div>
         )}
       </div>
+      {orderParams.orderitems?.length > 0 && (
+        <div className="flex items-center gap-3">
+          <Popover trigger={["click"]} content={renderPromotionCanBeActive()}>
+            <Button onClick={props.findDiscountCanBeActice}>
+              Chương trình khuyến mãi
+            </Button>
+          </Popover>
+          {orderParams?.promotion && (
+            <div className="flex gap-4">
+              {renderPromotionActive(orderParams?.promotion, "blue")}
+            </div>
+          )}
+        </div>
+      )}
     </main>
   );
 }
