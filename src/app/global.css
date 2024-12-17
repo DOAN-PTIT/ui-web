@@ -58,3 +58,6 @@
     border: 1px solid #d0d5dd;
     width: 32px;
 }
+.ant-table-footer{
+    @apply !rounded-none
+}
