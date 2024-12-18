@@ -57,10 +57,12 @@ function Promition(props: PromitionProps) {
 
   const columns = [
     {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
-      render: (text: string) => <a>{text}</a>,
+      title: "STT",
+      dataIndex: "stt",
+      key: "stt",
+      render: (_: any, __: any, index: number) => {
+        return <span className="text-blue-500 font-medium">{index + 1}</span>;
+      }
     },
     {
       title: "Tên khuyến mãi",

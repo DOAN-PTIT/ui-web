@@ -51,14 +51,14 @@ function Product(props: ProductProps) {
 
   const columns: TableProps<ProductType>["columns"] = [
     {
-      key: "ID",
-      dataIndex: "id",
-      title: "ID",
+      key: "STT",
+      dataIndex: "stt",
+      title: "STT",
       fixed: "left",
       width: "10%",
-      render: (text, record) => {
-        return <span className="font-medium">{text}</span>;
-      },
+      render: (_: any, __: any, index: number) => {
+        return <span className="text-blue-500 font-medium">{index + 1}</span>;
+      }
     },
     {
       key: "PRODUCT NAME",

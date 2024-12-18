@@ -74,13 +74,13 @@ function Order(props: OrderProps) {
 
   const columns: TableProps<ColumnType>["columns"] = [
     {
-      key: "ID",
-      dataIndex: "id",
-      title: "ID",
+      key: "STT",
+      dataIndex: "stt",
+      title: "STT",
       fixed: "left",
       width: 80,
-      render: (id: number) => {
-        return <span className="text-blue-500 font-medium">{id}</span>;
+      render: (_: any, __: any, index: number) => {
+        return <span className="text-blue-500 font-medium">{index + 1}</span>;
       }
     },
     {

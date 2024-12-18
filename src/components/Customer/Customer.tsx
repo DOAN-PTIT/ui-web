@@ -59,11 +59,12 @@ function Customer(props: CustomerProps) {
 
   const columns: TableProps<CustomerType>["columns"] = [
     {
-      key: "ID",
-      dataIndex: "id",
-      title: "ID",
+      key: "STT",
+      dataIndex: "stt",
+      title: "STT",
       fixed: "left",
       width: 180,
+      render: (_: any, __: any, index: number) => index + 1,
     },
     {
       key: "CUSTOMER NAME",
