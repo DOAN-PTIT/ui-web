@@ -49,3 +49,28 @@ export type Customer = {
 }
 
 export type DisplayChart = "year" | "month"
+
+export interface Supplier {
+    id?: any;
+    supplier_code?: string;
+    name: string;
+    phone_number?: string;
+    address?: string;
+    description?: string;
+    is_active?: boolean;
+}
+export interface Debt {
+    id?: number,
+    name: string,
+    purchase_date?: string,
+    deal_date?: string,
+    money_must_pay: number,
+    status: 0 | 1 | -1,
+    supplier_id?: number,
+    purchase_id?: number,
+    description?: string,
+    created_at?: string,
+    updated_at?: string,
+    supplier?: Supplier,
+    shop_id?: number
+}

@@ -11,6 +11,10 @@ import {
   SettingOutlined,
   ShoppingCartOutlined,
   UserOutlined,
+  UserAddOutlined,
+  PoundCircleOutlined,
+  UsergroupAddOutlined,
+  DownloadOutlined,
 } from "@ant-design/icons";
 import { SealPercent } from "@phosphor-icons/react";
 import type { MenuProps } from "antd";
@@ -57,6 +61,21 @@ const listItem = [
     key: "promotion",
     label: "Khuyến mãi",
     icon: <SealPercent size={18} />
+  },
+  {
+    key: "supplier",
+    label: "Nhà cung cấp",
+    icon: <UsergroupAddOutlined />,
+  },
+  {
+    key: "purchase",
+    label: "Nhập hàng",
+    icon: <DownloadOutlined />,
+  },
+  {
+    key: "debt",
+    label: "Công nợ",
+    icon: <PoundCircleOutlined />,
   },
   {
     key: "report",
