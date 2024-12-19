@@ -4,6 +4,7 @@ export type Product = {
     description: string;
     note: string;
     product_code: string;
+    product_code: string;
     variation: Variation[];
 }
 
@@ -15,6 +16,7 @@ export type Variation = {
     barcode: string
     variation_code: string
     price_at_counter: number
+    last_imported_price: number
     updatedAt: Date
     createdAt: Date
     product: Product
@@ -73,4 +75,24 @@ export interface Debt {
     updated_at?: string,
     supplier?: Supplier,
     shop_id?: number
+}
+
+export interface Purchase {
+    id?: number,
+    creator: string,
+    supplier: Supplier,
+    total_price_product: number,
+    shipping_fee: number,
+    discount: number,
+    total_price: number,
+    created_at: string,
+    description: string,
+    items: PurchaseItem[]
+}
+
+export interface PurchaseItem {
+    id?: number,
+    variation: Variation,
+    quantity: number,
+    imported_price: number,
 }
