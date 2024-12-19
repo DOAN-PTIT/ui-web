@@ -44,6 +44,7 @@ interface VariationProps {
   amount: number;
   index?: number;
   price_at_counter?: number;
+  last_imported_price?: number;
 }
 
 interface ProductDetailProps
@@ -186,6 +187,23 @@ function ProductDetail(props: ProductDetailProps) {
       },
     },
     {
+      key: "LAST IMPORT PRICE",
+      dataIndex: "last_imported_price",
+      title: "Giá nhập cuối",
+      render: (text, record) => {
+        return (
+          <Input
+            name="last_imported_price"
+            defaultValue={text}
+            value={record.last_imported_price}
+            onChange={(e) =>
+              onInputVariationChange("last_imported_price", e.target.value)
+            }
+          />
+        );
+      },
+    },
+    {
       key: "SALE PRICE",
       dataIndex: "retail_price",
       title: "Giá bán",
@@ -255,7 +273,10 @@ function ProductDetail(props: ProductDetailProps) {
 
   const getDataVariation: () => TableProps<VariationProps>["dataSource"] =
     () => {
-      return variationData;
+      return variationData.map((item: any) => ({
+        ...item,
+        id: item.variation_code,
+      }));
     };
 
   const handleCreateProduct = async () => {
@@ -341,6 +362,7 @@ function ProductDetail(props: ProductDetailProps) {
       barcode: "",
       retail_price: 0,
       amount: 0,
+      last_imported_price: 0,
     } as never;
     newVariationData.unshift(newVariation);
 

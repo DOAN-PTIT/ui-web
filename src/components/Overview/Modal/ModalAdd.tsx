@@ -62,7 +62,6 @@ function AddModal({ open, onOk, onCancel }: AddModalProps) {
         ...prevState,
         avatar: info.file.originFileObj as RcFile, // Lưu file thay vì base64
       }));
-      console.log(param)
     }
   };
 

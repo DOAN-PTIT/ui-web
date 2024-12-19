@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { useMemo, useRef, useState, useCallback, Dispatch, useEffect } from "react";
+import { useMemo, useRef, useState, useCallback, Dispatch, useEffect, SetStateAction } from "react";
 import { AppDispatch, RootState } from "@/store";
 import { notification, Select, Tag } from "antd";
 import { connect } from "react-redux";
@@ -12,14 +12,17 @@ interface ProductSearchBarProps
   extends ReturnType<typeof mapStateToProps>,
     ReturnType<typeof mapDispatchToProps> {
   setSelectedProduct: Dispatch<any>,
-  selectedProduct: any[]
+  selectedProduct: any[],
+  onSelectedProduct?: (id: number) => void,
+  setSearchProductResultProps?: Dispatch<SetStateAction<any[]>>
+  searchProductResultProps?: any[]
 }
 
 const { Option } = Select;
 const deboundTime = 800;
 
 function ProductSearchBar(props: ProductSearchBarProps) {
-  const { currentShop, selectedProduct, setSelectedProduct } = props;
+  const { currentShop, selectedProduct, setSelectedProduct, setSearchProductResultProps, searchProductResultProps } = props;
 
   const [searchProductResult, setSearchProductResult] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -35,6 +38,9 @@ function ProductSearchBar(props: ProductSearchBarProps) {
       const fetchId = fetchRef.current;
       setIsLoading(true);
       setSearchProductResult([]);
+      if (setSearchProductResultProps) {
+        setSearchProductResultProps([]);
+      }
       const url = `/shop/${currentShop.id}/variation/${value}`;
 
       return await apiClient
@@ -45,6 +51,9 @@ function ProductSearchBar(props: ProductSearchBarProps) {
           }
           setIsLoading(false);
           setSearchProductResult(res.data);
+          if (setSearchProductResultProps) {
+            setSearchProductResultProps(res.data);
+          }
         })
         .catch((error) => {
           setIsLoading(false);
@@ -100,6 +109,11 @@ function ProductSearchBar(props: ProductSearchBarProps) {
         )
       }
       onSearch={deboundSearch}
+      onSelect={(value: any) => {
+        if (props.onSelectedProduct) {
+          props.onSelectedProduct(value);
+        }
+      }}
       suffixIcon={null}
     >
       {searchProductResult.map((variation: any) => (
