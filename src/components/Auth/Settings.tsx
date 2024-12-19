@@ -3,7 +3,7 @@
 import { default as Img, default as Logo } from '@/assets/favicon.png'; // Ensure this path is correct
 import apiClient from '@/service/auth';
 import { FacebookLogo, LinkSimple } from '@phosphor-icons/react';
-import { Avatar, Button, DatePicker, Divider, Form, Input, Layout, message, Select, Upload, UploadFile } from "antd"; // Optional: You can also use Ant Design's Image if needed
+import { Menu as AntdMenu, Avatar, Button, DatePicker, Divider, Form, Input, Layout, message, Select, Upload, UploadFile } from "antd"; // Optional: You can also use Ant Design's Image if needed
 import Image from 'next/image'; // Next.js Image for optimized image loading
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -13,9 +13,15 @@ import TitleLabel from '../Custom/TitleLabel';
 import HeaderAction from "../HeaderAction/HeaderAction";
 import PassModel from './Modal/ModelPass';
 import dayjs from 'dayjs';
-import { UserOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, UserOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
 
 const { Content, Sider } = Layout;
+const backItem = {
+    key: "home",
+    label: "Bảng điểu khiển",
+    icon: <AppstoreOutlined />
+}
 interface Profile {
     access_token: string
     date_of_birth: string
@@ -31,6 +37,7 @@ interface Profile {
 
 
 function Settings() {
+    const route = useRouter();
     const [collapsed, setCollapsed] = useState(true);
     const [openModal, setOpenModal] = useState(false);
     const [dataProfile, setDataProfile] = useState<Profile>();
@@ -152,9 +159,11 @@ function Settings() {
                 collapsedWidth={60}
                 collapsed={collapsed}
                 onCollapse={(value) => setCollapsed(value)}
-                className="custom-sider bg-[#f2f4f7] hidden md:block"
+                className="custom-sider bg-[#f2f4f7] bottom-0 top-0 h-screen "
             >
                 {/* Logo container */}
+                <div className='flex flex-col justify-between h-full'>
+
                 <div
                     className="flex items-center justify-center ml-2 mt-2"
                     style={{ padding: collapsed ? "0 0" : "0 20px" }}>
@@ -171,7 +180,19 @@ function Settings() {
 
                     </Link>
                 </div>
-
+                <div>
+                    <AntdMenu
+                        className="bg-[#f2f4f7] text-[#101828] !border-none "
+                        defaultOpenKeys={["dashbroad"]}
+                        defaultSelectedKeys={["dashbroad"]}
+                        selectedKeys={["settings"]}
+                        items={[backItem]}
+                        onClick={() => route.push("/shop/overview")}
+                        theme="light"
+                        mode="inline"
+                    />
+                </div>
+                </div>
                 {/* <Menu className="bg-[#eaecf0]" defaultSelectedKeys={['1']} mode="inline" /> */}
             </Sider>
 

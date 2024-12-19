@@ -1,16 +1,14 @@
 "use client";
-import { AppDispatch, RootState } from "@/store";
 import {
   LogoutOutlined,
   SettingOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Avatar, Dropdown, Input, Layout, Menu, message, Spin } from "antd";
+import { Avatar, Dropdown, Input, Layout, Menu, message } from "antd";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useSelector } from "react-redux";
 
 interface HeaderActionProps {
   title: string;
@@ -23,7 +21,6 @@ function HeaderAction(props: HeaderActionProps) {
   const { isShowSearch, title, inputPlaholder, onSearch } = props;
   const router = useRouter();
   const [loading, setLoading] = useState(false)
-  const {avatar} = useSelector((state:RootState)=> state.userReducer.user)
   async function logout() {
     setLoading(true)
     try {
@@ -99,7 +96,7 @@ function HeaderAction(props: HeaderActionProps) {
         </div>
 
         <Dropdown overlay={<Menu items={items} />} trigger={['click']}>
-        <Avatar className="cursor-pointer mr-2" src={avatar} icon={<UserOutlined />} />
+        <Avatar className="cursor-pointer mr-2" icon={<UserOutlined />} />
         </Dropdown>
       </Layout.Header>
 
