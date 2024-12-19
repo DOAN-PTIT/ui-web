@@ -10,7 +10,6 @@ export default function PassModel({ open, onOk, onCancel }: { open: boolean, onO
             // await form.validateFields(); 
             await apiClient.post('/user/change-password', data)
             message.success('Đã thay đổi mật khẩu thành công!');
-            console.log(form)
             form.resetFields();
             onOk();
         } catch (error) {
@@ -19,7 +18,6 @@ export default function PassModel({ open, onOk, onCancel }: { open: boolean, onO
     };
     const onFinish = (value: any) => {
         delete value.password;
-        console.log('xa', value)
         handleOk(value)
     }
     return (

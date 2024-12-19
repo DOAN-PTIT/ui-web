@@ -117,7 +117,6 @@ function Debt(props: DebtProps) {
     try {
       return await fetchDebts({ ...defaultParams, shop_id: currentShop.id })
         .then((res) => {
-          console.log(res.payload.data);
           setDebts(res.payload.data);
           setLoading(false);
         })
