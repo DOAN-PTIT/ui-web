@@ -155,6 +155,21 @@ export const orderStatus = [
   },
 ];
 
+export const purchaseStatus = {
+  "-1": {
+    label: "Hủy",
+    color: "red",
+  },
+  "0": {
+    label: "Mới",
+    color: "blue",
+  },
+  "1": {
+    label: "Đã nhập hàng",
+    color: "green",
+  }
+}
+
 export const calculateTotalPriceProduct = (order: Order) => {
   let totalPrice = 0;
   if (order?.orderitems) {

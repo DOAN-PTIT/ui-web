@@ -131,7 +131,6 @@ function Settings() {
         return false;
     };
     const onFinish = (values: any) => {
-        console.log(values);
         const formattedValues = {
             ...values,
             date_of_birth: values.date_of_birth
