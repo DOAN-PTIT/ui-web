@@ -71,12 +71,15 @@ function Overview(props: OverviewProps) {
   const [isLoadingFbPage, setIsLoadingFbPage] = useState(false);
   const [openIntegration, setOpenIntegration] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [dataEdit, setDataEdit] = useState<any>();
+  
   const [dataListShop, setDataListShop] = useState<ListShop[]>([]);
   useEffect(() => {
     getListShop();
     getCurrentUser();
   }, []);
-  const filteredShops = dataListShop?.filter((shop) => shop.is_deleted === true);
+  // const filteredShops = dataListShop?.filter((shop) => shop.is_deleted === true);
   const route = useRouter();
   const searchParams = useSearchParams();
 
@@ -153,33 +156,48 @@ function Overview(props: OverviewProps) {
 
   const handleOk = async (param: { name: string; avatar: any }) => {
     setIsLoading(true)
-    if (!param.name || !param.avatar) {
-      message.error("Thiếu hình đại diện");
-      return;
-    }
 
     const createShopFormData = new FormData();
+    if (param.avatar instanceof File ){
+      createShopFormData.append("avatar", param.avatar);
+    }
     createShopFormData.append("name", param.name);
-    createShopFormData.append("avatar", param.avatar);
 
     // console.log("FormData Preview:", Array.from(createShopFormData.entries()));
 
     const url = `/user/create-shop`;
-    try {
-      await apiClient
-        .post(url, createShopFormData, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "multipart/form-data",
-          },
-        })
-      setIsLoading(false)
-      setOpenModal(false)
-      message.success("Thêm cửa hàng thành công!")
-      getListShop()
-    } catch (error) {
-      console.log("Error:", error)
+    if (isEdit) {
+        try {
+          await apiClient.post(`shop/profile/update/${dataEdit.id}`, createShopFormData, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "multipart/form-data",
+            },
+          })
+          setOpenModal(false)
+          await message.success("Cập nhật cửa hàng thành công!")
+          await getListShop()
+        } catch (error) {
+          message.error("Cập nhật cửa hàng thất bại!")
+          console.log(error)
+        }
+    } else {
+      try {
+        await apiClient
+          .post(url, createShopFormData, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "multipart/form-data",
+            },
+          })
+        setOpenModal(false)
+        await message.success("Thêm cửa hàng thành công!")
+        await getListShop()
+      } catch (error) {
+        console.log("Error:", error)
+      }
     }
+    
   };
 
 
@@ -263,7 +281,10 @@ function Overview(props: OverviewProps) {
               </Button>
               <Button
                 type="primary"
-                onClick={handleOpenModel}
+                onClick={()=>{
+                  setIsEdit(false)
+                  handleOpenModel()
+                }}
                 icon={<PlusCircleOutlined />}
               >
                 Thêm cửa hàng
@@ -280,6 +301,8 @@ function Overview(props: OverviewProps) {
                 open={openModal}
                 onOk={handleOk}
                 onCancel={handleCancel}
+                isEdit={isEdit}
+                dataEdit={dataEdit}
               />
             </Space>
             <Space className="grid grid-cols-2 xl:grid-cols-3 gap-7 mx-auto h-full mt-10 justify-center max-w-fit ">
@@ -302,7 +325,13 @@ function Overview(props: OverviewProps) {
                       }
                       actions={[
                         <Tooltip key="edit" title="Cập nhật cửa hàng">
-                          <EditOutlined />
+                          <EditOutlined 
+                            onClick={()=>{
+                              setIsEdit(true)
+                              handleOpenModel()
+                              setDataEdit(shop)
+                            }}
+                          />
                         </Tooltip>,
                         <Tooltip key="delete" title="Xóa cửa hàng">
                           <Popconfirm

@@ -60,7 +60,6 @@ function LoginComponent() {
       })
       .catch((error: any) => {
         const res = error.response.data.message;
-        console.log('rfgds',res);
         setErrorLogin(res)
         // openNotification(res);
       })

@@ -111,7 +111,6 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
         case "DISCOUNT":
           return orderParams?.total_discount || 0;
         case "AFTER DISCOUNT":
-          console.log(orderParams);
           return orderParams?.total_cost - orderParams?.total_discount || 0;
         case "NEED TO PAY":
 
