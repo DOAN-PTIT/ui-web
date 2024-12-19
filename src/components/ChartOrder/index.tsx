@@ -29,7 +29,6 @@ const ChartOrder = (props: ChartOrderProps) => {
       return await apiClient
         .post(url)
         .then((res) => {
-          console.log(res.data);
           setOrderStat(res.data);
           setTotalOrder(res.data.totalOrder);
           setLoading(false);
