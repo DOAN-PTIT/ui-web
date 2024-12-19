@@ -1,4 +1,5 @@
 import { getCurrentShop, getListShopUser } from "@/action/shop.action";
+import { Supplier } from "@/utils/type";
 import { createSlice } from "@reduxjs/toolkit";
 
 const reducer = createSlice({
@@ -9,6 +10,7 @@ const reducer = createSlice({
             id: 0,
             name: "",
             avatar: "",
+            suppliers: [] as Supplier[]
         },
         user: {
             employees: [{
