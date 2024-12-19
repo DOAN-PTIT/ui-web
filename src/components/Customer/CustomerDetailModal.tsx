@@ -1,26 +1,29 @@
 import apiClient from "@/service/auth";
 import { RootState } from "@/store";
 import { CopyOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, DatePicker, Divider, Empty, Input, message, Modal, Select, Spin, Table, TableProps } from "antd";
+import { Button, DatePicker, Divider, Empty, Input, message, Modal, Select, Spin, Table, TableProps, Typography } from "antd";
 import dayjs from "dayjs";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import Avatar from "react-avatar";
 import { useSelector } from "react-redux";
+
 export default function CustomerDetail({ open, onCancel, data, loading }: { open: boolean, onCancel: () => void,data:any ,loading:boolean}) {
     
     const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
     const [profileCustomer,setProfileCustomer] = useState({
+        name: "",
         email: "",
         gender: "",
         address: "",
         phone_number: "",
-        date_of_birth: "",          // YYYY-MM-DD
+        date_of_birth: "",  
         referral_code: ""
     })
     useEffect(() => {
         if (data?.customer) {
             setProfileCustomer({
+                name: data.customer.name || "",
                 email: data.customer.email || "",
                 gender: data.customer.gender || "",
                 address: data.customer.address || "",
@@ -31,23 +34,26 @@ export default function CustomerDetail({ open, onCancel, data, loading }: { open
         }
     }, [data]);
     const {id} = useSelector((state:RootState)=>state.shopReducer.shop)
-    const handleUpdateProfile = async()=>{
+    // const handleUpdateProfile = async()=>{
+    //     try {
+    //         await apiClient.post(`shop/${id}/customer/${data.customer.id}/update`, profileCustomer)
+    //         message.success("Cập nhật thành công!");
+    //     } catch (error) {
+    //         console.log(error)
+    //         message.error("Cập nhật thất bại!");
+    //     }
+    // }
+    const handleSingleFieldUpdate = async (fieldName: string, value: any) => {
         try {
-            await apiClient.post(`shop/${id}/customer/${data.customer.id}/update`, profileCustomer)
-            message.success("Cập nhật thành công!");
+            const updatedProfile = { ...profileCustomer, [fieldName]: value };
+            await apiClient.post(`shop/${id}/customer/${data.customer.id}/update`, { [fieldName]: value });
+            setProfileCustomer(updatedProfile); 
+            message.success(`Cập nhật ${fieldName} thành công!`);
         } catch (error) {
-            console.log(error)
-            message.error("Cập nhật thất bại!");
+            console.error(error);
+            message.error(`Cập nhật ${fieldName} thất bại!`);
         }
-    }
-    // const handleInputChange = (field: string, value: any) => {
-    //     setProfileCustomer((prev) => {
-    //         const newState = { ...prev, [field]: value };
-           
-    //         handleUpdateProfile();
-    //         return newState;
-    //     });
-    // };
+    };
     const handleExpand = (expanded: boolean, record: any) => {
         setExpandedRowKeys((prevKeys) => {
             const rowKey = record?.id; 
@@ -146,6 +152,11 @@ export default function CustomerDetail({ open, onCancel, data, loading }: { open
         },
 
     ];
+    const options = [
+        { label: 'Nam', value: 'MALE' },
+        { label: 'Nữ', value: 'FEMALE' },
+        { label: 'Khác', value: 'OTHER' }
+    ]
     const statusLabels: any = {
         1: "Đang xử lý",
         2: "Chấp nhận",
@@ -206,16 +217,34 @@ export default function CustomerDetail({ open, onCancel, data, loading }: { open
             () => message.error("Sao chép thất bại!")
         );
     };
+    const [editing, setEditing] = useState(false);
+   
     return (
         <Modal open={open} closable footer={false} onCancel={onCancel} className="modal-detail !w-5/6">
             <Spin spinning={loading}>
                 <div className="flex p-4 justify-between">
                     <div className="flex items-center">
-                        <Avatar name={data?.customer.name} round size={'40'} />
-                        <div className="ml-2 text-base font-medium">{data?.customer.name}</div>
+                        <Avatar name={profileCustomer.name} round size={'40'} />
+                        {editing ? (
+                            <Input 
+                                className="ml-3" 
+                                value={profileCustomer.name} 
+                                onChange={(e) => setProfileCustomer(prev => ({ ...prev, name: e.target.value }))}
+                                onBlur={() => {
+                                    setEditing(false)
+                                    handleSingleFieldUpdate("name", profileCustomer.name)
+                                }}
+                                onPressEnter={() => {
+                                    setEditing(false)
+                                    handleSingleFieldUpdate("name", profileCustomer.name)
+                                }}
+                            />
+                        ) :
+                            <div onClick={() => setEditing(true)} className="ml-2 text-base font-medium">{profileCustomer.name}</div>
+                        }
                     </div>
                     <div className="flex items-end  ">
-                        <Button onClick={handleUpdateProfile} type="primary" size="middle" className="mr-12 ">Tạo đơn</Button>
+                        <Button  type="primary" size="middle" className="mr-12 ">Tạo đơn</Button>
                     </div>
                 </div>
                 <Divider className="mt-1 mb-0" />
@@ -231,16 +260,19 @@ export default function CustomerDetail({ open, onCancel, data, loading }: { open
                             <div className="p-4">
                                 <div className="flex justify-between items-center text-sm mb-2">
                                     <div className="w-1/2">Ngày sinh</div>
-                                    <DatePicker value={dayjs(data?.customer.date_of_birth)} placeholder="Chọn ngày sinh" className="w-1/2" />
+                                    <DatePicker 
+                                        onChange={(value) => {
+                                            handleSingleFieldUpdate("date_of_birth", dayjs(value).format("YYYY-MM-DD"))}}
+                                        value={dayjs(profileCustomer.date_of_birth)} placeholder="Chọn ngày sinh" className="w-1/2" />
                                 </div>
                                 <div className="flex justify-between items-center text-sm mb-2">
                                     <div className="w-1/2">Giới tính</div>
-                                    <Select value={data?.customer.gender=='MALE'? 'Nam' : 'Nữ'} placeholder='Chọn giới tính' className="w-1/2" 
-                                        // onChange={(value) => setProfileCustomer((prev) => ({ ...prev, gender: value }))}
-                                        options={[
-                                            {label:'Nam',value:'MALE'},
-                                            {label:'Nữ',value:'FEMALE'},
-                                        ]} 
+                                    <Select 
+                                        className="w-1/2"
+                                        placeholder='Chọn giới tính'
+                                        value={profileCustomer.gender}   
+                                        options={options} 
+                                        onChange={(value) => handleSingleFieldUpdate("gender", value)}
                                     />
                                 </div>
                                 <div className="flex justify-between items-center text-sm mb-2">
@@ -268,7 +300,7 @@ export default function CustomerDetail({ open, onCancel, data, loading }: { open
                                 </div>
                                 <div className="flex justify-between items-center text-sm mb-2">
                                     <div className="w-1/2">Lần mua cuối</div>
-                                    <Input className="w-1/2" value={dayjs(data?.customer.last_purchase).format("HH:mm DD/MM/YYYY")}/>
+                                    <Input className="w-1/2" readOnly value={dayjs(data?.customer.last_purchase).format("HH:mm DD/MM/YYYY")}/>
                                 </div>
                             </div>
                             

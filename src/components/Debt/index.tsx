@@ -38,11 +38,13 @@ function Debt(props: DebtProps) {
 
   const columns: TableProps<any>["columns"] = [
     {
-      key: "ID",
-      dataIndex: "id",
-      title: "ID",
-      width: "4%",
-      align: "right"
+      title: "STT",
+      dataIndex: "STT",
+      key: "stt",
+      render: (_: any, __: any, index: number) => {
+        return <span className="text-blue-500 font-medium">{index + 1}</span>;
+      }
+
     },
     {
       key: "name",
