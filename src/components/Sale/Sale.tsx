@@ -15,6 +15,7 @@ import { calcOrderDebt, calcTotalOrderPrice, formatNumber } from "@/utils/tools"
 import { useEffect, useState } from "react";
 import { createOrder } from "@/reducer/order.reducer";
 import apiClient from "@/service/auth";
+import { isEmpty } from "lodash";
 
 const { Content, Footer } = Layout;
 
@@ -30,11 +31,11 @@ function Sale(props: SaleProps) {
   const [promotionsCanBeActive, setPromotionsCanBeActive] = useState<any>([]);
 
 
-  useEffect(() => {
-    if (!orderParams.creator_id) {
-      createOrder({ ...orderParams, add_cutomer: currentUser });
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (orderParams.add_customer) {
+  //     createOrder({ ...orderParams, add_customer: null });
+  //   }
+  // }, []);
 
   const handleCreateOrder = async () => {
     // setIsLoading(true);
@@ -134,7 +135,7 @@ function Sale(props: SaleProps) {
               <FormBoxOrderInfo />
             </Row>
             <Row>
-              <FormBoxCustomer />
+              <FormBoxCustomer customer={orderParams?.add_customer} />
             </Row>
             <Row>
               <FormBoxReceive />
