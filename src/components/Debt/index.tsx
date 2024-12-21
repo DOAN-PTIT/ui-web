@@ -45,7 +45,6 @@ function Debt(props: DebtProps) {
       key: "stt",
       render: (_: any, __: any, index: number) => {
         return <span className="text-blue-500 font-medium">{index + 1}</span>;
-      },
     },
     {
       key: "name",

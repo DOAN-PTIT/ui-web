@@ -1,4 +1,5 @@
 "use client";
+import apiClient from "@/service/auth";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   Divider,
@@ -18,6 +19,8 @@ interface AddModalProps {
   open: boolean;
   onOk: (param: { name: string; avatar: any }) => Promise<void>;
   onCancel: () => void;
+  isEdit?: boolean;
+  dataEdit?: any
 }
 
 const beforeUpload = (file: FileType) => {
@@ -31,7 +34,7 @@ const beforeUpload = (file: FileType) => {
   }
   return isJpgOrPng && isLt2M;
 };
-function AddModal({ open, onOk, onCancel }: AddModalProps) {
+function AddModal({ open, onOk, onCancel,isEdit,dataEdit }: AddModalProps) {
   const [loading, setLoading] = useState(false);
   const [param, setParam] = useState<{
     name: string;
@@ -42,36 +45,45 @@ function AddModal({ open, onOk, onCancel }: AddModalProps) {
   });
 
   useEffect(() => {
-    setParam({
-      name: "",
-      avatar: null,
-    });
-  }, [open]);
+    if (isEdit && dataEdit) {
+      setParam({
+        name: dataEdit.name || "",
+        avatar: null,
+      });
+    } else {
+      setParam({
+        name: "",
+        avatar: null,
+      });
+    }
+  }, [isEdit, dataEdit,open]);
 
   const handleChange: UploadProps["onChange"] = (info) => {
     setLoading(true);
     if (info.file.status === "uploading") {
       return;
     }
-
     if (info.file.status === "done") {
       setLoading(false);
-      // Lưu file gốc (originFileObj) vào avatar
-      // NOTE: K cần gửi base64, chỉ gửi file ảnh gốc
       setParam((prevState) => ({
         ...prevState,
-        avatar: info.file.originFileObj as RcFile, // Lưu file thay vì base64
+        avatar: info.file.originFileObj as RcFile,
       }));
     }
+    
   };
 
   // set avatarUrl
-  const avatarUrl = param.avatar ? URL.createObjectURL(param.avatar) : "";
+  const avatarUrl = param.avatar instanceof File
+    ? URL.createObjectURL(param.avatar)
+    : isEdit && dataEdit?.avatar
+      ? dataEdit.avatar
+      : "";
 
   const uploadButton = (
     <button style={{ border: 0, background: "none" }} type="button">
       {loading ? <LoadingOutlined /> : <PlusOutlined />}
-      <div style={{ marginTop: 8 }}>Upload</div>
+      <div style={{ marginTop: 8 }}>Tải lên</div>
     </button>
   );
 
@@ -79,11 +91,17 @@ function AddModal({ open, onOk, onCancel }: AddModalProps) {
     <>
       <Modal
         className="p-0"
-        title="Thêm của hàng mới"
+        title={isEdit ? "Cập nhật cửa hàng" :"Thêm của hàng mới"}
         open={open}
-        onOk={() => onOk(param)}
+        onOk={async () => {
+          if (!param.avatar && !isEdit) {
+            message.error("Vui lòng tải lên ảnh đại diện!");
+            return;
+          }
+          await onOk(param);
+        }}
         onCancel={onCancel}
-        okText="Thêm"
+        okText={isEdit?"Cập nhật":"Thêm"}
         cancelText="Hủy"
       >
         <Divider className="p-0 m-0 px-10" />
@@ -99,7 +117,7 @@ function AddModal({ open, onOk, onCancel }: AddModalProps) {
           />
           <div className="mt-3">Hình đại diện cửa hàng:</div>
           <Upload
-            accept="image/*"
+            accept="image/png,image/jpeg"
             listType="picture-card"
             className="avatar-uploader mt-1"
             showUploadList={false}
@@ -112,7 +130,7 @@ function AddModal({ open, onOk, onCancel }: AddModalProps) {
             }}
           >
             {param.avatar ? (
-              <Image src={avatarUrl} alt="avatar" style={{
+              <Image preview={!isEdit} src={avatarUrl} alt="avatar" style={{
                 width: "100%",        
                 height: "90px",       
                 objectFit: "cover",   

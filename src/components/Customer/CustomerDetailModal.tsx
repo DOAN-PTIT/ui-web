@@ -19,85 +19,65 @@ import dayjs from "dayjs";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import Avatar from "react-avatar";
-import { connect, useSelector } from "react-redux";
-import OrderDetail from "../OrderDetail";
-import { createOrder } from "@/reducer/order.reducer";
-import { useRouter } from "next/navigation";
-import { isEmpty } from "lodash";
+import { useSelector } from "react-redux";
 
-interface CustomerDetailProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> {
-    open: boolean;
-    onCancel: () => void;
-    data: any;
-    loading: boolean;
-  }
-
-function CustomerDetail({
-  open,
-  onCancel,
-  data,
-  loading,
-  createOrder,
-  currentShop
-}: CustomerDetailProps) {
-  const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
-  const [profileCustomer, setProfileCustomer] = useState({
-    name: "",
-    email: "",
-    gender: "",
-    address: "",
-    phone_number: "",
-    date_of_birth: "",
-    referral_code: "",
-  });
-  useEffect(() => {
-    if (data?.customer) {
-      setProfileCustomer({
-        name: data.customer.name || "",
-        email: data.customer.email || "",
-        gender: data.customer.gender || "",
-        address: data.customer.address || "",
-        phone_number: data.customer.phone_number || "",
-        date_of_birth: data.customer.date_of_birth || "",
-        referral_code: data.customer.referral_code || "",
-      });
-    }
-  }, [data]);
-  const { id } = useSelector((state: RootState) => state.shopReducer.shop);
-  const router = useRouter()
-  // const handleUpdateProfile = async()=>{
-  //     try {
-  //         await apiClient.post(`shop/${id}/customer/${data.customer.id}/update`, profileCustomer)
-  //         message.success("Cập nhật thành công!");
-  //     } catch (error) {
-  //         console.log(error)
-  //         message.error("Cập nhật thất bại!");
-  //     }
-  // }
-  const handleSingleFieldUpdate = async (fieldName: string, value: any) => {
-    try {
-      const updatedProfile = { ...profileCustomer, [fieldName]: value };
-      await apiClient.post(`shop/${id}/customer/${data.customer.id}/update`, {
-        [fieldName]: value,
-      });
-      setProfileCustomer(updatedProfile);
-      message.success(`Cập nhật ${fieldName} thành công!`);
-    } catch (error) {
-      console.error(error);
-      message.error(`Cập nhật ${fieldName} thất bại!`);
-    }
-  };
-  const handleExpand = (expanded: boolean, record: any) => {
-    setExpandedRowKeys((prevKeys) => {
-      const rowKey = record?.id;
-      if (!rowKey) return prevKeys;
-      if (expanded) {
-        return [rowKey];
-      } else {
-        return prevKeys.filter((key) => key !== rowKey);
-      }
-    });
-  };
+export default function CustomerDetail({ open, onCancel, data, loading }: { open: boolean, onCancel: () => void,data:any ,loading:boolean}) {
+    
+    const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
+    const [profileCustomer,setProfileCustomer] = useState({
+        name: "",
+        email: "",
+        gender: "",
+        address: "",
+        phone_number: "",
+        date_of_birth: "",  
+        referral_code: ""
+    })
+    useEffect(() => {
+        if (data?.customer) {
+            setProfileCustomer({
+                name: data.customer.name || "",
+                email: data.customer.email || "",
+                gender: data.customer.gender || "",
+                address: data.customer.address || "",
+                phone_number: data.customer.phone_number || "",
+                date_of_birth: data.customer.date_of_birth || "",
+                referral_code: data.customer.referral_code || "",
+            });
+        }
+    }, [data]);
+    const {id} = useSelector((state:RootState)=>state.shopReducer.shop)
+    // const handleUpdateProfile = async()=>{
+    //     try {
+    //         await apiClient.post(`shop/${id}/customer/${data.customer.id}/update`, profileCustomer)
+    //         message.success("Cập nhật thành công!");
+    //     } catch (error) {
+    //         console.log(error)
+    //         message.error("Cập nhật thất bại!");
+    //     }
+    // }
+    const handleSingleFieldUpdate = async (fieldName: string, value: any) => {
+        try {
+            const updatedProfile = { ...profileCustomer, [fieldName]: value };
+            await apiClient.post(`shop/${id}/customer/${data.customer.id}/update`, { [fieldName]: value });
+            setProfileCustomer(updatedProfile); 
+            message.success(`Cập nhật ${fieldName} thành công!`);
+        } catch (error) {
+            console.error(error);
+            message.error(`Cập nhật ${fieldName} thất bại!`);
+        }
+    };
+    const handleExpand = (expanded: boolean, record: any) => {
+        setExpandedRowKeys((prevKeys) => {
+            const rowKey = record?.id; 
+            if (!rowKey) return prevKeys;
+            if (expanded) {
+                return [rowKey];
+            } else {
+                return prevKeys.filter((key) => key !== rowKey);
+            }
+        });
+    };
 
   const expandedRowRender = (record: any) => (
     <Table
@@ -164,6 +144,20 @@ function CustomerDetail({
         );
       },
     },
+
+    ];
+    const options = [
+        { label: 'Nam', value: 'MALE' },
+        { label: 'Nữ', value: 'FEMALE' },
+        { label: 'Khác', value: 'OTHER' }
+    ]
+    const statusLabels: any = {
+        1: "Đang xử lý",
+        2: "Chấp nhận",
+        3: "Đang giao",
+        4: "Đã giao",
+        "-1": "Đã hủy",
+    };
 
     {
       key: "TOTAL COST",
@@ -241,6 +235,67 @@ function CustomerDetail({
     } else {
       return "Online";
     }
+    const checkStatus = (status: number) => statusLabels[status] || "Không xác định";
+    const colorStatus = (status: number) => statusColors[status] || "text-gray-400";
+    const received = (data: any) => {
+        if (!Array.isArray(data)) {
+            return 0; 
+        }
+        return data.filter((i: any) => i.status === 4).length;
+    };
+    const spent = (data: any) => {
+        if (!Array.isArray(data)) {
+            return 0; 
+        }
+        return data.reduce((sum, order) => {
+            if (order?.status === 4 && typeof order?.total_cost === "number") {
+                return sum + order.total_cost; 
+            }
+            return sum;
+        }, 0); 
+    };
+    const formatCurrency = (amount: number | undefined): string => {
+        if (typeof amount !== "number") {
+            return "0 đ"; 
+        }
+        return `${new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount)}`;
+    };
+    const handleCopy = () => {
+        navigator.clipboard.writeText(data?.customer?.referral_code || "Không có mã").then(
+            () => message.success("Đã sao chép!"),
+            () => message.error("Sao chép thất bại!")
+        );
+    };
+    const [editing, setEditing] = useState(false);
+   
+    return (
+        <Modal open={open} closable footer={false} onCancel={onCancel} className="modal-detail !w-5/6">
+            <Spin spinning={loading}>
+                <div className="flex p-4 justify-between">
+                    <div className="flex items-center">
+                        <Avatar name={profileCustomer.name} round size={'40'} />
+                        {editing ? (
+                            <Input 
+                                className="ml-3" 
+                                value={profileCustomer.name} 
+                                onChange={(e) => setProfileCustomer(prev => ({ ...prev, name: e.target.value }))}
+                                onBlur={() => {
+                                    setEditing(false)
+                                    handleSingleFieldUpdate("name", profileCustomer.name)
+                                }}
+                                onPressEnter={() => {
+                                    setEditing(false)
+                                    handleSingleFieldUpdate("name", profileCustomer.name)
+                                }}
+                            />
+                        ) :
+                            <div onClick={() => setEditing(true)} className="ml-2 text-base font-medium">{profileCustomer.name}</div>
+                        }
+                    </div>
+                    <div className="flex items-end  ">
+                        <Button  type="primary" size="middle" className="mr-12 ">Tạo đơn</Button>
+                    </div>
+
   };
   const checkStatus = (status: number) =>
     statusLabels[status] || "Không xác định";
@@ -364,6 +419,7 @@ function CustomerDetail({
                     placeholder="Chọn ngày sinh"
                     className="w-1/2"
                   />
+ 
                 </div>
                 <div className="flex justify-between items-center text-sm mb-2">
                   <div className="w-1/2">Giới tính</div>
@@ -377,6 +433,60 @@ function CustomerDetail({
                     }
                   />
                 </div>
+                <div className="bg-gray-200 p-5 h-auto flex gap-4">
+                    <div className="w-1/3 ">
+                        <div className="rounded-md bg-white mb-2">
+                            <div className="text-base font-medium px-4 py-4">Thông tin cá nhân</div>
+                            <Divider className="m-0" />
+                            <div className="p-4">
+                                <div className="flex justify-between items-center text-sm mb-2">
+                                    <div className="w-1/2">Ngày sinh</div>
+                                    <DatePicker 
+                                        onChange={(value) => {
+                                            handleSingleFieldUpdate("date_of_birth", dayjs(value).format("YYYY-MM-DD"))}}
+                                        value={dayjs(profileCustomer.date_of_birth)} placeholder="Chọn ngày sinh" className="w-1/2" />
+                                </div>
+                                <div className="flex justify-between items-center text-sm mb-2">
+                                    <div className="w-1/2">Giới tính</div>
+                                    <Select 
+                                        className="w-1/2"
+                                        placeholder='Chọn giới tính'
+                                        value={profileCustomer.gender}   
+                                        options={options} 
+                                        onChange={(value) => handleSingleFieldUpdate("gender", value)}
+                                    />
+                                </div>
+                                <div className="flex justify-between items-center text-sm mb-2">
+                                    <div className="w-1/2">Số điện thoại</div>
+                                    <div className="text-blue-800 font-medium">{data?.customer.phone_number}</div>
+                                </div>
+                                <div className="flex justify-between items-center text-sm mb-2">
+                                    <div className="w-1/2">Email</div>
+                                    <div className="text-blue-800 font-medium">{data?.customer.email}</div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div className="rounded-md bg-white">
+                            <div className="text-base font-medium px-4 py-4">Thông tin mua hàng</div>
+                            <Divider className="m-0" />
+                            <div className="p-4">
+                                <div className="flex justify-between items-center text-sm mb-2">
+                                    <div className="w-1/2">Mã giới thiệu</div>
+                                    <Input className="w-1/2" value={data?.customer?.referral_code || "Không có mã"} readOnly suffix={<CopyOutlined onClick={handleCopy} />} />
+                                </div>
+                                <div className="flex justify-between items-center text-sm mb-2">
+                                    <div className="w-1/2">Số lần giới thiệu</div>
+                                    <div className="text-blue-800 font-medium">{data?.customer.number_of_referrals}</div>
+                                </div>
+                                <div className="flex justify-between items-center text-sm mb-2">
+                                    <div className="w-1/2">Lần mua cuối</div>
+                                    <Input className="w-1/2" readOnly value={dayjs(data?.customer.last_purchase).format("HH:mm DD/MM/YYYY")}/>
+                                </div>
+                            </div>
+                            
+                        </div>
+
                 <div className="flex justify-between items-center text-sm mb-2">
                   <div className="w-1/2">Số điện thoại</div>
                   <div className="text-blue-800 font-medium">
@@ -449,6 +559,7 @@ function CustomerDetail({
                     <div className="mr-1">Đã mua: </div>
                     <div className="font-medium">
                       {data?.orders.count + " lần"}{" "}
+ 
                     </div>
                   </div>
                   <div className="flex">

@@ -32,9 +32,11 @@ import {
 } from "react";
 import { connect } from "react-redux";
 import defaultImage from "../../assets/default.png";
-import { ModalUpLoad } from "./ModalUpload";
+
 import axios from "axios";
 import apiClient from "@/service/auth";
+import UploadFile from "./UploadFile";
+import { RcFile } from "antd/es/upload";
 
 interface VariationProps {
   id: string;
@@ -157,16 +159,25 @@ function ProductDetail(props: ProductDetailProps) {
       width: 120,
       fixed: "left",
       render: (text, record) => {
-        const url = text || defaultImage.src;
+        const cac = new FormData
+        
+        const handleUploadChange = (file) => {
+          if (file) {
+            cac.append("image",file)
+            
+            onInputVariationChange("image", file);
+          }
+        };
         return (
           <>
-            <Image
+            <UploadFile onChange={handleUploadChange}/>
+            {/* <Image
               alt=""
-              onClick={() => setIsOpenModal(true)}
+              // onClick={() => setIsOpenModal(true)}
               src={url}
               preview={false}
               className="cursor-pointer"
-            />
+            /> */}
           </>
         );
       },
@@ -318,7 +329,11 @@ function ProductDetail(props: ProductDetailProps) {
     try {
       const url = `/shop/${currentShop.id}/product/${createProductParams.id}/update`;
       return await apiClient
-        .post(url, { ...createProductParams, variations: variationData })
+        .post(url, { ...createProductParams, variations: variationData, }, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
         .then((res) => {
           setModalVisiable(false);
           getListProduct({ shopId: currentShop.id, page: currentPage });
@@ -358,10 +373,10 @@ function ProductDetail(props: ProductDetailProps) {
     const newVariation = {
       variation_code: "",
       image: "",
-      price_at_counter: 0,
+      price_at_counter: "",
       barcode: "",
-      retail_price: 0,
-      amount: 0,
+      retail_price: "",
+      amount: "",
       last_imported_price: 0,
     } as never;
     newVariationData.unshift(newVariation);
@@ -440,7 +455,6 @@ function ProductDetail(props: ProductDetailProps) {
       ...exitVariation,
       [key]: value,
       price_at_counter: 0,
-      // image: defaultImage,
       index,
     };
 
@@ -553,7 +567,6 @@ function ProductDetail(props: ProductDetailProps) {
       }}
       footer={renderFooter()}
     >
-      <ModalUpLoad open={isOpenModal} onCancel={handleCancel} />
       <Layout className="p-5 h-[600px] overflow-y-scroll">
         {isLoading ? (
           <div className="flex items-center justify-center gap-4 h-full w-full">
