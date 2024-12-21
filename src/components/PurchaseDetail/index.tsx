@@ -61,6 +61,7 @@ const PurchaseDetail = (props: PurchaseDetailProps) => {
   } as Purchase);
   const [searchProductResult, setSearchProductResult] = useState<any[]>([]);
   const [supplierId, setSupplierId] = useState<number | undefined>(undefined);
+  const [disabled, setDisabled] = useState(false);
 
   useEffect(() => {
     if (purchaseId) {
@@ -143,6 +144,9 @@ const PurchaseDetail = (props: PurchaseDetailProps) => {
       .get(url)
       .then((res) => {
         const data = res.data;
+        if (data.status == 1) {
+          setDisabled(true);
+        }
         setPurchase(data);
         setLoading(false);
       })
@@ -452,6 +456,7 @@ const PurchaseDetail = (props: PurchaseDetailProps) => {
           onClick={handleCreatePurchase}
           className="font-medium p-5 text-[16px] mr-[10px]"
           loading={loading}
+          disabled={disabled}
         >
           Lưu
         </Button>

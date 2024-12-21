@@ -127,33 +127,28 @@ export const getHostName = () => {
   return "http://localhost:8000";
 };
 
-export const orderStatus = [
-  {
-    key: 1,
-    value: "Mới",
+export const orderStatus = {
+  1: {
+    label: "Đang xử lý",
     color: "blue",
   },
-  {
-    key: 2,
-    value: "Đã xác nhận",
+  2: {
+    label: "Đã xác nhận",
+    color: "yellow",
+  },
+  3: {
+    label: "Đang giao hàng",
+    color: "cyan",
+  },
+  4: {
+    label: "Đã giao hàng",
     color: "green",
   },
-  {
-    key: 3,
-    value: "Đang giao hàng",
-    color: "orange",
-  },
-  {
-    key: 4,
-    value: "Đã giao hàng",
-    color: "purple",
-  },
-  {
-    key: 5,
-    value: "Đã hủy",
+  "-1": {
+    label: "Đã hủy",
     color: "red",
   },
-];
+}
 
 export const purchaseStatus = {
   "-1": {
@@ -258,7 +253,6 @@ export const calcTotalOrderPrice = (order: any) => {
       (order.surcharge || 0) -
       (order.paid || 0);
   }
-  console.log(total_price);
   return total_price;
 };
 
@@ -353,3 +347,22 @@ export const getPromotionStatus = {
     color: "red",
   },
 };
+
+export const debtStatus = {
+  "-1": {
+    label: "Hủy",
+    color: "red",
+  },
+  "0": {
+    label: "Chưa thanh toán",
+    color: "cyan",
+  },
+  "1": {
+    label: "Đã thanh toán",
+    color: "green",
+  },
+  "2": {
+    label: "Quá hạn",
+    color: "red",
+  }
+}

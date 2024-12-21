@@ -1,5 +1,5 @@
 import { AppDispatch, RootState } from "@/store";
-import { Layout, Table } from "antd";
+import { Layout, notification, Table } from "antd";
 import type { TableProps } from "antd";
 import { connect } from "react-redux";
 import HeaderAction from "../HeaderAction/HeaderAction";
@@ -8,11 +8,12 @@ import "../../styles/global.css";
 import apiClient from "@/service/auth";
 import ActionTools from "../ActionTools/ActionTools";
 import DebtDetail from "../DebtDetail";
-import { fetchDebts } from "@/action/debt.action";
+import { fetchDebts, updateDebt } from "@/action/debt.action";
 import { Debt as DebtType } from "@/utils/type";
 import moment from "moment";
-import { formatNumber } from "@/utils/tools";
-import '@/styles/global.css'
+import { debtStatus, formatNumber } from "@/utils/tools";
+import "@/styles/global.css";
+import CustomSelect from "@/container/ConfigSelect";
 
 const { Content } = Layout;
 const defaultParams = {
@@ -25,16 +26,17 @@ interface DebtProps
     ReturnType<typeof mapDispatchToProps> {}
 
 function Debt(props: DebtProps) {
-  const { fetchDebts, currentShop } = props;
+  const { fetchDebts, currentShop, updateDebt } = props;
   const [modalVisiable, setModalVisiable] = useState(false);
   const [title, setTitle] = useState("Tạo công nợ");
   const [debts, setDebts] = useState<DebtType[]>([]);
   const [loading, setLoading] = useState(false);
   const [debtSelected, setDebtSelected] = useState<DebtType | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    getListDebts()
-  }, [])
+    getListDebts();
+  }, []);
 
   const columns: TableProps<any>["columns"] = [
     {
@@ -43,8 +45,6 @@ function Debt(props: DebtProps) {
       key: "stt",
       render: (_: any, __: any, index: number) => {
         return <span className="text-blue-500 font-medium">{index + 1}</span>;
-      }
-
     },
     {
       key: "name",
@@ -93,31 +93,61 @@ function Debt(props: DebtProps) {
     dataIndex: "status",
     title: "Trạng thái",
     fixed: "right",
-    render: (status: number) => {
+    render: (status: number, record: any) => {
       return (
-        <span
-          className={`${
-            status === 0
-              ? "text-yellow-400"
-              : status === 1
-              ? "text-green-400"
-              : "text-red-400"
-          } font-medium`}
-        >
-          {status === 0
-            ? "Chưa thanh toán"
-            : status === 1
-            ? "Đã thanh toán"
-            : "Quá hạn"}
-        </span>
+        <CustomSelect
+          data={debtStatus}
+          currentStatus={status.toString()}
+          handleClick={(e) => {
+            e.stopPropagation();
+            setModalVisiable(false);
+            setDebtSelected(record.id);
+          }}
+          handleSelect={handleUpdateDebtStatus}
+        />
       );
     },
-  })
+  });
 
-  const getListDebts = async () => {
+  const handleUpdateDebtStatus = async (value: any) => {
+    setLoading(true);
+    await updateDebt({
+      id: debtSelected,
+      data: {
+        status: value,
+      },
+      shop_id: currentShop.id,
+    })
+      .then((res) => {
+        if (res.payload) {
+          setLoading(false);
+          setDebtSelected(null);
+          getListDebts();
+          notification.success({
+            message: "Thành công",
+            description: "Cập nhật trạng thái công nợ thành công",
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        setLoading(false);
+        setDebtSelected(null);
+        notification.error({
+          message: "Thất bại",
+          description: "Cập nhật trạng thái công nợ thất bại",
+        });
+      });
+  };
+
+  const getListDebts = async (params = {} as any) => {
     setLoading(true);
     try {
-      return await fetchDebts({ ...defaultParams, shop_id: currentShop.id })
+      return await fetchDebts({
+        ...defaultParams,
+        shop_id: currentShop.id,
+        ...params,
+      })
         .then((res) => {
           setDebts(res.payload.data);
           setLoading(false);
@@ -132,21 +162,25 @@ function Debt(props: DebtProps) {
   };
 
   const getData = () => {
-    return debts.length > 0 ? debts.map(debt => {
-      return {
-        id: debt.id,
-        name: debt.name,
-        debt_type: <span className="text-red-400 font-medium">Công nợ cần trả</span>,
-        description: debt.description,
-        purchase_date: moment(debt.purchase_date).format("DD/MM/YYYY"),
-        deal_date: moment(debt.deal_date).format("DD/MM/YYYY"),
-        total_purchase: formatNumber(debt.money_must_pay) + ' đ',
-        supplier: debt.supplier?.name,
-        created_at: moment(debt.created_at).format("DD/MM/YYYY"),
-        status: debt.status
-      }
-    }) : [];
-  }
+    return debts.length > 0
+      ? debts.map((debt) => {
+          return {
+            id: debt.id,
+            name: debt.name,
+            debt_type: (
+              <span className="text-red-400 font-medium">Công nợ cần trả</span>
+            ),
+            description: debt.description,
+            purchase_date: moment(debt.purchase_date).format("DD/MM/YYYY"),
+            deal_date: moment(debt.deal_date).format("DD/MM/YYYY"),
+            total_purchase: formatNumber(debt.money_must_pay) + " đ",
+            supplier: debt.supplier?.name,
+            created_at: moment(debt.created_at).format("DD/MM/YYYY"),
+            status: debt.status,
+          };
+        })
+      : [];
+  };
 
   return (
     <Layout>
@@ -163,7 +197,14 @@ function Debt(props: DebtProps) {
         <Table
           columns={columns}
           dataSource={getData()}
-          pagination={{ size: "small" }}
+          pagination={{
+            size: "small",
+            current: currentPage,
+            onChange: (page, pageSize) => {
+              setCurrentPage(page);
+              getListDebts({ page });
+            },
+          }}
           scroll={{ y: 500, x: 2200 }}
           loading={loading}
           onRow={(record) => {
@@ -200,6 +241,7 @@ const mapStateToProps = (state: RootState) => {
 const mapDispatchToProps = (dispatch: AppDispatch) => {
   return {
     fetchDebts: (params: any) => dispatch(fetchDebts(params)),
+    updateDebt: (params: any) => dispatch(updateDebt(params)),
   };
 };
 

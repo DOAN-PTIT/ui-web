@@ -1,12 +1,22 @@
 "use client";
 
-import { Col, Layout, Row, Select, Table, Tag } from "antd";
+import {
+  Col,
+  Layout,
+  message,
+  notification,
+  Row,
+  Select,
+  Table,
+  Tag,
+  Typography,
+} from "antd";
 import ActionTools from "../ActionTools/ActionTools";
 import HeaderAction from "../HeaderAction/HeaderAction";
 import type { TableProps } from "antd";
 import { useRouter } from "next/navigation";
 import { AppDispatch, RootState } from "@/store";
-import { getListOrders } from "@/action/order.action";
+import { getListOrders, updateOrder } from "@/action/order.action";
 import { connect } from "react-redux";
 import { useEffect, useState } from "react";
 import moment from "moment";
@@ -16,6 +26,7 @@ import OrderDetail from "../OrderDetail";
 import { createOrder } from "@/reducer/order.reducer";
 import Avatar from "react-avatar";
 import apiClient from "@/service/auth";
+import CustomSelect from "@/container/ConfigSelect";
 
 interface ColumnType {
   id: string;
@@ -31,13 +42,14 @@ interface ColumnType {
 }
 
 const { Content } = Layout;
+const { Text } = Typography;
 
 interface OrderProps
   extends ReturnType<typeof mapStateToProps>,
     ReturnType<typeof mapDispatchToProps> {}
 
 function Order(props: OrderProps) {
-  const { currentShop } = props;
+  const { currentShop, updateOrder } = props;
   const defaultParams = {
     page: 1,
     page_size: 30,
@@ -48,7 +60,7 @@ function Order(props: OrderProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
   const [params, setParams] = useState({ ...defaultParams });
-  const [selectedRowKey, setSelectedRowKey] = useState([]);
+  const [selectedRowKey, setSelectedRowKey] = useState();
   const [open, setOpen] = useState(false);
 
   const route = useRouter();
@@ -61,16 +73,16 @@ function Order(props: OrderProps) {
     setIsLoading(true);
     try {
       const url = `shop/${params.shop_id}/orders`;
-      return await apiClient.get(url, { params }).then(res => {
+      return await apiClient.get(url, { params }).then((res) => {
         setOrders(res.data.data);
         setTotalEntries(res.data.totalEntries);
         setIsLoading(false);
-      })
+      });
     } catch (error) {
       console.log(error);
       setIsLoading(false);
     }
-  }
+  };
 
   const columns: TableProps<ColumnType>["columns"] = [
     {
@@ -80,39 +92,65 @@ function Order(props: OrderProps) {
       fixed: "left",
       width: 80,
       render: (_: any, __: any, index: number) => {
-        return <span className="text-blue-500 font-medium">{index + 1}</span>;
-      }
+        return <span className="font-medium">{index + 1}</span>;
+      },
+    },
+    {
+      key: "ID",
+      dataIndex: "id",
+      title: "ID",
+      fixed: "left",
+      width: 120,
+      render: (text) => {
+        return (
+          <div onClick={(e) => e.stopPropagation()}>
+            <Text
+              copyable={{
+                icon: <div className="font-bold">{text}</div>,
+                onCopy(event) {
+                  message.success(`Sao chép thành công mã đơn hàng: ${text}`);
+                },
+                tooltips: "Click để sao chép mã đơn hàng",
+              }}
+            />
+          </div>
+        );
+      },
     },
     {
       key: "PRODUCT",
       dataIndex: "product",
       title: "Sản phẩm",
+      ellipsis: true,
       render: (product: any) => {
-        return <span className="font-medium">{product}</span>
-      }
+        return <span className="font-medium">{product}</span>;
+      },
     },
     {
       key: "CUSTOMER",
       dataIndex: "customer",
       title: "Khách hàng",
       render: (customer: any) => {
-        return <div>
-          <Avatar name={customer.name} size="25" round={true} />
-          <span className="ml-2">{customer.name}</span>
-        </div>
-      }
+        return (
+          <div>
+            <Avatar name={customer.name} size="25" round={true} />
+            <span className="ml-2">{customer.name}</span>
+          </div>
+        );
+      },
     },
     {
       key: "ADDRESS",
       dataIndex: "address",
       title: "Địa chỉ",
-      width: 200,
+      width: "20%",
       ellipsis: true,
     },
     {
       key: "PHONE NUMBER",
       dataIndex: "phoneNumber",
       title: "Số điện thoại",
+      width: 200,
     },
     {
       key: "TOTAL PRICE",
@@ -144,28 +182,46 @@ function Order(props: OrderProps) {
     title: "Trạng thái",
     fixed: "right",
     width: 200,
-    render: (status: number) => {
-      const defaultValue = orderStatus.find((item) => item.key === status);
-      const listStatus = orderStatus
-        .filter((item) => item.key !== status)
-        .map((item) => item);
-
+    render: (status: number, record: any) => {
       return (
-        <Select
-          style={{ width: "100%" }}
-          className="custom_select_antd text-center"
-          suffixIcon={null}
-          defaultValue={defaultValue}
-        >
-          {listStatus.map((item) => (
-            <Select.Option key={item.key} value={item.key}>
-              <Tag className="font-medium" color={item.color}>{item.value}</Tag>
-            </Select.Option>
-          ))}
-        </Select>
+        <CustomSelect
+          data={orderStatus}
+          currentStatus={status.toString()}
+          handleSelect={handleUpdateOrderStatus}
+          handleClick={(e) => {
+            e.stopPropagation();
+            setSelectedRowKey(record.id);
+            setOpen(false);
+          }}
+        />
       );
     },
   });
+
+  const handleUpdateOrderStatus = async (value: any) => {
+    const params = {
+      shop_id: currentShop.id,
+      id: selectedRowKey,
+      status: value,
+    };
+    await updateOrder(params)
+      .then((res) => {
+        setSelectedRowKey(null)
+        notification.success({
+          message: "Thành công",
+          description: "Cập nhật trạng thái đơn hàng thành công",
+        });
+        getListOrders(defaultParams);
+      })
+      .catch((error) => {
+        console.log(error);
+        setSelectedRowKey(null)
+        notification.error({
+          message: "Lỗi",
+          description: "Cập nhật trạng thái đơn hàng thất bại",
+        });
+      });
+  };
 
   const getData: () => TableProps<any>["dataSource"] = () => {
     return orders.map((order: any) => {
@@ -177,7 +233,7 @@ function Order(props: OrderProps) {
         customer: order?.customer,
         phoneNumber: order?.customer?.phone_number || "",
         address: order?.customer?.address || "",
-        status: 1,
+        status: order.status || 1,
         totalPrice: `${formatNumber(order.total_cost)} đ`,
         insertedAt: moment(order.createdAt).format("DD/MM/YYYY HH:mm"),
         updatedAt: moment(order.createdAt).format("DD/MM/YYYY HH:mm"),
@@ -189,16 +245,19 @@ function Order(props: OrderProps) {
   const handleRowClick = (record: any) => {
     setSelectedRowKey(record.id);
     setOpen(true);
-  }
+  };
 
   const renderTableFooter = () => {
     const totalPrice = orders.reduce((acc, order) => {
       return acc + order?.total_cost;
-    }, 0)
+    }, 0);
     return (
       <Row>
         <Col span={4}>
-          Tổng tiền: <span className="font-bold text-green-500">{formatNumber(totalPrice)} đ</span>
+          Tổng tiền:{" "}
+          <span className="font-bold text-green-500">
+            {formatNumber(totalPrice)} đ
+          </span>
         </Col>
       </Row>
     );
@@ -227,7 +286,7 @@ function Order(props: OrderProps) {
                 handleRowClick(record);
               },
               style: { cursor: "pointer" },
-            }
+            };
           }}
           pagination={{
             defaultPageSize: 30,
@@ -246,7 +305,14 @@ function Order(props: OrderProps) {
           loading={isLoading}
         />
       </Content>
-      {open && <OrderDetail selectedRowKey={selectedRowKey} open={true} setOpen={setOpen} fetchOrder={() => getListOrders(params)} />}
+      {open && (
+        <OrderDetail
+          selectedRowKey={selectedRowKey}
+          open={true}
+          setOpen={setOpen}
+          fetchOrder={() => getListOrders(params)}
+        />
+      )}
     </Layout>
   );
 }
@@ -266,6 +332,7 @@ const mapDispatchToProps = (dispatch: AppDispatch) => {
       shop_id: number;
     }) => dispatch(getListOrders(params)),
     createOrder: (order: any) => dispatch(createOrder(order)),
+    updateOrder: (order: any) => dispatch(updateOrder(order)),
   };
 };
 

@@ -32,7 +32,7 @@ function Supplier(props: SupplierProps) {
   const [supplierSelected, setSupplierSelected] = useState(0);
 
   useEffect(() => {
-    getListSupplier()
+    getListSupplier();
   }, []);
 
   const columns: TableProps<any>["columns"] = [
@@ -73,11 +73,11 @@ function Supplier(props: SupplierProps) {
     },
   ];
 
-  const getListSupplier = async () => {
+  const getListSupplier = async (param = {} as any) => {
     try {
       setLoading(true);
       const shop_id = currentShop.id;
-      const params = { ...defaultParams, shop_id };
+      const params = { ...defaultParams, ...param, shop_id };
       const url = `shop/${shop_id}/suppliers`;
       return await apiClient
         .get(url, { params })
@@ -99,19 +99,29 @@ function Supplier(props: SupplierProps) {
   };
 
   const getData = () => {
-    return suppliers.length > 0 ? suppliers.map((supplier: SupplierType) => {
-      return {
-        key: supplier.id,
-        supplier_code: supplier.supplier_code,
-        name: supplier.name,
-        phone_number: supplier.phone_number || <span className="text-red-400 font-medium">Chưa có thông tin</span>,
-        address: supplier.address || <span className="text-red-400 font-medium">Chưa có thông tin</span>,
-        description: supplier.description,
-        debt: 0,
-        total_purchase: 0,
-      };
-    }) : [];
-  }
+    return suppliers.length > 0
+      ? suppliers.map((supplier: SupplierType) => {
+          return {
+            key: supplier.id,
+            supplier_code: supplier.supplier_code,
+            name: supplier.name,
+            phone_number: supplier.phone_number || (
+              <span className="text-red-400 font-medium">
+                Chưa có thông tin
+              </span>
+            ),
+            address: supplier.address || (
+              <span className="text-red-400 font-medium">
+                Chưa có thông tin
+              </span>
+            ),
+            description: supplier.description,
+            debt: 0,
+            total_purchase: 0,
+          };
+        })
+      : [];
+  };
 
   return (
     <Layout className="w-full h-screen">
@@ -131,6 +141,10 @@ function Supplier(props: SupplierProps) {
           loading={loading}
           pagination={{
             size: "small",
+            onChange: (page) => {
+              setCurrentPage(page);
+              getListSupplier({ page });
+            },
           }}
           onRow={(record) => {
             return {
@@ -139,7 +153,7 @@ function Supplier(props: SupplierProps) {
                 setModalVisiable(true);
                 setSupplierSelected(record.key);
               },
-              style: { cursor: "pointer" }
+              style: { cursor: "pointer" },
             };
           }}
         />

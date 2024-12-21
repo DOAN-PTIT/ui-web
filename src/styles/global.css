@@ -1,7 +1,5 @@
-.custom_select_antd {
-  .ant-select-selector {
+.custom_select_antd .ant-select-selector {
     border: none !important;
-  }
 }
 
 .order__table__container .ant-table-container {
