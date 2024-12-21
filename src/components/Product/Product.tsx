@@ -1,6 +1,6 @@
 "use client";
 
-import { Image, Layout, Table } from "antd";
+import { Image, Layout, message, Table, Typography } from "antd";
 import HeaderAction from "../HeaderAction/HeaderAction";
 import ActionTools from "../ActionTools/ActionTools";
 import type { TableProps } from "antd";
@@ -28,6 +28,8 @@ interface ProductType {
   totalVariation: any;
 }
 
+const { Text } = Typography;
+
 interface ProductProps
   extends ReturnType<typeof mapStateToProps>,
     ReturnType<typeof mapDispatchToProps> {}
@@ -36,6 +38,7 @@ function Product(props: ProductProps) {
   const [modalVisiable, setModalVisiable] = useState(false);
   const [isSyncFBCatalog, setIsSyncFBCatalog] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const {
     getListProduct,
@@ -55,10 +58,32 @@ function Product(props: ProductProps) {
       dataIndex: "stt",
       title: "STT",
       fixed: "left",
-      width: "10%",
+      width: "5%",
       render: (_: any, __: any, index: number) => {
-        return <span className="text-blue-500 font-medium">{index + 1}</span>;
-      }
+        return <span className="font-medium">{index + 1}</span>;
+      },
+    },
+    {
+      key: "PRODUCT CODE",
+      dataIndex: "id",
+      title: "Mã sản phẩm",
+      fixed: "left",
+      width: "8%",
+      render: (text, record) => {
+        return (
+          <Text
+            copyable={{
+              text: text,
+              onCopy: () => {
+                message.success(`Sao chép thành công mã sản phẩm: ${text}`);
+              },
+              tooltips: "Click để sao chép mã sản phẩm",
+              icon: <div className="font-medium">{text}</div>,
+            }}
+            className="font-bold"
+          />
+        );
+      },
     },
     {
       key: "PRODUCT NAME",
@@ -211,8 +236,13 @@ function Product(props: ProductProps) {
             pageSize: 30,
             defaultCurrent: 1,
             defaultPageSize: 30,
+            current: currentPage,
             pageSizeOptions: [10, 20, 30, 50, 100],
             size: "small",
+            onChange: (page, pageSize) => {
+              setCurrentPage(page);
+              getListProduct({ shopId: currentShop.id, page });
+            },
           }}
           scroll={{ x: 2500 }}
           size="small"
