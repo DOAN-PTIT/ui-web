@@ -60,7 +60,7 @@ function Order(props: OrderProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
   const [params, setParams] = useState({ ...defaultParams });
-  const [selectedRowKey, setSelectedRowKey] = useState([]);
+  const [selectedRowKey, setSelectedRowKey] = useState();
   const [open, setOpen] = useState(false);
 
   const route = useRouter();
@@ -206,6 +206,7 @@ function Order(props: OrderProps) {
     };
     await updateOrder(params)
       .then((res) => {
+        setSelectedRowKey(null)
         notification.success({
           message: "Thành công",
           description: "Cập nhật trạng thái đơn hàng thành công",
@@ -214,6 +215,7 @@ function Order(props: OrderProps) {
       })
       .catch((error) => {
         console.log(error);
+        setSelectedRowKey(null)
         notification.error({
           message: "Lỗi",
           description: "Cập nhật trạng thái đơn hàng thất bại",

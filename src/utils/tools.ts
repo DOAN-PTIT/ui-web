@@ -253,7 +253,6 @@ export const calcTotalOrderPrice = (order: any) => {
       (order.surcharge || 0) -
       (order.paid || 0);
   }
-  console.log(total_price);
   return total_price;
 };
 
@@ -348,3 +347,22 @@ export const getPromotionStatus = {
     color: "red",
   },
 };
+
+export const debtStatus = {
+  "-1": {
+    label: "Hủy",
+    color: "red",
+  },
+  "0": {
+    label: "Chưa thanh toán",
+    color: "cyan",
+  },
+  "1": {
+    label: "Đã thanh toán",
+    color: "green",
+  },
+  "2": {
+    label: "Quá hạn",
+    color: "red",
+  }
+}

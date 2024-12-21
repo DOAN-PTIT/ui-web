@@ -1,5 +1,5 @@
 import { AppDispatch, RootState } from "@/store";
-import { ConfigProvider, Layout, Select, Table } from "antd";
+import { ConfigProvider, Layout, notification, Select, Table } from "antd";
 import type { TableProps } from "antd";
 import { connect } from "react-redux";
 import HeaderAction from "../HeaderAction/HeaderAction";
@@ -12,6 +12,8 @@ import PurchaseDetail from "../PurchaseDetail";
 import moment from "moment";
 import Avatar from "react-avatar";
 import { purchaseStatus } from "@/utils/tools";
+import CustomSelect from "@/container/ConfigSelect";
+import { updatePurchase } from "@/action/purchase.action";
 
 const { Content } = Layout;
 const defaultParams = {
@@ -24,6 +26,7 @@ interface PurchaseProps
     ReturnType<typeof mapDispatchToProps> {}
 
 function Purchase(props: PurchaseProps) {
+  const { updatePurchase } = props;
   const [modalVisiable, setModalVisiable] = useState(false);
   const [title, setTitle] = useState("Tạo phiếu nhập hàng");
   const [purchases, setPurchases] = useState<any[]>([]);
@@ -92,43 +95,18 @@ function Purchase(props: PurchaseProps) {
     dataIndex: "status",
     fixed: "right",
     align: "center",
-    render: (status: number) => {
-      const listStatus = Object.entries(purchaseStatus).map(([key, value]) => {
-        return {
-          key: key,
-          value: value,
-        };
-      });
-      const statusItem = listStatus.find((item: any) => item.key == status);
+    render: (status: number, record: any) => {
       return (
-        <div
-          onClick={(e) => e.stopPropagation()}
-          className={`custom_select text-white bg-blue-500 w-[150px] rounded-lg`}
-        >
-          <ConfigProvider
-            theme={{
-              components: {
-                Select: {
-                  selectorBg: "unset",
-                },
-              },
-            }}
-          >
-            <Select
-              className="w-full"
-              style={{ color: "white !importance" }}
-              value={statusItem?.key}
-            >
-              {listStatus.map((item) => {
-                return (
-                  <Select.Option key={item.key} value={item.key}>
-                    <span className="font-medium">{item.value.label}</span>
-                  </Select.Option>
-                );
-              })}
-            </Select>
-          </ConfigProvider>
-        </div>
+        <CustomSelect
+          data={purchaseStatus}
+          currentStatus={status.toString()}
+          handleSelect={handleUpdatePurchaseStatus}
+          handleClick={(e) => {
+            e.stopPropagation();
+            setSelectedPurchase(record.key);
+            setModalVisiable(false);
+          }}
+        />
       );
     },
   });
@@ -153,6 +131,37 @@ function Purchase(props: PurchaseProps) {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleUpdatePurchaseStatus = async (status: number) => {
+    setLoading(true);
+    await updatePurchase({
+      id: selectedPurchase,
+      data: {
+        status: status
+      },
+      shop_id: props.currentShop.id,
+    })
+      .then((res) => {
+        if (res.payload) {
+          setLoading(false);
+          setSelectedPurchase(null);
+          notification.success({
+            message: "Thành công",
+            description: "Cập nhật trạng thái thành công",
+          });
+          getListDebts();
+        }
+      })
+      .catch((err) => {
+        setLoading(false);
+        setSelectedPurchase(null);
+        console.log(err);
+        notification.error({
+          message: "Thất bại",
+          description: "Cập nhật trạng thái thất bại",
+        });
+      });
   };
 
   const getData = () => {
@@ -225,7 +234,9 @@ const mapStateToProps = (state: RootState) => {
 };
 
 const mapDispatchToProps = (dispatch: AppDispatch) => {
-  return {};
+  return {
+    updatePurchase: (data: any) => dispatch(updatePurchase(data)),
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Purchase);
