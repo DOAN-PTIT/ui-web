@@ -17,7 +17,7 @@ const { Content } = Layout;
 const defaultParams = {
   page: 1,
   page_size: 30,
-}
+};
 
 interface PurchaseProps
   extends ReturnType<typeof mapStateToProps>,
@@ -33,7 +33,7 @@ function Purchase(props: PurchaseProps) {
 
   useEffect(() => {
     getListDebts();
-  }, [])
+  }, []);
 
   const columns: TableProps<any>["columns"] = [
     {
@@ -41,11 +41,13 @@ function Purchase(props: PurchaseProps) {
       key: "creator",
       dataIndex: "creator",
       render: (shopUser) => {
-        return <div>
-          <Avatar name={shopUser?.user?.name} size="30" round={true} />
-          <span className="ml-2">{shopUser?.user?.name}</span>
-        </div>
-      }
+        return (
+          <div>
+            <Avatar name={shopUser?.user?.name} size="30" round={true} />
+            <span className="ml-2">{shopUser?.user?.name}</span>
+          </div>
+        );
+      },
     },
     {
       title: "Nhà cung cấp",
@@ -95,35 +97,44 @@ function Purchase(props: PurchaseProps) {
         return {
           key: key,
           value: value,
-        }
-      })
+        };
+      });
       const statusItem = listStatus.find((item: any) => item.key == status);
       return (
-        <div onClick={(e) => e.stopPropagation()} className={`custom_select text-white bg-blue-500 w-[150px] rounded-lg`}>
-          <ConfigProvider theme={{
-            components: {
-              Select: {
-                selectorBg: "unset",
-              }
-            }
-          }}>
-          <Select className="w-full" style={{color: "white !importance"}}  value={statusItem?.key}>
-          {listStatus.map((item) => {
-            return (
-              <Select.Option key={item.key} value={item.key}>
-                <span className="font-medium">{item.value.label}</span>
-              </Select.Option>
-            );
-          })}
-        </Select>
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className={`custom_select text-white bg-blue-500 w-[150px] rounded-lg`}
+        >
+          <ConfigProvider
+            theme={{
+              components: {
+                Select: {
+                  selectorBg: "unset",
+                },
+              },
+            }}
+          >
+            <Select
+              className="w-full"
+              style={{ color: "white !importance" }}
+              value={statusItem?.key}
+            >
+              {listStatus.map((item) => {
+                return (
+                  <Select.Option key={item.key} value={item.key}>
+                    <span className="font-medium">{item.value.label}</span>
+                  </Select.Option>
+                );
+              })}
+            </Select>
           </ConfigProvider>
         </div>
       );
-    }
-  })
+    },
+  });
 
   const getListDebts = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       const url = `/shop/${props.currentShop.id}/purchases`;
       return await apiClient
@@ -145,21 +156,23 @@ function Purchase(props: PurchaseProps) {
   };
 
   const getData = () => {
-    return purchases.length > 0 ? purchases.map((item: any) => {
-      return {
-        key: item.id,
-        creator: item.shop_user,
-        supplier: item?.supplier?.name,
-        total_price_product: item.product_fee,
-        shipping_fee: item.shipping_fee,
-        discount: item.discount,
-        total_price: item.total_price,
-        created_at: moment(item.created_at).format("DD/MM/YYYY"),
-        description: item.description,
-        status: item.status,
-      }
-    }) : []
-  }
+    return purchases.length > 0
+      ? purchases.map((item: any) => {
+          return {
+            key: item.id,
+            creator: item.shop_user,
+            supplier: item?.supplier?.name,
+            total_price_product: item.product_fee,
+            shipping_fee: item.shipping_fee,
+            discount: item.discount,
+            total_price: item.total_price,
+            created_at: moment(item.created_at).format("DD/MM/YYYY"),
+            description: item.description,
+            status: item.status,
+          };
+        })
+      : [];
+  };
 
   return (
     <Layout>
@@ -179,18 +192,16 @@ function Purchase(props: PurchaseProps) {
           pagination={{ size: "small", current: 1, total: totalPage }}
           scroll={{ y: 500, x: 2000 }}
           loading={loading}
-          onRow={
-            (record, rowIndex) => {
-              return {
-                onClick: event => {
-                  setModalVisiable(true);
-                  setTitle("Chi tiết phiếu nhập hàng");
-                  setSelectedPurchase(record.key);
-                },
-                style: { cursor: "pointer" }
-              }
-            }
-          }
+          onRow={(record, rowIndex) => {
+            return {
+              onClick: (event) => {
+                setModalVisiable(true);
+                setTitle("Chi tiết phiếu nhập hàng");
+                setSelectedPurchase(record.key);
+              },
+              style: { cursor: "pointer" },
+            };
+          }}
         />
         {modalVisiable && (
           <PurchaseDetail

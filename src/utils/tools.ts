@@ -127,33 +127,28 @@ export const getHostName = () => {
   return "http://localhost:8000";
 };
 
-export const orderStatus = [
-  {
-    key: 1,
-    value: "Mới",
+export const orderStatus = {
+  1: {
+    label: "Đang xử lý",
     color: "blue",
   },
-  {
-    key: 2,
-    value: "Đã xác nhận",
+  2: {
+    label: "Đã xác nhận",
+    color: "yellow",
+  },
+  3: {
+    label: "Đang giao hàng",
+    color: "cyan",
+  },
+  4: {
+    label: "Đã giao hàng",
     color: "green",
   },
-  {
-    key: 3,
-    value: "Đang giao hàng",
-    color: "orange",
-  },
-  {
-    key: 4,
-    value: "Đã giao hàng",
-    color: "purple",
-  },
-  {
-    key: 5,
-    value: "Đã hủy",
+  "-1": {
+    label: "Đã hủy",
     color: "red",
   },
-];
+}
 
 export const purchaseStatus = {
   "-1": {
