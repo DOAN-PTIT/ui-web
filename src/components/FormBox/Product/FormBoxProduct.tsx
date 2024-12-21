@@ -232,6 +232,7 @@ function FormBoxProduct(props: FormBoxProductProps) {
         {selectedProduct?.length > 0 ? (
           <div className="flex flex-col gap-3">
             {selectedProduct?.map((variation: any, index: number) => {
+              console.log(variation);
               return (
                 <div
                   key={variation?.id}
@@ -268,7 +269,7 @@ function FormBoxProduct(props: FormBoxProductProps) {
                     </div>
                     <div className="flex gap-4 items-center mt-12">
                       <span className="text-green-500 font-medium">
-                        {formatNumber(variation.retail_price)} ₫
+                        {formatNumber(isAtCounter ? variation.price_at_counter : variation.retail_price)} ₫
                       </span>
                       x
                       <Input
