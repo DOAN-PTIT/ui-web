@@ -151,7 +151,7 @@ function OrderDetail(props: OrderDetailProps) {
   };
 
   const renderFooter = () => {
-    const status = orderStatus.find((item) => item.key == orderDetail.status);
+    const status = orderStatus[orderDetail.status];
     const totalCost = calcTotalOrderPrice(orderDetail);
     return (
       <div className="flex justify-between items-center">
@@ -164,7 +164,7 @@ function OrderDetail(props: OrderDetailProps) {
             <div
               className={`text-${status?.color}-500 border p-3 rounded-md text-[16px] cursor-default bg-${status?.color}-300 border-${status?.color}-600`}
             >
-              Trang thái: <span className="font-bold">{status?.value}</span>
+              Trang thái: <span className="font-bold">{status?.label}</span>
             </div>
           )}
           <Button
