@@ -15,17 +15,18 @@ interface FormBoxCustomerProps
   extends ReturnType<typeof mapStateToProps>,
     ReturnType<typeof mapDispatchToProps> {
       order?: any;
+      customer?: any
     }
 
 function FormBoxCustomer(props: FormBoxCustomerProps) {
-  const { currentShop, order } = props;
+  const { currentShop, order, customer } = props;
 
   const [searchField, setSearchField] = useState("");
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<
     Customer | undefined
-  >(order?.customer || undefined);
+  >(order?.customer || customer || undefined);
 
   useEffect(() => {
     if (selectedCustomer) {

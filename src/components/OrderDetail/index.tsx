@@ -29,7 +29,7 @@ interface OrderDetailProps
   selectedRowKey: any;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  fetchOrder: () => Promise<void>;
+  fetchOrder?: () => Promise<void>;
 }
 
 function OrderDetail(props: OrderDetailProps) {
@@ -49,7 +49,9 @@ function OrderDetail(props: OrderDetailProps) {
   const [promotionsCanBeActive, setPromotionsCanBeActive] = useState<any>([]);
 
   useEffect(() => {
-    getOrderDetail();
+    if(selectedRowKey) {
+      getOrderDetail();
+    }
   }, [selectedRowKey]);
 
   const getOrderDetail = async () => {
