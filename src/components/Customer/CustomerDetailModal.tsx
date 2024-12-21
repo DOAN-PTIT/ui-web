@@ -164,7 +164,6 @@ function CustomerDetail({
         );
       },
     },
-
     {
       key: "TOTAL COST",
       dataIndex: "total_cost",
@@ -377,78 +376,59 @@ function CustomerDetail({
                     }
                   />
                 </div>
-                <div className="flex justify-between items-center text-sm mb-2">
-                  <div className="w-1/2">Số điện thoại</div>
-                  <div className="text-blue-800 font-medium">
-                    {data?.customer.phone_number}
-                  </div>
-                </div>
-                <div className="flex justify-between items-center text-sm mb-2">
-                  <div className="w-1/2">Email</div>
-                  <div className="text-blue-800 font-medium">
-                    {data?.customer.email}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="rounded-md bg-white">
-              <div className="text-base font-medium px-4 py-4">
-                Thông tin mua hàng
-              </div>
-              <Divider className="m-0" />
-              <div className="p-4">
-                <div className="flex justify-between items-center text-sm mb-2">
-                  <div className="w-1/2">Mã giới thiệu</div>
-                  <Input
-                    className="w-1/2"
-                    value={data?.customer?.referral_code || "Không có mã"}
-                    readOnly
-                    suffix={<CopyOutlined onClick={handleCopy} />}
-                  />
-                </div>
-                <div className="flex justify-between items-center text-sm mb-2">
-                  <div className="w-1/2">Số lần giới thiệu</div>
-                  <div className="text-blue-800 font-medium">
-                    {data?.customer.number_of_referrals}
-                  </div>
-                </div>
-                <div className="flex justify-between items-center text-sm mb-2">
-                  <div className="w-1/2">Lần mua cuối</div>
-                  <Input
-                    className="w-1/2"
-                    readOnly
-                    value={dayjs(data?.customer.last_purchase).format(
-                      "HH:mm DD/MM/YYYY"
-                    )}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="w-2/3 rounded-lg bg-white">
-            <Table
-              className="bottom-0 cursor-pointer"
-              rowKey="id"
-              bordered
-              scroll={{ y: 300 }}
-              locale={{ emptyText: <Empty description="Trống" /> }}
-              title={() => (
-                <div className="text-base font-medium">Lịch sử mua hàng</div>
-              )}
-              pagination={{ pageSize: 5 }}
-              dataSource={data?.orders?.orders || []}
-              expandable={{
-                expandedRowRender,
-                expandedRowKeys,
-                onExpand: handleExpand,
-              }}
-              columns={columns}
-              footer={() => (
-                <div className="flex gap-6 !rounded-none">
-                  <div className="flex">
-                    <div className="mr-1">Đã mua: </div>
-                    <div className="font-medium">
-                      {data?.orders.count + " lần"}{" "}
+                <div className="bg-gray-200 p-5 h-auto flex gap-4">
+                    <div className="w-1/3 ">
+                        <div className="rounded-md bg-white mb-2">
+                            <div className="text-base font-medium px-4 py-4">Thông tin cá nhân</div>
+                            <Divider className="m-0" />
+                            <div className="p-4">
+                                <div className="flex justify-between items-center text-sm mb-2">
+                                    <div className="w-1/2">Ngày sinh</div>
+                                    <DatePicker 
+                                        onChange={(value) => {
+                                            handleSingleFieldUpdate("date_of_birth", dayjs(value).format("YYYY-MM-DD"))}}
+                                        value={dayjs(profileCustomer.date_of_birth)} placeholder="Chọn ngày sinh" className="w-1/2" />
+                                </div>
+                                <div className="flex justify-between items-center text-sm mb-2">
+                                    <div className="w-1/2">Giới tính</div>
+                                    <Select 
+                                        className="w-1/2"
+                                        placeholder='Chọn giới tính'
+                                        value={profileCustomer.gender}   
+                                        options={options} 
+                                        onChange={(value) => handleSingleFieldUpdate("gender", value)}
+                                    />
+                                </div>
+                                <div className="flex justify-between items-center text-sm mb-2">
+                                    <div className="w-1/2">Số điện thoại</div>
+                                    <div className="text-blue-800 font-medium">{data?.customer.phone_number}</div>
+                                </div>
+                                <div className="flex justify-between items-center text-sm mb-2">
+                                    <div className="w-1/2">Email</div>
+                                    <div className="text-blue-800 font-medium">{data?.customer.email}</div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div className="rounded-md bg-white">
+                            <div className="text-base font-medium px-4 py-4">Thông tin mua hàng</div>
+                            <Divider className="m-0" />
+                            <div className="p-4">
+                                <div className="flex justify-between items-center text-sm mb-2">
+                                    <div className="w-1/2">Mã giới thiệu</div>
+                                    <Input className="w-1/2" value={data?.customer?.referral_code || "Không có mã"} readOnly suffix={<CopyOutlined onClick={handleCopy} />} />
+                                </div>
+                                <div className="flex justify-between items-center text-sm mb-2">
+                                    <div className="w-1/2">Số lần giới thiệu</div>
+                                    <div className="text-blue-800 font-medium">{data?.customer.number_of_referrals}</div>
+                                </div>
+                                <div className="flex justify-between items-center text-sm mb-2">
+                                    <div className="w-1/2">Lần mua cuối</div>
+                                    <Input className="w-1/2" readOnly value={dayjs(data?.customer.last_purchase).format("HH:mm DD/MM/YYYY")}/>
+                                </div>
+                            </div>
+                            
+                        </div>
                     </div>
                   </div>
                   <div className="flex">

@@ -44,7 +44,7 @@ function Settings() {
     const [loading, setLoading] = useState(false);
     const [loadingUpdate, setLoadingUpdate] = useState(false);
     const [fileList, setFileList] = useState<UploadFile[]>([]);
-    const [avatarUrl, setAvatarUrl] = useState(); // Thêm trạng thái để lưu URL avatar
+    const [avatarUrl, setAvatarUrl] = useState();
     const [data, setData] = useState()
     const handleOpenModel = () => {
         setOpenModal(true)
@@ -61,19 +61,9 @@ function Settings() {
             value: 'Tiếng việt',
             label: 'Tiếng việt',
         },
-        {
-            value: 'Anh',
-            label: 'Anh',
-        },
+       
     ];
-    // const optionsTime = [
-    //     {
-    //         value: '(GMT +7:00) Bangkok, Hanoi, Jakarta',
-    //         label: '(GMT +7:00) Bangkok, Hanoi, Jakarta',
-    //     },
-
-    // ];
-
+   
 
     const [form] = Form.useForm();
     async function fetchProfile() {
@@ -256,7 +246,7 @@ function Settings() {
                                     <div className='mb-4'>
                                         <TitleLabel title='Đăng nhập bằng Email' />
                                         <Form.Item >
-                                            <Input placeholder="Nhập Email" value={dataProfile?.email} />
+                                            <Input disabled placeholder="Nhập Email" value={dataProfile?.email} />
                                         </Form.Item>
                                     </div>
                                     <div className='mb-4'>
