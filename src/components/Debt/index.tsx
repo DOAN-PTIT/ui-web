@@ -32,6 +32,7 @@ function Debt(props: DebtProps) {
   const [debts, setDebts] = useState<DebtType[]>([]);
   const [loading, setLoading] = useState(false);
   const [debtSelected, setDebtSelected] = useState<DebtType | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     getListDebts();
@@ -114,7 +115,7 @@ function Debt(props: DebtProps) {
     await updateDebt({
       id: debtSelected,
       data: {
-        status: value
+        status: value,
       },
       shop_id: currentShop.id,
     })
@@ -140,10 +141,14 @@ function Debt(props: DebtProps) {
       });
   };
 
-  const getListDebts = async () => {
+  const getListDebts = async (params = {} as any) => {
     setLoading(true);
     try {
-      return await fetchDebts({ ...defaultParams, shop_id: currentShop.id })
+      return await fetchDebts({
+        ...defaultParams,
+        shop_id: currentShop.id,
+        ...params,
+      })
         .then((res) => {
           setDebts(res.payload.data);
           setLoading(false);
@@ -193,7 +198,14 @@ function Debt(props: DebtProps) {
         <Table
           columns={columns}
           dataSource={getData()}
-          pagination={{ size: "small" }}
+          pagination={{
+            size: "small",
+            current: currentPage,
+            onChange: (page, pageSize) => {
+              setCurrentPage(page);
+              getListDebts({ page });
+            },
+          }}
           scroll={{ y: 500, x: 2200 }}
           loading={loading}
           onRow={(record) => {

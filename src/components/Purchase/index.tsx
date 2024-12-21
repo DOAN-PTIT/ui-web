@@ -33,6 +33,7 @@ function Purchase(props: PurchaseProps) {
   const [totalPage, setTotalPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [selectedPurchase, setSelectedPurchase] = useState<any>();
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     getListDebts();
@@ -111,12 +112,12 @@ function Purchase(props: PurchaseProps) {
     },
   });
 
-  const getListDebts = async () => {
+  const getListDebts = async (params = {} as any) => {
     setLoading(true);
     try {
       const url = `/shop/${props.currentShop.id}/purchases`;
       return await apiClient
-        .get(url, { params: defaultParams })
+        .get(url, { params: { ...defaultParams, ...params } })
         .then((res) => {
           if (res.data) {
             setPurchases(res.data.data);
@@ -138,7 +139,7 @@ function Purchase(props: PurchaseProps) {
     await updatePurchase({
       id: selectedPurchase,
       data: {
-        status: status
+        status: status,
       },
       shop_id: props.currentShop.id,
     })
@@ -198,7 +199,15 @@ function Purchase(props: PurchaseProps) {
         <Table
           columns={columns}
           dataSource={getData()}
-          pagination={{ size: "small", current: 1, total: totalPage }}
+          pagination={{
+            size: "small",
+            current: currentPage,
+            total: totalPage,
+            onChange: (page, pageSize) => {
+              setCurrentPage(page);
+              getListDebts({ page: page });
+            },
+          }}
           scroll={{ y: 500, x: 2000 }}
           loading={loading}
           onRow={(record, rowIndex) => {
