@@ -2,20 +2,7 @@ import { createOrder } from "@/reducer/order.reducer";
 import apiClient from "@/service/auth";
 import { AppDispatch, RootState } from "@/store";
 import { CopyOutlined, UserOutlined } from "@ant-design/icons";
-import {
-  Button,
-  DatePicker,
-  Divider,
-  Empty,
-  Input,
-  message,
-  Modal,
-  Select,
-  Spin,
-  Table,
-  TableProps,
-  Typography,
-} from "antd";
+import { Button, DatePicker, Divider, Empty, Input, message, Modal, Select, Spin, Table, TableProps } from "antd";
 import dayjs from "dayjs";
 import moment from "moment";
 import { useRouter } from "next/navigation";
@@ -25,7 +12,7 @@ import { connect, useSelector } from "react-redux";
 
 interface CustomerDetailProps
   extends ReturnType<typeof mapStateToProps>,
-    ReturnType<typeof mapDispatchToProps> {
+  ReturnType<typeof mapDispatchToProps> {
   open: boolean;
   onCancel: () => void;
   data: any;
@@ -40,6 +27,9 @@ function CustomerDetail({
   createOrder,
   currentShop,
 }: CustomerDetailProps) {
+
+  const router = useRouter();
+
   const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
   const [profileCustomer, setProfileCustomer] = useState({
     name: "",
@@ -63,21 +53,7 @@ function CustomerDetail({
       });
     }
   }, [data]);
-  const { id } = useSelector((state: RootState) => state.shopReducer.shop);
-  const router = useRouter();
-  const handleSingleFieldUpdate = async (fieldName: string, value: any) => {
-    try {
-      const updatedProfile = { ...profileCustomer, [fieldName]: value };
-      await apiClient.post(`shop/${id}/customer/${data.customer.id}/update`, {
-        [fieldName]: value,
-      });
-      setProfileCustomer(updatedProfile);
-      message.success(`Cập nhật ${fieldName} thành công!`);
-    } catch (error) {
-      console.error(error);
-      message.error(`Cập nhật ${fieldName} thất bại!`);
-    }
-  };
+
   const handleExpand = (expanded: boolean, record: any) => {
     setExpandedRowKeys((prevKeys) => {
       const rowKey = record?.id;
@@ -94,34 +70,19 @@ function CustomerDetail({
     <Table
       columns={[
         {
-          title: "ID sản phẩm",
-          dataIndex: "id",
-          key: "id",
+          title: 'ID sản phẩm',
+          dataIndex: 'id',
+          key: 'id',
           render: (_: any, __: any, index: number) => index + 1,
         },
-        {
-          title: "Tên sản phẩm",
-          dataIndex: "product",
-          key: "product",
-          render: (product) => product?.name || "N/A",
-        },
-        {
-          title: "Giá",
-          dataIndex: "retail_price",
-          key: "retail_price",
-          render: (_, item) =>
-            formatCurrency(item?.variation?.retail_price || 0),
-        },
-        { title: "Số lượng", dataIndex: "quantity", key: "quantity" },
-        {
-          title: "Tổng tiền",
-          key: "cost",
-          render: (_, item) =>
-            formatCurrency(item?.quantity * item?.variation?.retail_price || 0),
-        },
+        { title: 'Tên sản phẩm', dataIndex: 'product', key: 'product', render: (product) => product?.name || "N/A" },
+        { title: 'Giá', dataIndex: 'retail_price', key: 'retail_price', render: (_, item) => formatCurrency(item?.variation?.retail_price || 0) },
+        { title: 'Số lượng', dataIndex: 'quantity', key: 'quantity' },
+        { title: 'Tổng tiền', key: 'cost', render: (_, item) => formatCurrency(item?.quantity * item?.variation?.retail_price || 0) },
       ]}
       dataSource={record?.orderitems || []}
       pagination={false}
+
     />
   );
 
@@ -141,51 +102,43 @@ function CustomerDetail({
       fixed: "left",
       width: 180,
       render: (_, record) => {
-        const productNames = record?.orderitems
-          ?.map((item: any) => item?.product?.name)
-          .join(", ");
+        const productNames = record?.orderitems?.map((item: any) => item?.product?.name).join(", ");
         const maxLength = 25;
-        const shortenedNames =
-          productNames?.length > maxLength
-            ? productNames.substring(0, maxLength) + "..."
-            : productNames;
+        const shortenedNames = productNames?.length > maxLength
+          ? productNames.substring(0, maxLength) + "..."
+          : productNames;
 
-        return (
-          <div title={productNames || "N/A"}>{shortenedNames || "N/A"}</div>
-        );
+        return <div title={productNames || "N/A"}>{shortenedNames || "N/A"}</div>;
       },
     },
+
     {
       key: "TOTAL COST",
       dataIndex: "total_cost",
       title: "Tổng tiền",
-      render: (_, i) => <div>{formatCurrency(i?.total_cost)}</div>,
+      render: (_, i) => (
+        <div>
+          {formatCurrency(i?.total_cost)}
+        </div>
+      )
     },
     {
       key: "CREATED",
       dataIndex: "createdAt",
       title: "Mua lúc",
       render: (_, i) => (
-        <div className="text-gray-500 italic">
-          {i?.createdAt
-            ? moment(i.createdAt).format("HH:mm DD/MM/YYYY")
-            : "N/A"}
-        </div>
-      ),
+        <div className="text-gray-500 italic">{i?.createdAt ? moment(i.createdAt).format("HH:mm DD/MM/YYYY") : "N/A"}</div>
+      )
     },
     {
       key: "EMAIL",
       dataIndex: "at_counter",
       title: "Hình thức mua hàng",
       render: (_, i) => (
-        <div
-          className={`${checkColorCounter(
-            i?.at_counter
-          )} border py-1 rounded-lg flex items-center justify-center`}
-        >
+        <div className={`${checkColorCounter(i?.at_counter)} border py-1 rounded-lg flex items-center justify-center`}>
           {checkCounter(i?.at_counter)}
         </div>
-      ),
+      )
     },
     {
       key: "EMAIL",
@@ -195,13 +148,9 @@ function CustomerDetail({
         <div className={`${colorStatus(i?.status)}`}>
           {checkStatus(i?.status)}
         </div>
-      ),
+      )
     },
-  ];
-  const options = [
-    { label: "Nam", value: "MALE" },
-    { label: "Nữ", value: "FEMALE" },
-    { label: "Khác", value: "OTHER" },
+
   ];
   const statusLabels: any = {
     1: "Đang xử lý",
@@ -220,22 +169,24 @@ function CustomerDetail({
   };
   const checkColorCounter = (data: any) => {
     if (data === true) {
-      return "text-[#E67E22] border-[#E67E22]";
+      return 'text-[#E67E22] border-[#E67E22]'
     } else {
-      return "text-[#3498DB] border-[#3498DB]";
+      return 'text-[#3498DB] border-[#3498DB]'
     }
-  };
+  }
   const checkCounter = (data: any) => {
     if (data === true) {
-      return "Office";
+      return 'Office'
     } else {
-      return "Online";
+      return 'Online'
     }
+
   };
   const checkStatus = (status: number) =>
     statusLabels[status] || "Không xác định";
   const colorStatus = (status: number) =>
     statusColors[status] || "text-gray-400";
+
   const received = (data: any) => {
     if (!Array.isArray(data)) {
       return 0;
@@ -257,21 +208,33 @@ function CustomerDetail({
     if (typeof amount !== "number") {
       return "0 đ";
     }
-    return `${new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(amount)}`;
+    return `${new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount)}`;
   };
   const handleCopy = () => {
-    navigator.clipboard
-      .writeText(data?.customer?.referral_code || "Không có mã")
-      .then(
-        () => message.success("Đã sao chép!"),
-        () => message.error("Sao chép thất bại!")
-      );
+    navigator.clipboard.writeText(data?.customer?.referral_code || "Không có mã").then(
+      () => message.success("Đã sao chép!"),
+      () => message.error("Sao chép thất bại!")
+    );
+  };
+  const options = [
+    { label: "Nam", value: "MALE" },
+    { label: "Nữ", value: "FEMALE" },
+    { label: "Khác", value: "OTHER" },
+  ];
+  const handleSingleFieldUpdate = async (fieldName: string, value: any) => {
+    try {
+      const updatedProfile = { ...profileCustomer, [fieldName]: value };
+      await apiClient.post(`shop/${id}/customer/${data.customer.id}/update`, {
+        [fieldName]: value,
+      });
+      setProfileCustomer(updatedProfile);
+      message.success(`Cập nhật ${fieldName} thành công!`);
+    } catch (error) {
+      console.error(error);
+      message.error(`Cập nhật ${fieldName} thất bại!`);
+    }
   };
   const [editing, setEditing] = useState(false);
-
   return (
     <Modal
       open={open}
@@ -462,9 +425,8 @@ function CustomerDetail({
         </div>
       </Spin>
     </Modal>
-  );
+  )
 }
-
 const mapStateToProps = (state: RootState) => {
   return {
     orderParams: state.orderReducer.createOrder,

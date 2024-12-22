@@ -59,7 +59,7 @@ function LoginComponent() {
         message.success('Đăng nhập thành công!')
       })
       .catch((error: any) => {
-        const res = error.response.data.message;
+        const res = error.response?.data.message;
         setErrorLogin(res)
         // openNotification(res);
       })
