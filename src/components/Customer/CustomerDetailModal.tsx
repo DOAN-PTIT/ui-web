@@ -29,7 +29,7 @@ function CustomerDetail({
 }: CustomerDetailProps) {
 
   const router = useRouter();
-
+  const {id} = currentShop
   const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
   const [profileCustomer, setProfileCustomer] = useState({
     name: "",
