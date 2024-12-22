@@ -1,5 +1,5 @@
 import { AppDispatch, RootState } from "@/store";
-import { DisplayChart } from "@/utils/type";
+import { DisplayChart, Revenue } from "@/utils/type";
 import { connect } from "react-redux";
 import {
   Chart as ChartJS,
@@ -12,7 +12,9 @@ import {
   BarElement,
 } from "chart.js";
 import { Line, Bar } from "react-chartjs-2";
-import { Divider } from "antd";
+import { Divider, Spin } from "antd";
+import { getRevenueReport } from "@/action/report.action";
+import { useEffect, useState } from "react";
 
 ChartJS.register(
   CategoryScale,
@@ -27,45 +29,40 @@ ChartJS.register(
 interface ReportChartProps
   extends ReturnType<typeof mapStateToProps>,
     ReturnType<typeof mapDispatchToProps> {
-  displayChart: DisplayChart;
   title: string;
+  datasets: any[];
+  columns: string[];
+  loading: boolean;
 }
 
 const ReportChart = (props: ReportChartProps) => {
-  const { displayChart, title } = props;
-
-  const columnsByMonth = [
-    "Tháng 1",
-    "Tháng 2",
-    "Tháng 3",
-    "Tháng 4",
-    "Tháng 5",
-    "Tháng 6",
-    "Tháng 7",
-    "Tháng 8",
-    "Tháng 9",
-    "Tháng 10",
-    "Tháng 11",
-    "Tháng 12",
-  ];
-
-  const columnsByYear = Array.from({ length: 10 }, (_, i) =>
-    (new Date().getFullYear() - i).toString()
-  );
+  const {
+    title,
+    datasets,
+    columns,
+    loading,
+  } = props;
 
   return (
     <div className="w-full bg-white p-6 rounded-lg h-[700px] mt-4">
       <div className="font-[600] text-[16px]">{title}</div>
       <div className="w-full border border-dashed my-3"></div>
+      {loading ? (
+        <div className="h-full font-medium text-lg flex items-center justify-center w-full">
+          <p>
+            Chờ chút bạn nhé... <Spin />
+          </p>
+        </div>
+      ) : (
         <Bar
           data={{
-            labels: displayChart === "month" ? columnsByMonth : columnsByYear,
+            labels: columns,
             datasets: [
               {
-                data: [65, 59, 80, 81, 56, 55, 40, 65, 59, 80, 81, 56],
+                data: loading ? [] : datasets[0]?.data,
                 borderColor: "rgb(75, 192, 192)",
                 backgroundColor: "rgb(75, 192, 192)",
-                label: "Doanh thu",                    
+                label: "Doanh thu",
               },
             ],
           }}
@@ -82,16 +79,23 @@ const ReportChart = (props: ReportChartProps) => {
             },
           }}
         />
+      )}
     </div>
   );
 };
 
 const mapStateToProps = (state: RootState) => {
-  return {};
+  return {
+    year: state.reportReducer.year,
+    month: state.reportReducer.month,
+    currentShop: state.shopReducer.shop,
+  };
 };
 
 const mapDispatchToProps = (dispatch: AppDispatch) => {
-  return {};
+  return {
+    getRevenueReport: (params: any) => dispatch(getRevenueReport(params)),
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ReportChart);
