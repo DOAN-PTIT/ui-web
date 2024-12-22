@@ -60,7 +60,7 @@ function Order(props: OrderProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
   const [params, setParams] = useState({ ...defaultParams });
-  const [selectedRowKey, setSelectedRowKey] = useState();
+  const [selectedRowKey, setSelectedRowKey] = useState<number | null>(null);
   const [open, setOpen] = useState(false);
 
   const route = useRouter();
@@ -185,7 +185,7 @@ function Order(props: OrderProps) {
     render: (status: number, record: any) => {
       return (
         <CustomSelect
-          data={orderStatus}
+          data={Object.values(orderStatus)}
           currentStatus={status.toString()}
           handleSelect={handleUpdateOrderStatus}
           handleClick={(e) => {

@@ -30,9 +30,12 @@ interface ProductType {
 
 const { Text } = Typography;
 
-interface ProductProps
-  extends ReturnType<typeof mapStateToProps>,
-    ReturnType<typeof mapDispatchToProps> {}
+interface ProductProps extends ReturnType<typeof mapStateToProps> {
+  createProduct: (data: any) => Promise<any>;
+  getListProduct: (data: { shopId: any; page: number }) => Promise<any>;
+  getListProductFBShop: (data: any) => Promise<any>;
+  createVariation: (data: any) => Promise<any>;
+}
 
 function Product(props: ProductProps) {
   const [modalVisiable, setModalVisiable] = useState(false);

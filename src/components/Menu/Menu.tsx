@@ -133,10 +133,9 @@ function Menu(props: MenuComponentProps) {
       collapsedWidth={60}
       collapsed={collapsed}
       onCollapse={(value) => handleCollapsed(value)}
-      className="custom-sider fixed z-298989 bg-[#f2f4f7] bottom-0 top-0 h-screen"
+      className="custom-sider fixed z-298989 bg-[#f2f4f7] bottom-0 top-0 h-screen "
     >
       <div className="flex flex-col justify-between h-full">
-        <div>
           {params.id && (
             <div className="flex items-center  gap-3 flex-col mt-3 mb-2">
               <Avatar
@@ -151,19 +150,21 @@ function Menu(props: MenuComponentProps) {
               )}
             </div>
           )}
+        <div className="overflow-y-auto h-full">
           <AntdMenu
-            className="bg-[#f2f4f7] text-[#101828] !border-none justify-center"
+            className="bg-[#f2f4f7] text-[#101828] !border-none justify-center h-fit "
             defaultOpenKeys={["dashbroad"]}
             defaultSelectedKeys={["dashbroad"]}
             selectedKeys={selectedKeys}
             items={params.id ? items : []}
             theme="light"
             mode="inline"
+            overflowedIndicator
           />
         </div>
         <div>
           <AntdMenu
-            className="bg-[#f2f4f7] text-[#101828] !border-none justify-center"
+            className="z-10 bg-[#f2f4f7] text-[#101828] !border-none justify-center"
             defaultOpenKeys={["dashbroad"]}
             defaultSelectedKeys={["dashbroad"]}
             selectedKeys={["settings"]}
