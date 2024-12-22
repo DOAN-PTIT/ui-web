@@ -100,7 +100,7 @@ export default function SignUpComponent() {
     title: {
       fontSize: screens.md ? "24px" : "20px",
       fontWeight: 700,
-      marginTop: '24px!important',
+      marginTop: '4px!important',
       marginBottom: '16px',
     },
   };
@@ -111,7 +111,7 @@ export default function SignUpComponent() {
       <div style={styles.container}>
         <div style={styles.header}>
           <Image style={styles.imageLogo} src={iconLogo} alt="Favicon" />
-          <Title level={2}>Đăng ký POS</Title>
+          <Title level={2}>Đăng ký tài khoản</Title>
           <Text>Hãy tạo tài khoản mới để bắt đầu sử dụng dịch vụ của chúng tôi.</Text>
         </div>
         <Form
