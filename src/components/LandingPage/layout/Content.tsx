@@ -4,7 +4,7 @@ import { Button, Layout } from 'antd';
 import Image from 'next/image';
 import Link from 'next/link';
 import Background from '@/assets/background.png';
-import ImageEx from '@/assets/dashboard2.png'
+import ImageEx from '@/assets/dashboard1.png'
 
 const { Content } = Layout;
 
@@ -48,17 +48,11 @@ export default function LandingContent() {
                             {/* </Link> */}
                         </div>
                     </div>
-                    <div className='w-[300px] ml-14 sm:w-[606px] sm:overflow-hidden'>
+                    <div className='w-[300px] ml-14 sm:w-[610px] sm:overflow-hidden'>
                         <Image
                             src={ImageEx}
-                            alt=''
-                            className='h-full object-cover'
+                            alt='Mẫu'
                         />
-                    </div>
-                </div>
-                <div className=' '>
-                    <div>
-
                     </div>
                 </div>
             </div>
