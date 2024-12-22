@@ -74,7 +74,7 @@ function ProductDetail(props: ProductDetailProps) {
 
   const [createProductParams, setCreateProductParams] = useState<any>({});
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [variationData, setVariationData] = useState([]);
+  const [variationData, setVariationData] = useState<VariationProps[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isFacebookShop, setIsFacebookShop] = useState(false);
   const [isLoadingCatalog, setIsLoadingCatalog] = useState(false);
@@ -85,7 +85,7 @@ function ProductDetail(props: ProductDetailProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   interface VariationParam {
-    index: number;
+    index?: number;
     [key: string]: any;
   }
 
@@ -161,10 +161,9 @@ function ProductDetail(props: ProductDetailProps) {
       render: (text, record) => {
         const cac = new FormData
         
-        const handleUploadChange = (file) => {
+        const handleUploadChange = (file: RcFile | null) => {
           if (file) {
-            cac.append("image",file)
-            
+            cac.append("image", file);
             onInputVariationChange("image", file);
           }
         };
@@ -302,7 +301,11 @@ function ProductDetail(props: ProductDetailProps) {
 
         const resultArr: any = [];
         for (const variation of createVariationParams) {
-          delete variation.index;
+          if (variation.index !== undefined) {
+            if (variation.index !== undefined) {
+              delete variation.index;
+            }
+          }
           const result = await createVariation({
             ...variation,
             shop_id: currentShop.id,
@@ -312,7 +315,7 @@ function ProductDetail(props: ProductDetailProps) {
           if (result.payload) resultArr.push(result.payload);
         }
 
-        const variations = resultArr.filter((item) => item.id);
+        const variations = resultArr.filter((item: { id: any; }) => item.id);
         const product = res.payload;
 
         if (variations.length > 0 && selectedCatalog) {
@@ -480,7 +483,7 @@ function ProductDetail(props: ProductDetailProps) {
 
   const onInputVariationChange = (key: string, value: any) => {
     const newVariationData = [...variationData];
-    const newVariation = newVariationData[selectedVariation];
+    const newVariation: any = newVariationData[selectedVariation];
     newVariation[key] = value;
     newVariationData[selectedVariation] = newVariation;
     setVariationData(newVariationData);

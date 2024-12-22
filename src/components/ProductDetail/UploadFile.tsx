@@ -3,7 +3,7 @@ import { Image, message, Upload } from "antd";
 import { RcFile, UploadProps } from "antd/es/upload";
 import { useState } from "react";
 
-type FileType = Parameters<UploadProps["beforeUpload"]>[0];
+type FileType = Parameters<NonNullable<UploadProps["beforeUpload"]>>[0];
 
 interface UploadFileProps {
     onChange: (file: RcFile | null) => void; // Callback gửi file (RcFile)

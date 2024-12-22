@@ -44,7 +44,18 @@ function OrderDetail(props: OrderDetailProps) {
   } = props;
 
   const [isLoading, setIsLoading] = useState(false);
-  const [orderDetail, setOrderDetail] = useState<any>({});
+  interface OrderDetail {
+    id?: number;
+    status?: 1 | 2 | 3 | 4 | -1;
+    shopuser?: {
+      user?: {
+        avatar?: string;
+        name?: string;
+      };
+    };
+  }
+
+  const [orderDetail, setOrderDetail] = useState<OrderDetail>({});
   const [isAtCounter, setIsAtCounter] = useState(false);
   const [promotionsCanBeActive, setPromotionsCanBeActive] = useState<any>([]);
 
@@ -139,7 +150,7 @@ function OrderDetail(props: OrderDetailProps) {
         });
         setOpen(false);
         createOrder({});
-        props.fetchOrder();
+        props.fetchOrder?.();
         setIsLoading(false);
       })
       .catch((error) => {
@@ -153,7 +164,7 @@ function OrderDetail(props: OrderDetailProps) {
   };
 
   const renderFooter = () => {
-    const status = orderStatus[orderDetail.status];
+    const status = orderDetail.status !== undefined ? orderStatus[orderDetail.status] : undefined;
     const totalCost = calcTotalOrderPrice(orderDetail);
     return (
       <div className="flex justify-between items-center">
