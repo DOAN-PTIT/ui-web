@@ -7,6 +7,7 @@ import variationReducer from "./reducer/variation.reducer";
 import supplierReducer from "./reducer/supplier.reducer";
 import debtReducer from "./reducer/debt.reducer";
 import purchaseReducer from "./reducer/purchase.reducer";
+import reportReducer from "./reducer/report.reducer";
 
 const rootReducer = combineReducers({
     productReducer,
@@ -16,7 +17,8 @@ const rootReducer = combineReducers({
     variationReducer,
     supplierReducer,
     debtReducer,
-    purchaseReducer
+    purchaseReducer,
+    reportReducer
 });
 
 export default rootReducer;
