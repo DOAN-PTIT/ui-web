@@ -61,3 +61,24 @@
 .ant-table-footer{
     @apply !rounded-none
 }
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #ccc;
+  border-radius: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #a3a3a3;
+  border-radius: 24px;
+}
+
+/* To handle height for vertical scrollbar, you can control the thumb height */
+::-webkit-scrollbar-thumb {
+  max-height: 200px;
+  /* Minimum height of the thumb handle */
+}

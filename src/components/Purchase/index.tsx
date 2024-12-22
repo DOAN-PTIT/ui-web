@@ -99,7 +99,7 @@ function Purchase(props: PurchaseProps) {
     render: (status: number, record: any) => {
       return (
         <CustomSelect
-          data={purchaseStatus}
+          data={Object.values(purchaseStatus)}
           currentStatus={status.toString()}
           handleSelect={handleUpdatePurchaseStatus}
           handleClick={(e) => {

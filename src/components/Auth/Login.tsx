@@ -1,192 +1,207 @@
 "use client";
 
-import customerImage from "@/assets/customer-image.jpg";
-import orderImage from "@/assets/order-image.jpg";
-import reportImage from "@/assets/report-image.jpg";
+import iconLogo from "@/assets/favicon.png";
 import apiClient from "@/service/auth";
-import "@/styles/login.css";
-import { FacebookOutlined } from "@ant-design/icons";
-import type { NotificationArgsProps } from "antd";
+import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import {
   Button,
-  Carousel,
-  Col,
-  Divider,
+  Checkbox,
   Form,
+  Grid,
   Input,
-  Row,
+  Typography,
   message,
   notification,
 } from "antd";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-function saveTokenWithExpiration(token: string, expiresIn = 1800) { // Default is 30 minutes (1800 seconds)
-  const expirationTime = Date.now() + expiresIn * 1000;
-  localStorage.setItem("accessToken", token);
-  localStorage.setItem("tokenExpiration", expirationTime.toString());
-}
+import { useState } from "react";
+import Img1 from "@/assets/pancake_showcase.png";
+const { Text, Title, Link } = Typography;
+const { useBreakpoint } = Grid;
+
+type NotificationPlacement = "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
+
 interface ParamsLogin {
   email: string;
   password: string;
 }
-type NotificationPlacement = NotificationArgsProps["placement"];
 
-const { Password } = Input;
-function LoginComponent() {
-  const [params, setParams] = useState<ParamsLogin>({
-    email: "",
-    password: "",
-  });
+function saveTokenWithExpiration(token: string, expiresIn = 1800) {
+  const expirationTime = Date.now() + expiresIn * 1000;
+  localStorage.setItem("accessToken", token);
+  localStorage.setItem("tokenExpiration", expirationTime.toString());
+}
+
+export default function LoginComponent() {
+  const [params, setParams] = useState<ParamsLogin>({ email: "", password: "" });
   const [api, contextHolder] = notification.useNotification();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorLogin, setErrorLogin] = useState()
-  useEffect(() => { }, []);
-  const route = useRouter();
+  const [errorLogin, setErrorLogin] = useState<string | undefined>(undefined);
+  const screens = useBreakpoint();
+  const router = useRouter();
+
   const handleSubmitForm = async () => {
     setIsLoading(true);
     const url = `/auth/email/login`;
 
-    return await apiClient
-      .post(url, params)
-      .then((res) => {
-        const token = res.data.accessToken;
-        const refreshToken = res.data.refreshToken;
-        saveTokenWithExpiration(token);
-        localStorage.setItem("refreshToken", refreshToken);
-        route.push("/shop/overview");
-        message.success('Đăng nhập thành công!')
-      })
-      .catch((error: any) => {
-        const res = error.response?.data.message;
-        setErrorLogin(res)
-        // openNotification(res);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
-
-  const openNotification = (message: NotificationPlacement) => {
-    api.error({
-      message: "Unsuccess",
-      description: message,
-    });
+    try {
+      const res = await apiClient.post(url, params);
+      const token = res.data.accessToken;
+      const refreshToken = res.data.refreshToken;
+      saveTokenWithExpiration(token);
+      localStorage.setItem("refreshToken", refreshToken);
+      router.push("/shop/overview");
+      message.success("Đăng nhập thành công!");
+    } catch (error: any) {
+      const resMessage = error.response?.data?.message || "Có lỗi xảy ra";
+      setErrorLogin(resMessage);
+      api.error({ message: "Đăng nhập thất bại", description: resMessage });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleLoginWithFacebook = () => {
-    const fb_url = "http://localhost:8000/social/facebook"
-    document.location = fb_url;
+    const fbUrl = "http://localhost:8000/social/facebook";
+    document.location = fbUrl;
+  };
+
+  const styles = {
+    imageLogo: {
+      width: "70px",
+      height: "70px",
+      borderRadius: "50%",
+      margin: "0 auto",
+      display: "block",
+      marginBottom: "20px",
+    },
+    container: {
+      display: "flex",
+      background: "#f9fafb",
+      padding: screens.md ? "40px" : "60px 16px",
+      width: "380px",
+    },
+    footer: {
+      marginTop: "24px",
+      textAlign: "center" as "center",
+      width: "100%",
+    },
+    forgotPassword: {
+      float: "right" as "right",
+    },
+    header: {
+      marginBottom: "40px",
+    },
+    section: {
+      margin: "auto auto",
+      justifyContent: "center",
+      backgroundColor: "#314776",
+      display: "flex",
+      height: screens.sm ? "100vh" : "auto",
+      padding: screens.md ? "30px 0" : "0px",
+    },
+    text: {
+      color: "#8c8c8c",
+    },
+    title: {
+      fontSize: screens.md ? "24px" : "20px",
+      fontWeight: 700,
+      marginTop: '24px!important',
+      marginBottom: '16px',
+      color: "#47566e"
+    },
+    titleItem: {
+      fontSize: "24px",
+      fontWeight: 700,
+      marginBottom: "12px",
+      lineHeight: "30px",
+    },
+    titleChild: {
+      fontSize: "16px",
+      fontWeight: 400,
+    }
   };
 
   return (
-    <main className="login__container p-10 m-10">
+    <section style={styles.section}>
       {contextHolder}
-      <Row className="border rounded-md h-[80vh]" align="middle">
-        <Col span={10} className="p-10">
-          <h1 className="text-center font-bold text-2xl mb-4">Đăng nhập</h1>
-          <Form className="" layout="vertical" onFinish={handleSubmitForm}>
+      <div className="rounded-l-lg" style={styles.container}>
+        <div>
+          <div style={styles.header}>
+            <Image style={styles.imageLogo} src={iconLogo} alt="Favicon" />
+            <Title style={styles.title}>Đăng nhập GOS ID</Title>
+            <Text style={styles.text}>
+              Sử dụng email và password để truy cập vào tài khoản của bạn.
+            </Text>
+          </div>
+          <Form
+            name="normal_login"
+            initialValues={{ remember: true }}
+            onFinish={handleSubmitForm}
+            layout="vertical"
+            requiredMark="optional"
+          >
             <Form.Item
-              label="Tên đăng nhập"
-              name={"username"}
-              rules={[
-                {
-                  required: true,
-                  message: "Tài khoản không được để trống",
-                },
-
-              ]}
-            validateStatus={errorLogin ? 'error' : undefined}
-            help={errorLogin ? 'Tài khoản hoặc mật khẩu không đúng!' : undefined}
+              name="email"
+              validateStatus={errorLogin ? "error" : undefined}
+              help={errorLogin ? "Email hoặc mật khẩu không đúng!" : undefined}
+              rules={[{ type: "email", required: true, message: "Email không hợp lệ!" }]}
             >
-            <Input
-              placeholder="Tên đăng nhập"
-              name="username"
-              onChange={(e) =>
-                setParams({ ...params, email: e.target.value })
-              }
-            />
-          </Form.Item>
-          <Form.Item
-            label="Mật khẩu"
-            name={"password"}
-            rules={[
-              {
-                required: true,
-                message: "Mật khẩu trông được để trống",
-              },
-            ]}
-          >
-            <Password
-              placeholder="Mật khẩu"
+              <Input
+                prefix={<MailOutlined />}
+                size="large"
+                placeholder="Email đăng nhập"
+                onChange={(e) => setParams({ ...params, email: e.target.value })}
+              />
+            </Form.Item>
+            <Form.Item
               name="password"
-              onChange={(e) =>
-                setParams({ ...params, password: e.target.value })
-              }
-            />
-          </Form.Item>
-          <Form.Item className="text-center">
-            <Button htmlType="submit" type="primary" loading={isLoading}>
-              Đăng nhập
-            </Button>
-          </Form.Item>
-          <Form.Item className="text-center">
-            <span>
-              Nếu bạn chưa có tài khoản, đăng ký{" "}
-              <Link href={"/sign-up"} className="font-medium">
-                tại đây!!
-              </Link>
-            </span>
-          </Form.Item>
-        </Form>
-        <Divider />
-        <div className="text-center">
+              rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
+            >
+              <Input.Password
+                prefix={<LockOutlined />}
+                size="large"
+                placeholder="Mật khẩu"
+                onChange={(e) => setParams({ ...params, password: e.target.value })}
+              />
+            </Form.Item>
+            <Form.Item>
+              <Form.Item name="remember" valuePropName="checked" noStyle>
+                <Checkbox>Ghi nhớ đăng nhập</Checkbox>
+              </Form.Item>
+              <a style={styles.forgotPassword} href="">
+                Quên mật khẩu?
+              </a>
+            </Form.Item>
+            <Form.Item>
+              <Button size="large" block type="primary" htmlType="submit" loading={isLoading}>
+                Đăng nhập
+              </Button>
+              <div style={styles.footer}>
+                <Text style={styles.text}>Bạn chưa có tài khoản?</Text>{" "}
+                <Link href="/sign-up">Đăng ký ngay</Link>
+              </div>
+            </Form.Item>
+          </Form>
           <Button
+            type="default"
+            block
+            size="large"
             onClick={handleLoginWithFacebook}
-            icon={<FacebookOutlined />}
-            type="primary"
+            style={{ marginTop: "16px" }}
           >
-            Đăng nhập bằng Facebook
+            Đăng nhập với Facebook
           </Button>
         </div>
-      </Col>
-      <Col span={14} className="h-full text-center">
-        <Carousel
-          autoplay
-          autoplaySpeed={5000}
-          rootClassName="h-full"
-          className="h-full"
-        >
-          <div>
-            <Image src={orderImage} height={500} alt="" />
-            <h1 className="text-4xl font-bold mb-2">Quản lý bán hàng</h1>
-            <span className="font-medium opacity-85">
-              Ghi nhận các giao dịch bán hàng, in hóa đơn, và quản lý thanh
-              toán
-            </span>
-          </div>
-          <div>
-            <Image src={customerImage} height={480} alt="" />
-            <h1 className="text-4xl font-bold mb-2">Quản lý khách hàng</h1>
-            <span className="font-medium opacity-85">
-              Lưu trữ thông tin khách hàng, theo dõi lịch sử giao dịch và
-              chương trình khách hàng thân thiết.
-            </span>
-          </div>
-          <div>
-            <Image src={reportImage} height={480} alt="" />
-            <h1 className="text-4xl font-bold mb-2">Báo cáo và phân tích</h1>
-            <span className="font-medium opacity-85">
-              Cung cấp các báo cáo chi tiết về doanh thu, lợi nhuận và hiệu
-              suất kinh doanh để giúp người quản lý đưa ra quyết định.
-            </span>
-          </div>
-        </Carousel>
-      </Col>
-    </Row>
-    </main >
+      </div>
+      <div className="w-1/2 rounded-r-lg bg-[#5578bc] text-white">
+        <Image className="w-5/6 mx-auto" src={Img1} alt={""} />
+        <div className="mt-3 text-center">
+          <div style={styles.titleItem}>Gos Shop - Nền tảng quản lý và bán hàng đa kênh</div>
+          <div style={styles.titleChild}>Quản lý bán hàng toàn diện trên mạng xã hội và nền tảng thương mại điện tử</div>
+        </div>
+      </div>
+    </section>
   );
 }
-
-export default LoginComponent;
