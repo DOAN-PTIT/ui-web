@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Avatar from "react-avatar";
 import { connect, useSelector } from "react-redux";
+
 interface CustomerDetailProps
   extends ReturnType<typeof mapStateToProps>,
   ReturnType<typeof mapDispatchToProps> {
@@ -26,7 +27,9 @@ function CustomerDetail({
   createOrder,
   currentShop,
 }: CustomerDetailProps) {
+
   const router = useRouter();
+
   const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
   const [profileCustomer, setProfileCustomer] = useState({
     name: "",
@@ -50,8 +53,7 @@ function CustomerDetail({
       });
     }
   }, [data]);
-  const { id } = useSelector((state: RootState) => state.shopReducer.shop)
- 
+
   const handleExpand = (expanded: boolean, record: any) => {
     setExpandedRowKeys((prevKeys) => {
       const rowKey = record?.id;
@@ -178,9 +180,13 @@ function CustomerDetail({
     } else {
       return 'Online'
     }
-  }
-  const checkStatus = (status: number) => statusLabels[status] || "Không xác định";
-  const colorStatus = (status: number) => statusColors[status] || "text-gray-400";
+
+  };
+  const checkStatus = (status: number) =>
+    statusLabels[status] || "Không xác định";
+  const colorStatus = (status: number) =>
+    statusColors[status] || "text-gray-400";
+
   const received = (data: any) => {
     if (!Array.isArray(data)) {
       return 0;
