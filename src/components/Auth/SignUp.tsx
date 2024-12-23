@@ -14,7 +14,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
+import Img1 from "@/assets/webcake_showcase.png";
 const { Text, Title, Link } = Typography;
 const { useBreakpoint } = Grid;
 
@@ -70,11 +70,8 @@ export default function SignUpComponent() {
     },
     container: {
       background: "#f9fafb",
-      margin: "0 auto",
       padding: screens.md ? "40px" : "60px 16px",
       width: "380px",
-      border: "1px solid #f0f0f0",
-      borderRadius: "8px",
     },
     footer: {
       marginTop: "24px",
@@ -88,11 +85,12 @@ export default function SignUpComponent() {
       marginBottom: "40px",
     },
     section: {
-      alignItems: "center",
-      backgroundColor: "#fff",
+      margin: "auto auto",
+      justifyContent: "center",
+      backgroundColor: "#314776",
       display: "flex",
       height: screens.sm ? "100vh" : "auto",
-      padding: screens.md ? "64px 0" : "0px",
+      padding: screens.md ? "30px 0" : "0px",
     },
     text: {
       color: "#8c8c8c",
@@ -100,18 +98,29 @@ export default function SignUpComponent() {
     title: {
       fontSize: screens.md ? "24px" : "20px",
       fontWeight: 700,
-      marginTop: '4px!important',
+      marginTop: '24px!important',
       marginBottom: '16px',
+      color: "#47566e"
     },
+    titleItem: {
+      fontSize: "24px",
+      fontWeight: 700,
+      marginBottom: "12px",
+      lineHeight: "30px",
+    },
+    titleChild: {
+      fontSize: "16px",
+      fontWeight: 400,
+    }
   };
 
   return (
     <section style={styles.section}>
       {contextHolder}
-      <div style={styles.container}>
+      <div className="rounded-l-lg" style={styles.container}>
         <div style={styles.header}>
           <Image style={styles.imageLogo} src={iconLogo} alt="Favicon" />
-          <Title level={2}>Đăng ký tài khoản</Title>
+          <Title style={styles.title}>Đăng ký POS</Title>
           <Text>Hãy tạo tài khoản mới để bắt đầu sử dụng dịch vụ của chúng tôi.</Text>
         </div>
         <Form
@@ -170,6 +179,13 @@ export default function SignUpComponent() {
             <Text>Bạn đã có tài khoản?</Text> <Link href="/login">Đăng nhập ngay</Link>
           </div>
         </Form>
+      </div>
+      <div className="w-1/2 rounded-r-lg bg-[#5578bc] text-white">
+        <Image className="w-5/6 mx-auto" src={Img1} alt={""} />
+        <div className="mt-3 text-center">
+          <div style={styles.titleItem}>Webgos - Thiết kế dễ dàng, khởi chạy nhanh chóng</div>
+          <div style={styles.titleChild}>Quản lý bán hàng toàn diện trên mạng xã hội và nền tảng thương mại điện tử</div>
+        </div>
       </div>
     </section>
   );
