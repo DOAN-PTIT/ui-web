@@ -122,8 +122,8 @@ export default function Genaral() {
         <Layout className="">
             <HeaderAction
                 title="Cấu hình"
-                isShowSearch={true}
-                inputPlaholder="Tìm kiếm cấu hình" />
+                isShowSearch={false}
+            />
             <Breadcrumb style={{ margin: '16px 0' }}>
                 <Breadcrumb.Item href={`/shop/${shopId}/settings`}>Cấu hình</Breadcrumb.Item>
                 <Breadcrumb.Item href={`/shop/${shopId}/settings`}>Cửa hàng </Breadcrumb.Item>
