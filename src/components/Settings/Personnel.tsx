@@ -44,18 +44,13 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
             name: 'Gộp shop'
         }
     ]
-    
-    // console.log(employeeShop)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [openActor, setOpenActor] = useState(false)
     const [checkId, setCheckId] = useState()
     const [role, setRole] = useState()
-    // const [dataPersonnel, setDataPersonnel] = useState<User[]>()
     const handleOpenActor = (id: any) => {
         setOpenActor(true);
-        // localStorage.setItem('personId', id)
         setCheckId(id)
-        // changeRoleUser()
     }
     const showModal = () => {
         setIsModalOpen(true);
@@ -72,11 +67,6 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
 
 
     const shopId = shop.id
-
-    const handleRemove = async (id: any) => {
-        // console.log(id)
-        // console.log(`/shop/${shopId}/employee/${id}/remove`)
-
         try {
             await apiClient.post(`/shop/${shopId}/employee/${id}/remove`)
             message.success('Xóa nhân viên thành công')
@@ -95,7 +85,6 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
         }
     }
     useEffect(() => {
-        // fetchListPersonnel()
         getEmployeeShop({shopId})
         
     }, [])
