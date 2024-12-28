@@ -63,6 +63,7 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
         setIsModalOpen(false);
     };
     const shopId = shop.id
+    const handleRemove = async (id: any) => {
         try {
             await apiClient.post(`/shop/${shopId}/employee/${id}/remove`)
             message.success('Xóa nhân viên thành công')
