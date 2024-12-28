@@ -96,7 +96,7 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
 
   const calcPrice = (field: string) => {
     if (orderParams?.orderitems?.length === 0) {
-      createOrder({});
+      // createOrder({});
       return 0;
     } else {
       switch (field) {

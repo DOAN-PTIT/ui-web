@@ -25,7 +25,6 @@ const reducer = createSlice({
                 delivery_cost: action.payload.delivery_cost_shop || 0,
                 total_cost: action.payload.total_cost || 0,
                 surcharge: action.payload.surcharge || 0,
-                add_customer: action.payload.add_customer || null
             }
             state.createOrder = { ...defaultOrder, ...action.payload }
         }

@@ -211,7 +211,6 @@ const ChartRevenue = (props: ChartRevenueProps) => {
             <div className="font-bold">0</div>
           </div>
         </div>
-        <Line data={data} />
         <div className="flex justify-between mt-3">
           {renderBoxOnline()}
           {renderBoxAtCounter()}

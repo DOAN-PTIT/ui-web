@@ -2,7 +2,19 @@
 
 import moment from "moment";
 import Avatar from "react-avatar";
-import { Layout, Modal, Table, Input, Divider, DatePicker, Space, Button, message, notification, Spin } from "antd";
+import {
+  Layout,
+  Modal,
+  Table,
+  Input,
+  Divider,
+  DatePicker,
+  Space,
+  Button,
+  message,
+  notification,
+  Spin,
+} from "antd";
 import HeaderAction from "../HeaderAction/HeaderAction";
 import ActionTools from "../ActionTools/ActionTools";
 import type { TableProps } from "antd";
@@ -19,6 +31,7 @@ import { connect } from "react-redux";
 import apiClient from "@/service/auth";
 import "../../styles/global.css";
 import CustomerDetail from "./CustomerDetailModal";
+import { debounce } from "lodash";
 
 interface CustomerType {
   id: string;
@@ -33,28 +46,37 @@ interface CustomerType {
   phoneNumber: string;
 }
 
-interface CustomerProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> { }
+interface CustomerProps
+  extends ReturnType<typeof mapStateToProps>,
+    ReturnType<typeof mapDispatchToProps> {}
+
+const defaultParams = {
+  page: 1,
+  page_size: 30,
+  sortBy: "CREATED_AT_DESC",
+};
 
 function Customer(props: CustomerProps) {
   const { currentShop } = props;
   const [modalVisiable, setModalVisiable] = useState(false);
   const [openCustomerDetail, setOpenCustomerDetail] = useState(false);
-  const [idCustomerDetaild, setIdCustomerDetail] = useState<number>()
+  const [idCustomerDetaild, setIdCustomerDetail] = useState<number>();
   const [listCustomer, setListCustomer] = useState<[]>([]);
   const [totalCustomer, setTotalCustomer] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingCustomer, setIsLoadingCustomer] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [dataCustomer, setDataCustomer] = useState()
+  const [dataCustomer, setDataCustomer] = useState();
   const [createCustomerParams, setCreateCustomerParams] = useState({
     name: "",
     phone_number: "",
     email: "",
-    gender: "MALE"
-  })
+    gender: "MALE",
+  });
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    getListCustomer();
+    getListCustomer(defaultParams);
   }, [currentPage]);
 
   const columns: TableProps<CustomerType>["columns"] = [
@@ -79,7 +101,7 @@ function Customer(props: CustomerProps) {
             {text}
           </div>
         );
-      }
+      },
     },
     {
       key: "DATE OF BIRTH",
@@ -111,31 +133,23 @@ function Customer(props: CustomerProps) {
             {text ? text : <span className="text-red-400">Chưa có</span>}
           </div>
         );
-      }
+      },
     },
     {
       key: "TOTAL ORDER",
       dataIndex: "totalOrder",
       title: "Tổng đơn hàng",
       render: (text: string, record: any) => {
-        return (
-          <div>
-            {text || 0}
-          </div>
-        );
-      }
+        return <div>{text || 0}</div>;
+      },
     },
     {
       key: "TOTAL PURCHASE PRICE",
       dataIndex: "totalPurchasePrice",
       title: "Tổng tiền mua",
       render: (text: string, record: any) => {
-        return (
-          <div>
-            {text || 0}
-          </div>
-        );
-      }
+        return <div>{text || 0}</div>;
+      },
     },
     {
       key: "INSERTED AT",
@@ -149,25 +163,30 @@ function Customer(props: CustomerProps) {
   };
 
   const getData: () => TableProps<CustomerType>["dataSource"] = () => {
-    return listCustomer.length > 0 ?
-      listCustomer.map((customer: any) => ({
-        id: customer.id,
-        customerName: customer.name,
-        dateOfBirth: moment(customer.date_of_birth).format("DD/MM/YYYY"),
-        totalOrder: customer.total_order,
-        totalPurchasePrice: customer.total_purchase_price,
-        insertedAt: moment(customer.createdAt).format("DD/MM/YYYY"),
-        email: customer.email,
-        address: customer.address,
-        referralCode: customer.referral_code,
-        phoneNumber: customer.phone_number
-      }))
-      : []
+    return listCustomer.length > 0
+      ? listCustomer.map((customer: any) => ({
+          id: customer.id,
+          customerName: customer.name,
+          dateOfBirth: moment(customer.date_of_birth).format("DD/MM/YYYY"),
+          totalOrder: customer.total_order,
+          totalPurchasePrice: customer.total_purchase_price,
+          insertedAt: moment(customer.createdAt).format("DD/MM/YYYY"),
+          email: customer.email,
+          address: customer.address,
+          referralCode: customer.referral_code,
+          phoneNumber: customer.phone_number,
+        }))
+      : [];
   };
 
-  const getListCustomer = async () => {
+  const getListCustomer = async (params: any) => {
     setIsLoading(true);
-    const url = `shop/${currentShop.id}/customer/all?page=${currentPage}&&sortBy=CREATED_AT_DESC`;
+    const { page_size, sortBy, search } = params;
+    const url = `shop/${
+      currentShop.id
+    }/customer/all?page=${currentPage}&&sortBy=${sortBy}${
+      search ? `&&search=${search}` : ""
+    }`;
     return await apiClient
       .get(url)
       .then((res) => {
@@ -180,7 +199,15 @@ function Customer(props: CustomerProps) {
         setIsLoading(false);
         console.log(err);
       });
-  }
+  };
+
+  const handleSearch = (value: string) => {
+    const params = { ...defaultParams, search: value };
+    setSearchTerm(value);
+    getListCustomer(params);
+  };
+
+  const deboundSearch = debounce(handleSearch, 300);
 
   const handleCreateShopCustomer = async () => {
     setIsLoading(true);
@@ -190,66 +217,76 @@ function Customer(props: CustomerProps) {
       .then((res) => {
         setIsLoading(false);
         setModalVisiable(false);
-        getListCustomer();
+        getListCustomer(defaultParams);
         return res.data;
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
         notification.error({
           message: "Tạo khách hàng thất bại",
           description: Array.isArray(error.response?.data?.message)
             ? error.response.data.message.join("; ")
             : error.response?.data?.message || "Đã xảy ra lỗi không xác định.",
-          duration: 5
-        })
-      })
-  }
+          duration: 5,
+        });
+      });
+  };
 
   const onInputChange = (which: string, value: string = "") => {
     setCreateCustomerParams({
       ...createCustomerParams,
-      [which]: value
-    })
-  }
+      [which]: value,
+    });
+  };
 
   const renderFooterCreateModal = () => {
     return (
       <Space>
         <Button onClick={() => setModalVisiable(false)}>Huỷ bỏ</Button>
-        <Button type="primary" onClick={handleCreateShopCustomer}>Tạo khách hàng</Button>
+        <Button type="primary" onClick={handleCreateShopCustomer}>
+          Tạo khách hàng
+        </Button>
       </Space>
-    )
-  }
+    );
+  };
   const handleOpen = (id: number) => {
-    setOpenCustomerDetail(true)
-    setIdCustomerDetail(id)
-    fetchCustomerDetail(id)
-    console.log(id)
-  }
+    setOpenCustomerDetail(true);
+    setIdCustomerDetail(id);
+    fetchCustomerDetail(id);
+    console.log(id);
+  };
   const fetchCustomerDetail = async (id: any) => {
-    setIsLoadingCustomer(true)
+    setIsLoadingCustomer(true);
     try {
-      const res = await apiClient.get(`/shop/${currentShop.id}/customer/${id}/detail`)
-      setDataCustomer(res.data)
-      setIsLoadingCustomer(false)
+      const res = await apiClient.get(
+        `/shop/${currentShop.id}/customer/${id}/detail`
+      );
+      setDataCustomer(res.data);
+      setIsLoadingCustomer(false);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
   return (
     <Layout>
       <HeaderAction
         title="Khách hàng"
         isShowSearch={true}
         inputPlaholder="Tìm kiếm khách hàng"
+        handleSearch={deboundSearch}
       />
       <Layout.Content className="p-5 h-screen bg-gray-200 rounded-tl-xl order__table__container">
-        <ActionTools callBack={callBack} reloadCallBack={getListCustomer} />
+        <ActionTools
+          callBack={callBack}
+          reloadCallBack={() =>
+            getListCustomer({ ...defaultParams, search: searchTerm })
+          }
+        />
         <Table
           className="cursor-pointer"
           columns={columns}
           onRow={(record: any) => ({
-            onClick: () => handleOpen(record.id)
+            onClick: () => handleOpen(record.id),
           })}
           dataSource={getData()}
           virtual
@@ -266,7 +303,12 @@ function Customer(props: CustomerProps) {
         />
       </Layout.Content>
       {/* <Spin spinning={isLoadingCustomer}> */}
-        <CustomerDetail loading={isLoadingCustomer} data={dataCustomer} open={openCustomerDetail} onCancel={() => setOpenCustomerDetail(false)} />
+      <CustomerDetail
+        loading={isLoadingCustomer}
+        data={dataCustomer}
+        open={openCustomerDetail}
+        onCancel={() => setOpenCustomerDetail(false)}
+      />
       {/* </Spin> */}
       <Modal
         title={
@@ -278,24 +320,37 @@ function Customer(props: CustomerProps) {
         open={modalVisiable}
         onCancel={() => {
           setModalVisiable(false);
-          setCreateCustomerParams({} as any)
+          setCreateCustomerParams({} as any);
         }}
         footer={renderFooterCreateModal}
       >
         <div className="mt-5">
           <div className="flex">
             <UserOutlined className="mr-5" />
-            <Input required name="name" placeholder="Tên khách hàng" onChange={(e) => onInputChange("name", e.target.value)} />
+            <Input
+              required
+              name="name"
+              placeholder="Tên khách hàng"
+              onChange={(e) => onInputChange("name", e.target.value)}
+            />
           </div>
           <Divider />
           <div className="flex">
             <MailOutlined className="mr-5" />
-            <Input name="email" placeholder="Email" onChange={(e) => onInputChange("email", e.target.value)} />
+            <Input
+              name="email"
+              placeholder="Email"
+              onChange={(e) => onInputChange("email", e.target.value)}
+            />
           </div>
           <Divider />
           <div className="flex">
             <PhoneOutlined className="mr-5" />
-            <Input name="phone_number" placeholder="Số điện thoại" onChange={(e) => onInputChange("phone_number", e.target.value)} />
+            <Input
+              name="phone_number"
+              placeholder="Số điện thoại"
+              onChange={(e) => onInputChange("phone_number", e.target.value)}
+            />
           </div>
           <Divider />
           <div className="flex">
@@ -304,13 +359,19 @@ function Customer(props: CustomerProps) {
               name="date_of_birth"
               className="w-full"
               placeholder="Ngày sinh"
-              onChange={(date, dateString) => onInputChange("date_of_birth", dateString as string)}
+              onChange={(date, dateString) =>
+                onInputChange("date_of_birth", dateString as string)
+              }
             />
           </div>
           <Divider />
           <div className="flex">
             <ContainerOutlined className="mr-5" />
-            <Input name="address" placeholder="Địa chỉ" onChange={(e) => onInputChange("address", e.target.value)} />
+            <Input
+              name="address"
+              placeholder="Địa chỉ"
+              onChange={(e) => onInputChange("address", e.target.value)}
+            />
           </div>
           <Divider />
         </div>
@@ -321,12 +382,12 @@ function Customer(props: CustomerProps) {
 
 const mapStateToProps = (state: RootState) => {
   return {
-    currentShop: state.shopReducer.shop
-  }
-}
+    currentShop: state.shopReducer.shop,
+  };
+};
 
 const mapDispatchToProps = (dispatch: AppDispatch) => {
-  return {}
-}
+  return {};
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Customer);

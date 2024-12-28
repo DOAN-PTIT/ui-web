@@ -14,11 +14,11 @@ interface HeaderActionProps {
   title: string;
   isShowSearch: boolean;
   inputPlaholder?: string;
-  onSearch?: (value: string, filters?: Record<string, any>) => void;
+  handleSearch?: (value: string) => any;
 }
 
 function HeaderAction(props: HeaderActionProps) {
-  const { isShowSearch, title, inputPlaholder, onSearch } = props;
+  const { isShowSearch, title, inputPlaholder, handleSearch } = props;
   const router = useRouter();
   const [loading, setLoading] = useState(false)
   async function logout() {
@@ -90,7 +90,7 @@ function HeaderAction(props: HeaderActionProps) {
           {isShowSearch && (
             <Input
               placeholder={inputPlaholder}
-              onPressEnter={(e) => onSearch?.((e.target as HTMLInputElement).value)} 
+              onChange={(e) => handleSearch?.(e.target.value)}
             />
           )}
         </div>

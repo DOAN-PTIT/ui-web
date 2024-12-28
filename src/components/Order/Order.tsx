@@ -27,6 +27,7 @@ import { createOrder } from "@/reducer/order.reducer";
 import Avatar from "react-avatar";
 import apiClient from "@/service/auth";
 import CustomSelect from "@/container/ConfigSelect";
+import { debounce } from "lodash";
 
 interface ColumnType {
   id: string;
@@ -263,12 +264,21 @@ function Order(props: OrderProps) {
     );
   };
 
+  const handleSearch = (value: string): any => {
+    const searchParams = { ...params, search: value };
+    setParams(searchParams);
+    getListOrders(searchParams);
+  }
+
+  const debouncedSearch = debounce(handleSearch, 600);
+
   return (
     <Layout className={"h-full"}>
       <HeaderAction
         title="Đơn hàng"
         isShowSearch={true}
-        inputPlaholder="Tìm kiếm đơn hàng"
+        inputPlaholder="Tìm kiếm đơn hàng theo id, khách hàng, số điện thoại, sản phẩm"
+        handleSearch={debouncedSearch}
       />
       <Content className="content bg-gray-200 rounded-tl-xl p-5 order__table__container">
         <ActionTools

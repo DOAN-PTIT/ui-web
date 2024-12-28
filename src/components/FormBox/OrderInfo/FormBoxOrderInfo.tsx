@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 import Avatar from "react-avatar";
 import moment from "moment";
 import CustomDatePicker from "@/components/CustomDatePicker";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 interface FormBoxOrderInfoProps
   extends ReturnType<typeof mapStateToProps>,
     ReturnType<typeof mapDispatchToProps> {
@@ -56,7 +56,7 @@ function FormBoxOrderInfo(props: FormBoxOrderInfoProps) {
             showMinute
             showTime
             variant="filled"
-            defaultValue={moment(order?.createdAt)}
+            value={moment(order?.createdAt)}
           />
         </div>
         <div className="flex justify-between">
@@ -71,7 +71,7 @@ function FormBoxOrderInfo(props: FormBoxOrderInfoProps) {
             notFoundContent={
               isLoading ? <LoadingOutlined /> : <div>Không có nhân viên!</div>
             }
-            defaultValue={order?.shopuser_id || currentUser.id}
+            value={order?.shopuser_id || currentUser.id}
           >
             {shopUser?.employees.map((user: any) => {
               return (
