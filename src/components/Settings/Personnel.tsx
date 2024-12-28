@@ -49,6 +49,7 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [openActor, setOpenActor] = useState(false)
     const [checkId, setCheckId] = useState()
+    const [role, setRole] = useState()
     // const [dataPersonnel, setDataPersonnel] = useState<User[]>()
     const handleOpenActor = (id: any) => {
         setOpenActor(true);
@@ -85,13 +86,13 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
             console.log(error)
         }
     }
-    // const changeRoleUser = async ()=> {
-    //     try {
-    //         return await apiClient.get(`shop/${shopId}/employee/${checkId}/role?role=admin`)
-    //     } catch (error) {
-    //         console.log(error)
-    //     }
-    // }
+    const changeRoleUser = async (value:string)=> {
+        try {
+            return await apiClient.get(`shop/${shopId}/employee/${checkId}/role?role=${value}`)
+        } catch (error) {
+            console.log(error)
+        }
+    }
     useEffect(() => {
         // fetchListPersonnel()
         getEmployeeShop({shopId})
@@ -125,7 +126,7 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                         </div>
                         <div className="p-4 ">
                             {employeeShop?.employees?.map(i => (
-                                <div key={i.id} >
+                                <div aria-disabled key={i.id} >
                                     <div className={`${checkId == i.id && openActor && 'bg-cyan-100'} rounded-lg flex items-center justify-between text-sm px-2 py-1 mb-1 hover:bg-cyan-100 cursor-pointer`}>
                                         <div onClick={() => handleOpenActor(i.id)} className="flex w-full">
                                             <Tooltip className={`flex items-center`} placement="topLeft" title={checkRole(i?.shopusers[0].role)} >
@@ -138,8 +139,8 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                                             title="Xóa nhân viên"
                                             description="Bạn chắc chắn muốn xóa nhân viên shop?"
                                             onConfirm={() => handleRemove(i.id)}
-                                            okText="Yes"
-                                            cancelText="No"
+                                            okText="Xóa"
+                                            cancelText="Hủy"
                                         >
                                             <div><DeleteOutlined /></div>
                                         </Popconfirm>
@@ -166,7 +167,16 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                                             <div className="flex-1">
                                                 <div className="flex items-center justify-between">
                                                     <div className="text-base font-semibold">{i.name}</div>
-                                                    <Button type="primary">Lưu</Button>
+                                                    <Popconfirm
+                                                        title="Lưu chức vụ"
+                                                        placement="bottomLeft"
+                                                        description="Bạn chắc chắn muốn lưu chức vụ nhân viên shop?"
+                                                        onConfirm={() => changeRoleUser(role)}
+                                                        okText="Lưu"
+                                                        cancelText="Hủy"
+                                                    >
+                                                        <Button type="primary">Lưu</Button>
+                                                    </Popconfirm>
                                                 </div>
                                                 <div className="flex items-center">
                                                     <div className="flex">
@@ -184,12 +194,15 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                                             <div className="flex-1">
                                                 <div className="text-sm font-medium mb-1">Chức vụ</div>
                                                 <Select
-                                                    className="w-full"
-                                                    defaultValue="Nhân viên"
-                                                    options={[
+                                                    className="w-full text-black"
+                                                    defaultValue={i?.shopusers[0].role}
+                                                    disabled={i?.shopusers[0].role === 'owner' ? true : false}
+                                                    onChange={(value) => setRole(value)}
+                                                    options={
+                                                        i?.shopusers[0].role === 'owner' ? [{ value: 'owner', label: 'Chủ cửa hàng', disabled: true }] 
+                                                        :[
                                                         { value: 'admin', label: 'Quản lý' },
-                                                        { value: 'employee', label: 'Nhân viên' },
-                                                        
+                                                        { value: 'employee', label: 'Nhân viên' }  
                                                     ]}
                                                 />
                                             </div>
