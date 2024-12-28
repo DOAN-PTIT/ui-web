@@ -10,7 +10,8 @@ export const getListProduct = createAsyncThunk(
   "product/getListProduct",
   async (data: any) => {
   const {shopId, page} = data
-  const url = `/shop/products/${shopId}?page=${page}&sortBy=CREATED_AT_DESC`;
+  const search = data.search || "";
+  const url = `/shop/products/${shopId}?page=${page}&sortBy=CREATED_AT_DESC${search ? `&search=${search}` : ""}`;
     return await apiClient
       .post(url)
       .then((res) => res.data)

@@ -17,6 +17,8 @@ import { createVariation } from "@/action/variation.action";
 import ProductDetail from "../ProductDetail/ProductDetail";
 import "../../styles/global.css";
 import SyncProductFacebookShop from "../SyncProductFacebookShop";
+import { debounce } from "lodash";
+import { setListProduct } from "@/reducer/product.reducer";
 
 interface ProductType {
   id: string;
@@ -163,8 +165,8 @@ function Product(props: ProductProps) {
   const getData: () => TableProps<ProductType>["dataSource"] = () => {
     return listProduct?.products
       ? listProduct?.products.map((product: any) => {
-          const firstVariation = product?.variations[0];
-          const totalAmount = product?.variations.reduce(
+          const firstVariation = product?.variations && product?.variations[0];
+          const totalAmount = product?.variations?.reduce(
             (total: number, variation: any) => total + (variation?.amount || 0),
             0
           );
@@ -204,12 +206,24 @@ function Product(props: ProductProps) {
       : [];
   };
 
+  const handleSearch = async (value: any) => {
+    const params = {
+      shopId: currentShop.id,
+      page: 1,
+      search: value,
+    }
+    await getListProduct(params);
+  }
+
+  const deboundSearch = debounce(handleSearch, 600);
+
   return (
     <Layout className="h-full">
       <HeaderAction
         title="Sản phẩm"
         isShowSearch={true}
         inputPlaholder="Tìm kiếm sản phẩm"
+        handleSearch={deboundSearch}
       />
       <Layout.Content className="p-5 h-screen bg-gray-200 rounded-tl-xl order__table__container">
         <ActionTools

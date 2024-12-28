@@ -284,9 +284,7 @@ function CustomerDetail({
                 createOrder({
                   add_customer: data.customer ? data.customer : null,
                 });
-                setTimeout(async () => {
-                  router.push(`sale`);
-                }, 500);
+                router.push(`sale`);
               }}
             >
               Tạo đơn
@@ -371,10 +369,9 @@ function CustomerDetail({
                   <div className="w-1/2">Lần mua cuối</div>
                   <Input
                     className="w-1/2"
-                    readOnly
-                    value={dayjs(data?.customer.last_purchase).format(
+                    value={data?.customer.last_purchase ?moment(data?.customer.last_purchase).format(
                       "HH:mm DD/MM/YYYY"
-                    )}
+                    ) : moment().format("DD/MM/YYYY")}
                   />
                 </div>
               </div>

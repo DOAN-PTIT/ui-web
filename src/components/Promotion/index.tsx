@@ -9,6 +9,7 @@ import { connect } from "react-redux";
 import apiClient from "@/service/auth";
 import moment from "moment";
 import { getPromotionStatus, getPromotionType } from "@/utils/tools";
+import { debounce } from "lodash";
 
 const { Content } = Layout;
 const defaultParams = {
@@ -28,15 +29,17 @@ function Promition(props: PromitionProps) {
   const [promotionList, setPromotionList] = useState<any[]>([]);
   const [totalPage, setTotalPage] = useState(0);
   const [selectedRowKeys, setSelectedRowKeys] = useState<number>(0);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   useEffect(() => {
-    getListPromotions();
+    getListPromotions(defaultParams);
   }, [currentShop.id]);
 
-  const getListPromotions = async () => {
+  const getListPromotions = async (params: any) => {
     setIsLoading(true);
+    const { page, page_size, search } = params;
     try {
-      const url = `/shop/${currentShop.id}/promotions`;
+      const url = `/shop/${currentShop.id}/promotions${search ? `?search=${search}` : ""}`;
       return await apiClient
         .get(url, { params: defaultParams })
         .then((res) => {
@@ -112,6 +115,13 @@ function Promition(props: PromitionProps) {
     }) : [];
   }
 
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    getListPromotions({ ...defaultParams, search: value });
+  }
+
+  const deboundSearch = debounce(handleSearch, 300);
+
   const handleRowClick = (record: any) => {
     setOpen(true);
     setSelectedRowKeys(record.id)
@@ -123,11 +133,12 @@ function Promition(props: PromitionProps) {
         title="Khuyến Mãi"
         isShowSearch={true}
         inputPlaholder="Tìm kiếm khuyễn mãi theo id, tên"
+        handleSearch={deboundSearch}
       />
       <Content className="content bg-gray-200 rounded-tl-xl p-5 order__table__container">
         <ActionTools
           callBack={() => setOpen(true)}
-          reloadCallBack={getListPromotions}
+          reloadCallBack={() => getListPromotions({ ...defaultParams, search: searchTerm })}
         />
         <Table
           dataSource={getData()}

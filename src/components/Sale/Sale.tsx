@@ -30,7 +30,6 @@ function Sale(props: SaleProps) {
   const [isAtCounter, setIsAtCounter] = useState(false);
   const [promotionsCanBeActive, setPromotionsCanBeActive] = useState<any>([]);
 
-
   // useEffect(() => {
   //   if (orderParams.add_customer) {
   //     createOrder({ ...orderParams, add_customer: null });

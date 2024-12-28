@@ -10,11 +10,13 @@ import apiClient from "@/service/auth";
 import SupplierDetail from "../SupplierDetail";
 import { getListSupplier, updateSupplier } from "@/action/supplier.action";
 import { Supplier as SupplierType } from "@/utils/type";
+import { debounce } from "lodash";
 
 const { Content } = Layout;
 const defaultParams = {
   page: 1,
   page_size: 30,
+  search: "",
 };
 
 interface SupplierProps
@@ -30,6 +32,7 @@ function Supplier(props: SupplierProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [suppliers, setSuppliers] = useState<any[]>([]);
   const [supplierSelected, setSupplierSelected] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     getListSupplier();
@@ -123,17 +126,25 @@ function Supplier(props: SupplierProps) {
       : [];
   };
 
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    getListSupplier({ search: value });
+  }
+
+  const deboundSearch = debounce(handleSearch, 300);
+
   return (
     <Layout className="w-full h-screen">
       <HeaderAction
         title="Nhà cung cấp"
         isShowSearch={true}
         inputPlaholder="Tìm kiếm nhà cung cấp theo tên, mã,.."
+        handleSearch={deboundSearch}
       />
       <Content className="p-5 h-screen bg-gray-200 rounded-tl-xl order__table__container">
         <ActionTools
           callBack={() => setModalVisiable(true)}
-          reloadCallBack={getListSupplier}
+          reloadCallBack={() => getListSupplier({ search: searchTerm })}
         />
         <Table
           columns={columns}

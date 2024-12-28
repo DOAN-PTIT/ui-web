@@ -14,11 +14,13 @@ import moment from "moment";
 import { debtStatus, formatNumber } from "@/utils/tools";
 import "@/styles/global.css";
 import CustomSelect from "@/container/ConfigSelect";
+import { debounce } from "lodash";
 
 const { Content } = Layout;
 const defaultParams = {
   page: 1,
   page_size: 30,
+  search: "",
 };
 
 interface DebtProps
@@ -33,6 +35,7 @@ function Debt(props: DebtProps) {
   const [loading, setLoading] = useState(false);
   const [debtSelected, setDebtSelected] = useState<DebtType | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     getListDebts();
@@ -45,6 +48,7 @@ function Debt(props: DebtProps) {
       key: "stt",
       render: (_: any, __: any, index: number) => {
         return <span className="text-blue-500 font-medium">{index + 1}</span>;
+      },
     },
     {
       key: "name",
@@ -161,6 +165,13 @@ function Debt(props: DebtProps) {
     }
   };
 
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    getListDebts({ search: value });
+  }
+
+  const deboundSearch = debounce(handleSearch, 300);
+
   const getData = () => {
     return debts.length > 0
       ? debts.map((debt) => {
@@ -188,11 +199,12 @@ function Debt(props: DebtProps) {
         title="Công nợ"
         isShowSearch={true}
         inputPlaholder="Tìm kiếm công nợ theo têh, loại công nợ, nhà cung cấp,.."
+        handleSearch={deboundSearch}
       />
       <Content className="p-5 h-screen bg-gray-200 rounded-tl-xl order__table__container">
         <ActionTools
           callBack={() => setModalVisiable(true)}
-          reloadCallBack={getListDebts}
+          reloadCallBack={() => getListDebts({ search: searchTerm })}
         />
         <Table
           columns={columns}
