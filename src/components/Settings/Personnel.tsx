@@ -46,6 +46,9 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
     const [openActor, setOpenActor] = useState(false)
     const [checkId, setCheckId] = useState()
     const [role, setRole] = useState()
+    const [searchKey, setSearchKey] = useState("");
+     const [searchResults, setSearchResults] = useState<User[]>([]);
+     const [isSearching, setIsSearching] = useState(false);
     const handleOpenActor = (id: any) => {
         setOpenActor(true);
         setCheckId(id)
@@ -61,6 +64,26 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
         setIsModalOpen(false);
     };
     const shopId = shop.id
+     const searchEmployee = async (shopId: number, value: string) => {
+         const response = await apiClient.get(`/shop/${shopId}/employee/${value}`);
+         return response.data;
+     };
+     const handleSearch = async (value: string) => {
+         if (!value.trim()) {
+             setSearchResults([]);
+             return;
+         }
+
+         setIsSearching(true);
+         try {
+             const data = await searchEmployee(shopId, value);
+             setSearchResults(data);
+         } catch (error) {
+             message.error("Lỗi khi tìm kiếm nhân viên");
+         } finally {
+             setIsSearching(false);
+         }
+     };
     const handleRemove = async (id: any) => {
         try {
             await apiClient.post(`/shop/${shopId}/employee/${id}/remove`)
@@ -100,7 +123,12 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                     <div className="col-span-3 rounded-lg bg-white min-h-screen">
                         <div className="p-4 text-base font-semibold">Danh sách nhân viên</div>
                         <div className="flex px-4">
-                            <Search placeholder="Tìm kiếm nhân viên" />
+                            <Search
+                                placeholder="Tìm kiếm nhân viên"
+                                onSearch={handleSearch}
+                                onChange={(e) => handleSearch(e.target.value)}
+                                loading={isSearching}
+                            />
                             <div className="pl-2">
                                 <Button type="default" icon={<FilterOutlined />} />
                             </div>
@@ -110,17 +138,17 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                             </div>
                         </div>
                         <div className="p-4 ">
-                            {employeeShop?.employees?.map(i => (
+                            {(searchResults.length > 0 ? searchResults : employeeShop?.employees)?.map(i => (
                                 <div aria-disabled key={i.id} >
                                     <div className={`${checkId == i.id && openActor && 'bg-cyan-100'} rounded-lg flex items-center justify-between text-sm px-2 py-1 mb-1 hover:bg-cyan-100 cursor-pointer`}>
                                         <div onClick={() => handleOpenActor(i.id)} className="flex w-full">
-                                            <Tooltip className={`flex items-center`} placement="topLeft" title={checkRole(i?.shopusers[0].role)} >
+                                            <Tooltip className={`flex items-center`} placement="topLeft" title={checkRole(i?.shopusers && i.shopusers[0]?.role)} >
                                                 <Avatar src={i.avatar} icon={<UserOutlined />} alt="avt" className="mr-2 size-6" />
                                                 <div>{i.name}</div>
 
                                             </Tooltip>
                                         </div>
-                                        {i?.shopusers[0].role !== 'owner' && (
+                                        {i?.shopusers && i.shopusers[0]?.role !== 'owner' && (
                                             <Popconfirm
                                                 title="Xóa nhân viên"
                                                 description="Bạn chắc chắn muốn xóa nhân viên shop?"
@@ -141,7 +169,7 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
 
                         </div>
                     </div>
-                    {openActor && employeeShop?.employees?.find(i => i.id === checkId) ? (
+                    {openActor && (searchResults.length > 0 ? searchResults : employeeShop?.employees)?.find(i => i.id === checkId) ? (
                         <div className="col-span-7 rounded-lg py-4 px-6 bg-white">
                             {employeeShop?.employees
                                 .filter(i => i.id === checkId)
@@ -152,7 +180,7 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                                             <div className="flex-1">
                                                 <div className="flex items-center justify-between">
                                                     <div className="text-base font-semibold">{i.name}</div>
-                                                    {i?.shopusers[0].role !== 'owner' && (
+                                                    {i?.shopusers && i.shopusers[0]?.role !== 'owner' && (
                                                         <Popconfirm
                                                         title="Lưu chức vụ"
                                                         placement="bottomLeft"
@@ -183,11 +211,11 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                                                 <div className="text-sm font-medium mb-1">Chức vụ</div>
                                                 <Select
                                                     className="w-full text-black"
-                                                    defaultValue={i?.shopusers[0].role}
-                                                    disabled={i?.shopusers[0].role === 'owner' ? true : false}
+                                                    defaultValue={i?.shopusers && i.shopusers[0]?.role}
+                                                    disabled={i?.shopusers && i.shopusers[0]?.role === 'owner' ? true : false}
                                                     onChange={(value) => setRole(value)}
                                                     options={
-                                                        i?.shopusers[0].role === 'owner' ? [{ value: 'owner', label: 'Chủ cửa hàng', disabled: true }] 
+                                                        i?.shopusers && i.shopusers[0]?.role === 'owner' ? [{ value: 'owner', label: 'Chủ cửa hàng', disabled: true }] 
                                                         :[
                                                         { value: 'admin', label: 'Quản lý' },
                                                         { value: 'employee', label: 'Nhân viên' }  
@@ -197,7 +225,7 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                                             <div className="flex-1">
 
                                                 <div className="text-sm font-medium mb-1">Bắt đầu làm việc</div>
-                                                <DatePicker className="w-full" defaultValue={moment(i?.shopusers[0].createdAt, 'YYYY/MM/DD')} format={'YYYY/MM/DD'}  disabled/>
+                                                <DatePicker className="w-full" defaultValue={moment(i?.shopusers[0]?.createdAt, 'YYYY/MM/DD')} format={'YYYY/MM/DD'}  disabled/>
                                             </div>
                                         </div>
                                         <div>
