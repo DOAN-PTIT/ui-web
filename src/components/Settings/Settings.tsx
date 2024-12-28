@@ -14,8 +14,8 @@ function Settings() {
         <Layout className="">
             <HeaderAction
                 title="Cấu hình"
-                isShowSearch={true}
-                inputPlaholder="Tìm kiếm cấu hình" />
+                isShowSearch={false}
+            />
             <LayoutStyled className="bg-white">
                 <div className="w-full h-full p-5">
                     <div className="text-xl font-bold w-full">Cấu hình chung</div>
@@ -29,6 +29,9 @@ function Settings() {
                             </div>
                             <Link href={`/shop/${shopId}/settings/general`}>
                                 <div className="mt-3 text-sm text-[#0050b3] font-medium">Cài đặt chung</div>
+                            </Link>
+                            <Link href={`/shop/${shopId}/settings/partner`}>
+                                <div className="mt-3 text-sm text-[#0050b3] font-medium">Đơn vị vận chuyển</div>
                             </Link>
                         </div>
                         <div className="">
