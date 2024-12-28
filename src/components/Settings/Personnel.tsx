@@ -104,8 +104,9 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
         <Layout >
             <HeaderAction
                 title="Cấu hình"
-                isShowSearch={true}
-                inputPlaholder="Tìm kiếm cấu hình" />
+                isShowSearch={false}
+                inputPlaholder="Tìm kiếm cấu hình" 
+            />
             <Breadcrumb style={{ margin: '16px 0' }}>
                 <Breadcrumb.Item href={`/shop/${shopId}/settings`}>Cấu hình</Breadcrumb.Item>
                 <Breadcrumb.Item href={`/shop/${shopId}/settings`}>Nhân viên</Breadcrumb.Item>

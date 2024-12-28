@@ -27,7 +27,7 @@ export default function Customer() {
         <Layout className="">
             <HeaderAction
                 title="Cấu hình"
-                isShowSearch={true}
+                isShowSearch={false}
                 inputPlaholder="Tìm kiếm cấu hình" />
             <Breadcrumb style={{ margin: '16px 0' }}>
                 <Breadcrumb.Item href={`/shop/${shopId}/settings`}>Cấu hình</Breadcrumb.Item>
