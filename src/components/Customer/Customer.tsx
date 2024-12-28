@@ -32,6 +32,7 @@ import apiClient from "@/service/auth";
 import "../../styles/global.css";
 import CustomerDetail from "./CustomerDetailModal";
 import { debounce } from "lodash";
+import { autoAddZero } from "@/utils/tools";
 
 interface CustomerType {
   id: string;
@@ -86,7 +87,7 @@ function Customer(props: CustomerProps) {
       title: "STT",
       fixed: "left",
       width: 180,
-      render: (_: any, __: any, index: number) => index + 1,
+      render: (_: any, __: any, index: number) => autoAddZero(index + 1, 0),
     },
     {
       key: "CUSTOMER NAME",

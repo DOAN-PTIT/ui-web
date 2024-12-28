@@ -12,7 +12,7 @@ import {
   getListProductFBShop,
 } from "@/action/product.action";
 import { connect } from "react-redux";
-import { formatNumber } from "@/utils/tools";
+import { autoAddZero, formatNumber } from "@/utils/tools";
 import { createVariation } from "@/action/variation.action";
 import ProductDetail from "../ProductDetail/ProductDetail";
 import "../../styles/global.css";
@@ -65,7 +65,7 @@ function Product(props: ProductProps) {
       fixed: "left",
       width: "5%",
       render: (_: any, __: any, index: number) => {
-        return <span className="font-medium">{index + 1}</span>;
+        return <span className="font-medium">{autoAddZero(index + 1, 0)}</span>;
       },
     },
     {

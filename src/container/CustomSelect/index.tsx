@@ -3,7 +3,7 @@ import "@/styles/global.css";
 import { MouseEventHandler } from "react";
 
 interface CustomSelectProps {
-  data: any[];
+  data: any;
   handleSelect?: (value: any) => any;
   currentStatus?: string;
   handleClick?: (e: any) => void;
@@ -17,7 +17,7 @@ const CustomSelect = (props: CustomSelectProps) => {
       value: value,
     };
   });
-  const statusItem = listStatus.find((item: any) => item.key == currentStatus);
+  const statusItem: any = listStatus.find((item: any) => item.key == currentStatus);
 
   return (
     <div
@@ -34,7 +34,7 @@ const CustomSelect = (props: CustomSelectProps) => {
         }}
       >
         <Select className="w-full" onSelect={handleSelect} value={statusItem?.key}>
-          {listStatus.map((item) => {
+          {listStatus.map((item: any) => {
             return (
               <Select.Option key={item.key} value={item.key}>
                 <span className="font-medium">{item.value.label}</span>

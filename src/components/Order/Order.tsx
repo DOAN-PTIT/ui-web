@@ -20,13 +20,13 @@ import { getListOrders, updateOrder } from "@/action/order.action";
 import { connect } from "react-redux";
 import { useEffect, useState } from "react";
 import moment from "moment";
-import { formatNumber, orderStatus } from "@/utils/tools";
+import { autoAddZero, formatNumber, orderStatus } from "@/utils/tools";
 import "../../styles/global.css";
 import OrderDetail from "../OrderDetail";
 import { createOrder } from "@/reducer/order.reducer";
 import Avatar from "react-avatar";
 import apiClient from "@/service/auth";
-import CustomSelect from "@/container/ConfigSelect";
+import CustomSelect from "@/container/CustomSelect";
 import { debounce } from "lodash";
 
 interface ColumnType {
@@ -93,7 +93,7 @@ function Order(props: OrderProps) {
       fixed: "left",
       width: 80,
       render: (_: any, __: any, index: number) => {
-        return <span className="font-medium">{index + 1}</span>;
+        return <span className="font-medium">{autoAddZero(index + 1, 0)}</span>;
       },
     },
     {
@@ -107,9 +107,9 @@ function Order(props: OrderProps) {
           <div onClick={(e) => e.stopPropagation()}>
             <Text
               copyable={{
-                icon: <div className="font-bold">{text}</div>,
+                icon: <div className="font-bold">{autoAddZero(text, 0)}</div>,
                 onCopy(event) {
-                  message.success(`Sao chép thành công mã đơn hàng: ${text}`);
+                  message.success(`Sao chép thành công mã đơn hàng: ${autoAddZero(text, 0)}`);
                 },
                 tooltips: "Click để sao chép mã đơn hàng",
               }}
@@ -186,7 +186,7 @@ function Order(props: OrderProps) {
     render: (status: number, record: any) => {
       return (
         <CustomSelect
-          data={Object.values(orderStatus)}
+          data={orderStatus}
           currentStatus={status.toString()}
           handleSelect={handleUpdateOrderStatus}
           handleClick={(e) => {

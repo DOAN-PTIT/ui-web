@@ -11,8 +11,8 @@ import DebtDetail from "../DebtDetail";
 import PurchaseDetail from "../PurchaseDetail";
 import moment from "moment";
 import Avatar from "react-avatar";
-import { purchaseStatus } from "@/utils/tools";
-import CustomSelect from "@/container/ConfigSelect";
+import { autoAddZero, formatNumber, purchaseStatus } from "@/utils/tools";
+import CustomSelect from "@/container/CustomSelect";
 import { updatePurchase } from "@/action/purchase.action";
 
 const { Content } = Layout;
@@ -41,6 +41,15 @@ function Purchase(props: PurchaseProps) {
 
   const columns: TableProps<any>["columns"] = [
     {
+      title: "Mã phiếu nhập",
+      dataIndex: "id",
+      key: "id",
+      width: 120,
+      render: (id: string) => {
+        return <span className="font-medium">{autoAddZero(id, 0)}</span>;
+      }
+    },
+    {
       title: "Người tạo",
       key: "creator",
       dataIndex: "creator",
@@ -62,21 +71,33 @@ function Purchase(props: PurchaseProps) {
       title: "Tiền hàng",
       key: "total_price_product",
       dataIndex: "total_price_product",
+      render: (total_price_product) => {
+        return <span className="font-medium">{formatNumber(total_price_product)} đ</span>;
+      }
     },
     {
       title: "Phí vận chuyển",
       key: "shipping_fee",
       dataIndex: "shipping_fee",
+      render: (shipping_fee) => {
+        return <span className="font-medium">{formatNumber(shipping_fee)} đ</span>;
+      }
     },
     {
       title: "Chiết khấu",
       key: "discount",
       dataIndex: "discount",
+      render: (discount) => {
+        return <span className="font-medium">{formatNumber(discount)} đ</span>;
+      }
     },
     {
       title: "Tổng tiền",
       key: "total_price",
       dataIndex: "total_price",
+      render: (total_price) => {
+        return <span className="font-medium">{formatNumber(total_price)} đ</span>;
+      }
     },
     {
       title: "Ngày tạo",
@@ -169,6 +190,7 @@ function Purchase(props: PurchaseProps) {
     return purchases.length > 0
       ? purchases.map((item: any) => {
           return {
+            id: item.id,
             key: item.id,
             creator: item.shop_user,
             supplier: item?.supplier?.name,
@@ -214,7 +236,7 @@ function Purchase(props: PurchaseProps) {
             return {
               onClick: (event) => {
                 setModalVisiable(true);
-                setTitle("Chi tiết phiếu nhập hàng");
+                setTitle(`Chi tiết phiếu nhập hàng ${record.id}`);
                 setSelectedPurchase(record.key);
               },
               style: { cursor: "pointer" },
