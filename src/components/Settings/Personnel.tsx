@@ -15,7 +15,6 @@ import HeaderAction from "../HeaderAction/HeaderAction";
 import AuthCard from "./components/Card";
 import ModalAddCustomer from "./components/ModalAddCustomer";
 
-const { Content } = Layout
 const { Search } = Input;
 interface User {
     id: number;
@@ -29,7 +28,6 @@ interface User {
 interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> { }
  function Personnel(props: PesonnelProps) {
     const {employeeShop,getEmployeeShop,shop} = props
-    // console.log(props)
     const dataRow = [
         {
             id: '1',
@@ -138,10 +136,7 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                                     </div>
                                     <Divider className="my-1"/>
                                 </div>
-                                // <div key={i?.id || null}>
-
-                                //     {i.id}
-                                // </div>
+                                
                             ))}
 
                         </div>
@@ -199,19 +194,6 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                                                     ]}
                                                 />
                                             </div>
-                                            {/* <div className="flex-1">
-                                                <div className="text-sm font-medium mb-1">Kho hàng</div>
-                                                <Select
-                                                    className="w-full"
-                                                    defaultValue="lucy"
-                                                    options={[
-                                                        { value: 'jack', label: 'Jack' },
-                                                        { value: 'lucy', label: 'Lucy' },
-                                                        { value: 'Yiminghe', label: 'yiminghe' },
-                                                        { value: 'disabled', label: 'Disabled', disabled: true },
-                                                    ]}
-                                                />
-                                            </div> */}
                                             <div className="flex-1">
 
                                                 <div className="text-sm font-medium mb-1">Bắt đầu làm việc</div>
