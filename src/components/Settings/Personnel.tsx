@@ -55,17 +55,13 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
     const showModal = () => {
         setIsModalOpen(true);
     };
-
     const handleOk = () => {
         setIsModalOpen(false);
         getEmployeeShop({shopId})
-    };
-
+    }
     const handleCancel = () => {
         setIsModalOpen(false);
     };
-
-
     const shopId = shop.id
         try {
             await apiClient.post(`/shop/${shopId}/employee/${id}/remove`)
@@ -86,7 +82,6 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
     }
     useEffect(() => {
         getEmployeeShop({shopId})
-        
     }, [])
 
     return (
