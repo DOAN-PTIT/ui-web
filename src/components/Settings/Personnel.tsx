@@ -44,44 +44,29 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
             name: 'Gộp shop'
         }
     ]
-    
-    // console.log(employeeShop)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [openActor, setOpenActor] = useState(false)
     const [checkId, setCheckId] = useState()
     const [role, setRole] = useState()
-    // const [dataPersonnel, setDataPersonnel] = useState<User[]>()
     const handleOpenActor = (id: any) => {
         setOpenActor(true);
-        // localStorage.setItem('personId', id)
         setCheckId(id)
-        // changeRoleUser()
     }
     const showModal = () => {
         setIsModalOpen(true);
     };
-
     const handleOk = () => {
         setIsModalOpen(false);
         getEmployeeShop({shopId})
-    };
-
+    }
     const handleCancel = () => {
         setIsModalOpen(false);
     };
-
-
     const shopId = shop.id
-
-    const handleRemove = async (id: any) => {
-        // console.log(id)
-        // console.log(`/shop/${shopId}/employee/${id}/remove`)
-
         try {
             await apiClient.post(`/shop/${shopId}/employee/${id}/remove`)
             message.success('Xóa nhân viên thành công')
             getEmployeeShop({shopId})
-            
         } catch (error) {
             console.log(error)
         }
@@ -90,14 +75,13 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
         try {
             await apiClient.get(`shop/${shopId}/employee/${checkId}/role?role=${value}`)
             message.success('Thay đổi chức vụ thành công!')
+            getEmployeeShop({ shopId })
         } catch (error) {
             message.error('Thay đổi chức vụ thất bại!')
         }
     }
     useEffect(() => {
-        // fetchListPersonnel()
         getEmployeeShop({shopId})
-        
     }, [])
 
     return (
@@ -177,7 +161,7 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                                                         title="Lưu chức vụ"
                                                         placement="bottomLeft"
                                                         description="Bạn chắc chắn muốn lưu chức vụ nhân viên shop?"
-                                                        onConfirm={() => changeRoleUser(role)}
+                                                        onConfirm={() => role && changeRoleUser(role)}
                                                         okText="Lưu"
                                                         cancelText="Hủy"
                                                     >
