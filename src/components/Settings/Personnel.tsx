@@ -81,16 +81,17 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
             await apiClient.post(`/shop/${shopId}/employee/${id}/remove`)
             message.success('Xóa nhân viên thành công')
             getEmployeeShop({shopId})
-            
         } catch (error) {
             console.log(error)
         }
     }
     const changeRoleUser = async (value:string)=> {
         try {
-            return await apiClient.get(`shop/${shopId}/employee/${checkId}/role?role=${value}`)
+            await apiClient.get(`shop/${shopId}/employee/${checkId}/role?role=${value}`)
+            message.success('Thay đổi chức vụ thành công!')
+            getEmployeeShop({ shopId })
         } catch (error) {
-            console.log(error)
+            message.error('Thay đổi chức vụ thất bại!')
         }
     }
     useEffect(() => {
@@ -135,15 +136,18 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
 
                                             </Tooltip>
                                         </div>
-                                        <Popconfirm
-                                            title="Xóa nhân viên"
-                                            description="Bạn chắc chắn muốn xóa nhân viên shop?"
-                                            onConfirm={() => handleRemove(i.id)}
-                                            okText="Xóa"
-                                            cancelText="Hủy"
-                                        >
-                                            <div><DeleteOutlined /></div>
-                                        </Popconfirm>
+                                        {i?.shopusers[0].role !== 'owner' && (
+                                            <Popconfirm
+                                                title="Xóa nhân viên"
+                                                description="Bạn chắc chắn muốn xóa nhân viên shop?"
+                                                onConfirm={() => handleRemove(i.id)}
+                                                okText="Xóa"
+                                                cancelText="Hủy"
+                                            >
+                                                <div><DeleteOutlined /></div>
+                                            </Popconfirm>
+                                        )}
+
 
                                     </div>
                                     <Divider className="my-1"/>
@@ -167,16 +171,19 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                                             <div className="flex-1">
                                                 <div className="flex items-center justify-between">
                                                     <div className="text-base font-semibold">{i.name}</div>
-                                                    <Popconfirm
+                                                    {i?.shopusers[0].role !== 'owner' && (
+                                                        <Popconfirm
                                                         title="Lưu chức vụ"
                                                         placement="bottomLeft"
                                                         description="Bạn chắc chắn muốn lưu chức vụ nhân viên shop?"
-                                                        onConfirm={() => changeRoleUser(role)}
+                                                        onConfirm={() => role && changeRoleUser(role)}
                                                         okText="Lưu"
                                                         cancelText="Hủy"
                                                     >
                                                         <Button type="primary">Lưu</Button>
                                                     </Popconfirm>
+                                                    )}
+                                                    
                                                 </div>
                                                 <div className="flex items-center">
                                                     <div className="flex">
