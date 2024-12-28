@@ -8,8 +8,9 @@ import { AppDispatch, RootState } from "@/store";
 import { connect } from "react-redux";
 import apiClient from "@/service/auth";
 import moment from "moment";
-import { getPromotionStatus, getPromotionType } from "@/utils/tools";
+import { autoAddZero, getPromotionStatus, getPromotionType } from "@/utils/tools";
 import { debounce } from "lodash";
+import { title } from "process";
 
 const { Content } = Layout;
 const defaultParams = {
@@ -64,7 +65,15 @@ function Promition(props: PromitionProps) {
       dataIndex: "stt",
       key: "stt",
       render: (_: any, __: any, index: number) => {
-        return <span className="text-blue-500 font-medium">{index + 1}</span>;
+        return <span className="text-blue-500 font-medium">{autoAddZero(index + 1, 0)}</span>;
+      }
+    },
+    {
+      title: "Mã khuyến mãi",
+      dataIndex: "id",
+      key: "id",
+      render: (id: any) => {
+        return <span className="text-blue-500 font-medium">{id}</span>;
       }
     },
     {

@@ -366,3 +366,18 @@ export const debtStatus = {
     color: "red",
   }
 }
+
+export const autoAddZero = (rawId: any, total: any) => {
+  if (!rawId) return rawId;
+  let id = parseInt(rawId);
+  if (isNaN(id)) return rawId;
+  if (total < 1000) {
+    if (id < 10) return '00' + id;
+    if (id < 100) return '0' + id;
+  } else {
+    if (id < 10) return '000' + id;
+    if (id < 100) return '00' + id;
+    if (id < 1000) return '0' + id;
+  }
+  return id;
+};

@@ -11,9 +11,9 @@ import DebtDetail from "../DebtDetail";
 import { fetchDebts, updateDebt } from "@/action/debt.action";
 import { Debt as DebtType } from "@/utils/type";
 import moment from "moment";
-import { debtStatus, formatNumber } from "@/utils/tools";
+import { autoAddZero, debtStatus, formatNumber } from "@/utils/tools";
 import "@/styles/global.css";
-import CustomSelect from "@/container/ConfigSelect";
+import CustomSelect from "@/container/CustomSelect";
 import { debounce } from "lodash";
 
 const { Content } = Layout;
@@ -43,11 +43,11 @@ function Debt(props: DebtProps) {
 
   const columns: TableProps<any>["columns"] = [
     {
-      title: "STT",
-      dataIndex: "STT",
-      key: "stt",
-      render: (_: any, __: any, index: number) => {
-        return <span className="text-blue-500 font-medium">{index + 1}</span>;
+      title: "Mã công nợ",
+      dataIndex: "id",
+      key: "id",
+      render: (id: any) => {
+        return <span className="text-blue-500 font-medium">{(id)}</span>;
       },
     },
     {
