@@ -28,6 +28,7 @@ import Avatar from "react-avatar";
 import apiClient from "@/service/auth";
 import CustomSelect from "@/container/CustomSelect";
 import { debounce } from "lodash";
+import OrderExcelExcel from "../OrderExcelExcel";
 
 interface ColumnType {
   id: string;
@@ -63,6 +64,7 @@ function Order(props: OrderProps) {
   const [params, setParams] = useState({ ...defaultParams });
   const [selectedRowKey, setSelectedRowKey] = useState<number | null>(null);
   const [open, setOpen] = useState(false);
+  const [isExportExcel, setIsExportExcel] = useState(false);
 
   const route = useRouter();
 
@@ -109,7 +111,9 @@ function Order(props: OrderProps) {
               copyable={{
                 icon: <div className="font-bold">{autoAddZero(text, 0)}</div>,
                 onCopy(event) {
-                  message.success(`Sao chép thành công mã đơn hàng: ${autoAddZero(text, 0)}`);
+                  message.success(
+                    `Sao chép thành công mã đơn hàng: ${autoAddZero(text, 0)}`
+                  );
                 },
                 tooltips: "Click để sao chép mã đơn hàng",
               }}
@@ -208,7 +212,7 @@ function Order(props: OrderProps) {
     };
     await updateOrder(params)
       .then((res) => {
-        setSelectedRowKey(null)
+        setSelectedRowKey(null);
         notification.success({
           message: "Thành công",
           description: "Cập nhật trạng thái đơn hàng thành công",
@@ -217,7 +221,7 @@ function Order(props: OrderProps) {
       })
       .catch((error) => {
         console.log(error);
-        setSelectedRowKey(null)
+        setSelectedRowKey(null);
         notification.error({
           message: "Lỗi",
           description: "Cập nhật trạng thái đơn hàng thất bại",
@@ -269,7 +273,7 @@ function Order(props: OrderProps) {
     const searchParams = { ...params, search: value };
     setParams(searchParams);
     getListOrders(searchParams);
-  }
+  };
 
   const debouncedSearch = debounce(handleSearch, 600);
 
@@ -285,6 +289,7 @@ function Order(props: OrderProps) {
         <ActionTools
           callBack={() => route.push("sale")}
           reloadCallBack={() => getListOrders(params)}
+          handleClickExportExcel={() => setIsExportExcel(true)}
         />
         <Table
           columns={columns}
@@ -324,6 +329,7 @@ function Order(props: OrderProps) {
           fetchOrder={() => getListOrders(params)}
         />
       )}
+      {isExportExcel && <OrderExcelExcel open={isExportExcel} onCancel={() => setIsExportExcel(false)} />}
     </Layout>
   );
 }
