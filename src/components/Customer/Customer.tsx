@@ -33,6 +33,7 @@ import "../../styles/global.css";
 import CustomerDetail from "./CustomerDetailModal";
 import { debounce } from "lodash";
 import { autoAddZero } from "@/utils/tools";
+import CustomerExportExcel from "../CustomerExportExcel";
 
 interface CustomerType {
   id: string;
@@ -75,6 +76,7 @@ function Customer(props: CustomerProps) {
     gender: "MALE",
   });
   const [searchTerm, setSearchTerm] = useState("");
+  const [isExportExcel, setIsExportExcel] = useState(false);
 
   useEffect(() => {
     getListCustomer(defaultParams);
@@ -282,6 +284,7 @@ function Customer(props: CustomerProps) {
           reloadCallBack={() =>
             getListCustomer({ ...defaultParams, search: searchTerm })
           }
+          handleClickExportExcel={() => setIsExportExcel(true)}
         />
         <Table
           className="cursor-pointer"
@@ -377,6 +380,12 @@ function Customer(props: CustomerProps) {
           <Divider />
         </div>
       </Modal>
+      {isExportExcel && (
+        <CustomerExportExcel
+          open={isExportExcel}
+          onCancel={() => setIsExportExcel(false)}
+        />
+      )}
     </Layout>
   );
 }
