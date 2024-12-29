@@ -29,7 +29,6 @@ function Dashbroad() {
     <Layout className="w-full">
       <HeaderAction title="Tổng quan" isShowSearch={false} />
       <Content className="p-5 bg-gray-200 rounded-tl-xl flex flex-col gap-4">
-        {renderHeader()}
         <ChartOrder />
         <ChartRevenue />
         <div className="flex gap-3 w-full">

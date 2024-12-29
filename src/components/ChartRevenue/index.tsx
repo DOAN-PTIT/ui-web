@@ -170,7 +170,7 @@ const ChartRevenue = (props: ChartRevenueProps) => {
           <p className="">
             {showRevenue ? (
               <Fragment>
-                {/* Doanh thu: &nbsp;&nbsp;&nbsp;{" "} */}
+                Doanh thu: &nbsp;&nbsp;&nbsp;{" "}
                 <span className="font-bold mr-4">
                   {formatNumber(counterAmount)} đ
                 </span>
@@ -193,7 +193,7 @@ const ChartRevenue = (props: ChartRevenueProps) => {
   };
 
   return (
-    <div className="flex justify-between gap-3">
+    <div className="flex justify-between">
       <div className="w-2/3 p-4 rounded-md bg-white">
         {loading ? (
           <div className="flex w-full h-full items-center justify-center">
@@ -233,7 +233,7 @@ const ChartRevenue = (props: ChartRevenueProps) => {
           </>
         )}
       </div>
-      <div className="w-1/3 bg-white p-4 rounded-md">
+      <div className="w-1/3 bg-white p-4 rounded-md ml-3">
         <div className="text-[18px] font-bold">
           Thông tin kinh doanh hôm nay
         </div>
