@@ -8,17 +8,12 @@ import { connect } from "react-redux";
 import { saveAs } from "file-saver";
 import moment from "moment";
 
-interface OrderExportExcelProps
+interface CustomerExportExcelProps
   extends ReturnType<typeof mapStateToProps>,
     ReturnType<typeof mapDispatchToProps> {
   open: boolean;
   onCancel: () => void;
 }
-
-const defaultParams = {
-  page: 1,
-  page_size: 100,
-};
 
 const fill = {
   type: "pattern",
@@ -27,21 +22,21 @@ const fill = {
   bgColor: { argb: "FFF5F5F5" },
 };
 
-function OrderExportExcel(props: OrderExportExcelProps) {
+function CustomerExportExcel(props: CustomerExportExcelProps) {
   const { open, currentShop, onCancel } = props;
-  const [orders, setOrders] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [fileName, setFileName] = useState("Đơn hàng");
+  const [fileName, setFileName] = useState("Khách hàng");
   const [percent, setPercent] = useState(0);
 
   let arrRows: any = [];
   let transformedExports: any = [];
 
   useEffect(() => {
-    if (orders.length > 0) {
+    if (customers.length > 0) {
       handleDownload();
     }
-  }, [orders]);
+  }, [customers]);
 
   const columns = [
     {
@@ -51,28 +46,10 @@ function OrderExportExcel(props: OrderExportExcelProps) {
       key: "stt",
     },
     {
-      title: "Mã đơn hàng",
-      label: "Mã đơn hàng",
+      title: "Mã khách hàng",
+      label: "Mã khách hàng",
       disable: false,
       key: "id",
-    },
-    {
-      title: "Sản phẩm",
-      label: "Sản phẩm",
-      disable: false,
-      key: "product",
-    },
-    {
-      title: "Mã sản phẩm",
-      label: "Mã sản phẩm",
-      disable: false,
-      key: "product_id",
-    },
-    {
-      title: "Mã mẫu mã",
-      label: "Mã mẫu mã",
-      disable: false,
-      key: "varation_id",
     },
     {
       title: "Tên khách hàng",
@@ -93,16 +70,40 @@ function OrderExportExcel(props: OrderExportExcelProps) {
       key: "address",
     },
     {
-      title: "Trạng thái",
-      label: "Trạng thái",
+      title: "Email",
+      label: "Email",
       disable: false,
-      key: "status",
+      key: "email",
     },
     {
-      title: "Tổng tiền",
-      label: "Tổng tiền",
+      title: "Tổng đơn hàng",
+      label: "Tổng đơn hàng",
+      disable: false,
+      key: "total_order",
+    },
+    {
+      title: "Tổng tiền đã chi",
+      label: "Tổng tiền chi",
       disable: false,
       key: "totalPrice",
+    },
+    {
+      title: "Lần mua cuối",
+      label: "Lần mua cuối",
+      disable: false,
+      key: "last_purchase",
+    },
+    {
+      title: "Mã giới thiệu",
+      label: "Mã giới thiệu",
+      disable: false,
+      key: "referral_code",
+    },
+    {
+      title: "Số lần giới thiệu",
+      label: "Số lần giới thiệu",
+      disable: false,
+      key: "number_referral_count",
     },
     {
       title: "Ngày tạo",
@@ -116,46 +117,31 @@ function OrderExportExcel(props: OrderExportExcelProps) {
       disable: false,
       key: "updatedAt",
     },
-    {
-      title: "Tổng giảm giá",
-      label: "Tổng giảm giá",
-      disable: false,
-      key: "total_discount",
-    },
-    {
-      title: "Ghi chú",
-      label: "Ghi chú",
-      disable: false,
-      key: "note",
-    },
   ];
 
-  const fetchListOrder = async () => {
-    const url = `shop/${currentShop.id}/orders`;
+  const fetchListCustomers = async () => {
     let cloneParams = {
-      page_size: 30,
       page: 1,
+      sortBy: "CREATED_AT_DESC",
     };
-
-    let ordersData: any = [];
+    const url = `shop/${currentShop.id}/customer/all`;
+    let customersData: any = [];
 
     const sendRequest: any = async (params: any) => {
       return await apiClient.get(url, { params }).then((res) => {
         if (res.data) {
-          let data = res.data.data;
-          ordersData = ordersData.concat(data);
-          const percent = Math.round(
-            (ordersData.length * 100) / res.data.totalEntries
-          );
-          setPercent(percent);
-          if (data.length == 0 || ordersData.length >= res.data.totalEntries) {
-            return ordersData;
+          let data = res.data.customers;
+          customersData = customersData.concat(data);
+          const percent = Math.round(customersData.length * 100 / res.data.totalCount);
+            setPercent(percent);
+          if (data.length == 0 || customersData.length >= res.data.totalCount) {
+            return customersData;
           } else {
             params.page += 1;
             return sendRequest(params);
           }
         } else {
-          return ordersData;
+          return customersData;
         }
       });
     };
@@ -164,7 +150,7 @@ function OrderExportExcel(props: OrderExportExcelProps) {
     return await sendRequest(cloneParams)
       .then((res: any) => {
         if (res.length > 0) {
-          setOrders(res);
+          setCustomers(res);
           setIsLoading(false);
         }
       })
@@ -174,14 +160,14 @@ function OrderExportExcel(props: OrderExportExcelProps) {
       });
   };
   const handleDownload = () => {
-    if (orders.length == 0) {
-      fetchListOrder();
+    if (customers.length == 0) {
+      fetchListCustomers();
     } else {
       let startLine: any;
       setTimeout(async () => {
         transformedExports = [];
         arrRows = [];
-        transformExports(orders, 0);
+        transformExports(customers, 0);
 
         let writeExcel = async (
           fileName: string,
@@ -252,8 +238,7 @@ function OrderExportExcel(props: OrderExportExcelProps) {
     }
   };
 
-  const transformExports = (orders: any, currentIndex: number) => {
-    const itemCondition = ["product", "product_id", "varation", "varation_id"];
+  const transformExports = (customers: any, currentIndex: number) => {
     const transformedExportArr: any = [];
     const formFields = columns;
 
@@ -270,20 +255,10 @@ function OrderExportExcel(props: OrderExportExcelProps) {
     };
 
     let arrRow: any = [];
-    orders.forEach((order: any, exportIndex: number) => {
-      if (order.orderitems.length == 0 || !itemCondition) {
-        arrRow.push(exportIndex + currentIndex + 1);
-      } else {
-        order.orderitems.forEach((o: any) => {
-          arrRow.push(exportIndex + currentIndex + 1);
-        });
-      }
+    customers.forEach((customer: any, exportIndex: number) => {
+      arrRow.push(exportIndex + currentIndex + 1);
 
-      if (order.orderitems.length && itemCondition) {
-        order.orderitems.forEach((item: any, itemIndex: number) => {
-          takeRow(order, exportIndex + currentIndex, itemIndex);
-        });
-      } else takeRow(order, exportIndex + currentIndex, 0);
+      takeRow(customer, exportIndex + currentIndex, 0);
     });
 
     transformedExports = transformedExports.concat(transformedExportArr);
@@ -292,51 +267,40 @@ function OrderExportExcel(props: OrderExportExcelProps) {
 
   const takeValue = (
     key: string,
-    order: any,
+    customer: any,
     exportIndex: number,
     itemIndex: number
   ) => {
-    const item = order.orderitems[itemIndex];
-
     switch (key) {
-      case "product":
-        return item?.variation.product.name || "";
-      case "product_id":
-        return item?.variation.product.product_code || "";
-      case "varation_id":
-        return item?.variation.variation_code || "";
+      case "stt":
+        return exportIndex + 1;
+      case "id":
+        return customer.id;
+      case "customer":
+        return customer.name;
+      case "phone":
+        return customer.phone_number;
+      case "address":
+        return customer.address;
+      case "email":
+        return customer.email;
+      case "total_order":
+        return customer.order_count;
+      case "last_purchase":
+        return customer.last_purchase;
+      case "referral_code":
+        return customer.referral_code;
+      case "number_referral_count":
+        return customer.number_referral_count;
+      case "totalPrice":
+        return customer.total_spent;
+      case "insertedAt":
+        return moment(customer.createdAt).format("DD/MM/YYYY");
+      case "updatedAt":
+        return moment(customer.updatedAt).format("DD/MM/YYYY");
+      default:
+        return "";
     }
-
-    if (itemIndex == 0) {
-      switch (key) {
-        case "stt":
-          return exportIndex + 1;
-        case "id":
-          return order.id;
-        case "customer":
-          return order.customer.name;
-        case "phone":
-          return order.customer.phone_number || "";
-        case "address":
-          return order.customer.address || "";
-        case "status":
-          return order.status;
-        case "totalPrice":
-          return order.total_cost;
-        case "insertedAt":
-          return moment(order.createdAt).format("DD/MM/YYYY HH:mm");
-        case "updatedAt":
-          return moment(order.updatedAt).format("DD/MM/YYYY HH:mm");
-        case "total_discount":
-          return order.total_discount;
-        case "note":
-          return order.note;
-        default:
-          return "";
-      }
-    }
-
-    return "";
   };
 
   const renderContent = () => {
@@ -352,9 +316,9 @@ function OrderExportExcel(props: OrderExportExcelProps) {
           />
         </div>
         {isLoading && (
-          <div className="text-right mt-4">
-            <Progress percent={percent} className="w-[120px]" status="active" />
-          </div>
+            <div className="text-right">
+                <Progress percent={percent} status="active" className="w-[120px] my-4" />
+            </div>
         )}
         <div className="mt-4 text-right">
           <Button type="primary" onClick={handleDownload} disabled={isLoading}>
@@ -387,4 +351,7 @@ const mapDispatchToProps = (dispatch: AppDispatch) => {
   return {};
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(OrderExportExcel);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CustomerExportExcel);
