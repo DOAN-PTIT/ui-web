@@ -81,6 +81,17 @@ function ReportRevenue(props: ReportRevenueProps) {
       showSorterTooltip: false,
     },
     {
+      title: "Phí vận chuyển ĐVVC",
+      dataIndex: "partner_shipping_fee",
+      key: "partner_shipping_fee",
+      align: "right",
+      render: (text) => (
+        <span className="font-medium">{formatNumber(text)} đ</span>
+      ),
+      sorter: (a, b) => a.partner_shipping_fee - b.partner_shipping_fee,
+      showSorterTooltip: false,
+    },
+    {
       title: "Doanh số",
       dataIndex: "sales",
       key: "sales",
@@ -127,7 +138,6 @@ function ReportRevenue(props: ReportRevenueProps) {
         setLoading(false);
       })
       .then((err) => {
-        console.log(err);
         setLoading(false);
       });
   };
@@ -162,6 +172,7 @@ function ReportRevenue(props: ReportRevenueProps) {
             discount: item.total_discount,
             revenue: item.revenue,
             shipping_fee: item.delivery_cost_shop,
+            partner_shipping_fee: item.delivery_cost,
             sales: item.sales,
             profit: item.total_profit,
           };
