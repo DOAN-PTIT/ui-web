@@ -17,6 +17,7 @@ const ChartOrder = (props: ChartOrderProps) => {
   const [loading, setLoading] = useState(false);
   const [orderStat, setOrderStat] = useState<any>(null);
   const [totalOrder, setTotalOrder] = useState<any>(null);
+  const [totalPrice, setTotalPrice] = useState<any>(null);
 
   useEffect(() => {
     getOrderStat();
@@ -29,9 +30,13 @@ const ChartOrder = (props: ChartOrderProps) => {
       return await apiClient
         .post(url)
         .then((res) => {
-          setOrderStat(res.data);
-          setTotalOrder(res.data.totalOrder);
-          setLoading(false);
+          if (res.data) {
+            setOrderStat(res.data);
+            setTotalOrder(res.data.totalOrder);
+            const totalPrice = calcTotalOrderPrice(res.data?.totalAmount);
+            setTotalPrice(totalPrice);
+            setLoading(false);
+          }
         })
         .catch((error) => {
           console.log(error);
@@ -46,16 +51,12 @@ const ChartOrder = (props: ChartOrderProps) => {
   const getTotalOrderConfirm = () => {
     // status = 4
     const quantity = orderStat?.totalProductDelivered?._sum.quantity || 0;
-    const total_cost = orderStat?.totalAmount?.map((item: any) => {
-      if (item.status == 4) {
-        return item?._sum?.total_cost;
-      }
-
-      return 0;
+    const totalCostDelivery = orderStat?.totalAmount?.find((item: any) => {
+      return item.status == 4;
     });
 
     return {
-      total_cost: total_cost,
+      total_cost: totalCostDelivery?._sum?.total_cost || 0,
       quantity: quantity,
     };
   };
@@ -63,18 +64,22 @@ const ChartOrder = (props: ChartOrderProps) => {
   const getTotalOrderCancel = () => {
     // status = -1
     const quantity = orderStat?.totalProductCanceled?._sum.quantity || 0;
-    const total_cost = orderStat?.totalAmount?.map((item: any) => {
-      if (item.status == -1) {
-        return item?._sum?.total_cost;
-      }
-
-      return 0;
+    const totalCostConcel = orderStat?.totalAmount?.find((item: any) => {
+      return item.status == -1;
     });
 
     return {
-      total_cost: total_cost || 0,
+      total_cost: totalCostConcel?._sum?.total_cost || 0,
       quantity: quantity || 0,
     };
+  };
+
+  const calcTotalOrderPrice = (order: any) => {
+    let total = 0;
+    total = order?.reduce((acc: any, item: any) => {
+      return acc + item?._sum?.total_cost;
+    }, 0);
+    return total;
   };
 
   const getTotalVariation = () => {
@@ -151,15 +156,18 @@ const ChartOrder = (props: ChartOrderProps) => {
         <div className="flex mt-1 h-3/4">
           {box.detail.map((item: any, index: number) => {
             let value = item.value;
+            let price = "0" as any
             if (typeof value === "string") {
-              value = value.replace(/đ/g, "");
+              price = value.replace(/đ/g, "").replace(/\./g, "");
             } else if (value === null) {
               value = "0";
             }
 
             value = parseInt(value, 10) || 0;
+            price = parseInt(price, 10) || 0;
 
             const percent = totalOrder ? (value / totalOrder) * 100 : 0;
+            const percentPrice = totalPrice ? (price / totalPrice) * 100 : 0;
             return (
               <div key={index} className="w-1/2">
                 <p className="font-medium opacity-85">{item.title}</p>
@@ -167,9 +175,7 @@ const ChartOrder = (props: ChartOrderProps) => {
                   {item.value}
                 </p>
                 {box.isShowPercent && (
-                  <p className={`${item.color}`}>
-                    {percent.toFixed(2)} %
-                  </p>
+                  <p className={`${item.color}`}>{percent < 100 ? percent.toFixed(2) : percentPrice.toFixed(2)} %</p>
                 )}
               </div>
             );

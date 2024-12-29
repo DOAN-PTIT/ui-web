@@ -2,9 +2,12 @@ import apiClient from "@/service/auth";
 import { AppDispatch, RootState } from "@/store";
 import { formatNumber } from "@/utils/tools";
 import {
+  CalendarX,
   CheckSquareOffset,
   Coins,
   Globe,
+  IdentificationCard,
+  ListNumbers,
   Storefront,
 } from "@phosphor-icons/react";
 import { Spin } from "antd";
@@ -17,7 +20,7 @@ import {
   PointElement,
   LineElement,
 } from "chart.js";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import { connect } from "react-redux";
 
@@ -56,6 +59,16 @@ const ChartRevenue = (props: ChartRevenueProps) => {
     labels: [],
     data: [],
   });
+  const [todayData, setTodayData] = useState({
+    canceledOrdersCount: 0,
+    newCustomersCount: 0,
+    newOrdersCount: 0,
+    totalOrdersAtCounter: 0,
+    totalOrdersOnline: 0,
+    totalQuantitySold: 0,
+    totalRevenueAtCounter: 0,
+    totalRevenueOnline: 0,
+  });
 
   useEffect(() => {
     getData();
@@ -74,14 +87,12 @@ const ChartRevenue = (props: ChartRevenueProps) => {
     ],
   };
 
-  const getData = async () => {
-    setLoading(true);
+  const getLast7DaysData = async () => {
     try {
       const url = `shop/${currentShop.id}/day-chart`;
       return await apiClient
         .get(url)
         .then((res) => {
-          setLoading(false);
           setBoxData(res.data.box);
           setChartData(res.data.chart);
         })
@@ -89,6 +100,31 @@ const ChartRevenue = (props: ChartRevenueProps) => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const getTodayData = async () => {
+    try {
+      const url = `shop/${currentShop.id}/today-stats`;
+      return await apiClient
+        .get(url)
+        .then((res) => {
+          setTodayData(res.data);
+        })
+        .catch((err) => console.log(err));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getData = async () => {
+    setLoading(true);
+    return await Promise.all([getLast7DaysData(), getTodayData()])
+      .then(() => {
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
   };
 
   const renderBoxTotal = () => {
@@ -116,55 +152,41 @@ const ChartRevenue = (props: ChartRevenueProps) => {
     );
   };
 
-  const renderBoxOnline = () => {
+  const renderBoxToday = (
+    title: any,
+    counterAmount: any,
+    counterOrder = 0,
+    showCountOrder: boolean = false,
+    icon: any,
+    showRevenue: boolean
+  ) => {
     return (
       <div className="p-3 bg-gray-100 rounded-md">
         <div className="flex items-center">
-          <div>
-            <Globe size={24} color="#06bcea" weight="duotone" />
-          </div>
-          <div className="ml-2 font-medium">Online</div>
+          <div>{icon}</div>
+          <div className="ml-2 font-medium">{title}</div>
         </div>
         <div className="flex flex-col gap-3 mt-2">
           <p className="">
-            Doanh thu: &nbsp;&nbsp;&nbsp;{" "}
-            <span className="font-bold mr-4">
-              {formatNumber(boxData.online.amount)} đ
-            </span>
+            {showRevenue ? (
+              <Fragment>
+                {/* Doanh thu: &nbsp;&nbsp;&nbsp;{" "} */}
+                <span className="font-bold mr-4">
+                  {formatNumber(counterAmount)} đ
+                </span>
+              </Fragment>
+            ) : (
+              <p className="font-[600]">{counterAmount}</p>
+            )}
           </p>
-          <p className="">
-            Đơn chốt: &nbsp;&nbsp;&nbsp;{" "}
-            <span className="font-bold mr-4">
-              {formatNumber(boxData.online.order)}
-            </span>
-          </p>
-        </div>
-      </div>
-    );
-  };
-
-  const renderBoxAtCounter = () => {
-    return (
-      <div className="p-3 bg-gray-100 rounded-md">
-        <div className="flex items-center">
-          <div>
-            <Storefront size={24} color="#06bcea" weight="duotone" />
-          </div>
-          <div className="ml-2 font-medium">Bán tại quầy</div>
-        </div>
-        <div className="flex flex-col gap-3 mt-2">
-          <p className="">
-            Doanh thu: &nbsp;&nbsp;&nbsp;{" "}
-            <span className="font-bold mr-4">
-              {formatNumber(boxData.counter.amount)} đ
-            </span>
-          </p>
-          <p className="">
-            Đơn chốt: &nbsp;&nbsp;&nbsp;{" "}
-            <span className="font-bold mr-4">
-              {formatNumber(boxData.counter.order)}
-            </span>
-          </p>
+          {showCountOrder && (
+            <p className="">
+              Đơn chốt: &nbsp;&nbsp;&nbsp;{" "}
+              <span className="font-bold mr-4">
+                {formatNumber(counterOrder)}
+              </span>
+            </p>
+          )}
         </div>
       </div>
     );
@@ -181,8 +203,22 @@ const ChartRevenue = (props: ChartRevenueProps) => {
           <>
             <div className="grid grid-cols-3 gap-3 mb-3">
               {renderBoxTotal()}
-              {renderBoxOnline()}
-              {renderBoxAtCounter()}
+              {renderBoxToday(
+                "Online",
+                boxData.online.amount,
+                boxData.online.order,
+                true,
+                <Globe size={24} color="#06bcea" weight="duotone" />,
+                true
+              )}
+              {renderBoxToday(
+                "Bán tại quầy",
+                boxData.counter.amount,
+                boxData.counter.order,
+                true,
+                <Storefront size={24} color="#06bcea" weight="duotone" />,
+                true
+              )}
             </div>
             <Line
               data={data}
@@ -201,19 +237,65 @@ const ChartRevenue = (props: ChartRevenueProps) => {
         <div className="text-[18px] font-bold">
           Thông tin kinh doanh hôm nay
         </div>
-        <div>
+        <div className="mb-4">
           <div className="flex justify-between mt-4">
-            <div>Doanh thu</div>
-            <div className="font-bold">0đ</div>
+            <div>Doanh thu:</div>
+            <div className="font-bold">{formatNumber(todayData.totalRevenueAtCounter + todayData.totalRevenueOnline)}đ</div>
           </div>
           <div className="flex justify-between mt-4">
-            <div>Đơn chốt</div>
-            <div className="font-bold">0</div>
+            <div>Đơn chốt:</div>
+            <div className="font-bold">{todayData.totalOrdersAtCounter + todayData.totalOrdersOnline}</div>
           </div>
         </div>
-        <div className="flex justify-between mt-3">
-          {renderBoxOnline()}
-          {renderBoxAtCounter()}
+        <div className="grid grid-cols-2 gap-3">
+          {renderBoxToday(
+            "Online",
+            todayData.totalRevenueOnline,
+            todayData.totalOrdersOnline,
+            true,
+            <Globe size={24} color="#06bcea" weight="duotone" />,
+            true
+          )}
+          {renderBoxToday(
+            "Bán tại quầy",
+            todayData.totalRevenueAtCounter,
+            todayData.totalOrdersAtCounter,
+            true,
+            <Storefront size={24} color="#06bcea" weight="duotone" />,
+            true
+          )}
+          {renderBoxToday(
+            "Khách hàng mới",
+            <span>{todayData.newCustomersCount} (khách)</span>,
+            0,
+            false,
+            <IdentificationCard size={24} color="#06bcea" weight="duotone" />,
+            false
+          )}
+          {renderBoxToday(
+            <span className="text-green-500">Đơn mới</span>,
+            <span>{todayData.newOrdersCount} (đơn)</span>,
+            0,
+            false,
+            <CheckSquareOffset size={24} color="green" weight="duotone" />,
+            false
+          )}
+          {renderBoxToday(
+            <span className="text-red-500">Đơn hủy</span>,
+            <span>{todayData.canceledOrdersCount} (đơn)</span>,
+            0,
+            false,
+            <CalendarX size={24} color="#d93030" />,
+            false
+          )}
+          {renderBoxToday(
+            "Số lượng bán",
+            <span>{todayData.totalQuantitySold} (đơn)</span>,
+            0,
+            false,
+            <ListNumbers size={24} color="#06bcea" weight="duotone" />,
+            false
+          )}
         </div>
       </div>
     </div>
