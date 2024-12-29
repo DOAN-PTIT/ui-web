@@ -10,6 +10,7 @@ import Avatar from "react-avatar";
 import moment from "moment";
 import { Customer } from "@/utils/type";
 import { createOrder } from "@/reducer/order.reducer";
+import CustomDatePicker from "@/components/CustomDatePicker";
 
 interface FormBoxCustomerProps
   extends ReturnType<typeof mapStateToProps>,
@@ -154,7 +155,7 @@ function FormBoxCustomer(props: FormBoxCustomerProps) {
           filterOption={false}
           variant="filled"
         />
-        <DatePicker
+        <CustomDatePicker
           placeholder="Ngày sinh"
           format="DD/MM/YYYY"
           value={selectedCustomer && moment(selectedCustomer?.date_of_birth)}
@@ -181,23 +182,23 @@ function FormBoxCustomer(props: FormBoxCustomerProps) {
           </div>
           <Divider />
           <div className="flex justify-between">
-            <p>
+            <p className="w-3/4">
               Tổng số tiền đã chi:{" "}
               <span className="font-bold">
-                {formatNumber(selectedCustomer?.total_purchase, "VND")}
+                {formatNumber(selectedCustomer?.total_spent, "VND")} đ
               </span>
             </p>
             <div>
               <p>
                 Tổng số đơn đã mua:{" "}
                 <span className="font-bold text-green-500">
-                  {selectedCustomer?.total_order || 0}
+                  {selectedCustomer?.order_count || 0}
                 </span>
               </p>
               <p>
                 Lần cuối mua hàng:{" "}
-                <span className="font-bold">
-                  {selectedCustomer?.last_purchase || 0}
+                <span className="font-[600]">
+                  {selectedCustomer?.last_purchase ? moment(selectedCustomer?.last_purchase).format("DD/MM/YYYY HH:MM") : <span className="text-red-500">Chưa mua hàng</span>}
                 </span>
               </p>
             </div>

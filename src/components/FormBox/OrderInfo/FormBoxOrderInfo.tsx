@@ -26,6 +26,12 @@ function FormBoxOrderInfo(props: FormBoxOrderInfoProps) {
     order,
   } = props;
 
+  const [createdAt, setCreatedAt] = useState<any>(orderParams.createdAt ? moment(orderParams.createdAt) : moment());
+
+  useEffect(() => {
+    createOrder({ ...orderParams, createdAt: moment(createdAt).format("YYYY-MM-DD HH:mm") });
+  }, [createdAt]);
+
   const onFocusSelect = async () => {
     getListShopUser({ shopId: currentShop.id });
   };
@@ -46,17 +52,14 @@ function FormBoxOrderInfo(props: FormBoxOrderInfoProps) {
           <CustomDatePicker
             className="w-[180px]"
             onChange={(date, datetime) => {
-              createOrder({
-                ...orderParams,
-                createdAt: date.format("YYYY-MM-DD HH:mm"),
-              });
+              setCreatedAt(date);
             }}
             format="DD/MM/YYYY HH:mm"
             showHour
             showMinute
             showTime
             variant="filled"
-            value={moment(order?.createdAt)}
+            value={createdAt}
           />
         </div>
         <div className="flex justify-between">
@@ -65,13 +68,14 @@ function FormBoxOrderInfo(props: FormBoxOrderInfoProps) {
             onFocus={onFocusSelect}
             filterOption={false}
             onSelect={(value) => handleSelectChange(value)}
+            placeholder="Chọn nhân viên"
             className="w-[180px]"
             loading={isLoading}
             variant="filled"
             notFoundContent={
               isLoading ? <LoadingOutlined /> : <div>Không có nhân viên!</div>
             }
-            value={order?.shopuser_id || currentUser.id}
+            value={order?.shopuser?.user?.id}
           >
             {shopUser?.employees.map((user: any) => {
               return (

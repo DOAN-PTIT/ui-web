@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Col, Layout, notification, Row } from "antd";
+import { Button, Col, Layout, notification, Row, Spin } from "antd";
 import HeaderAction from "../HeaderAction/HeaderAction";
 import { SaveOutlined } from "@ant-design/icons";
 import FormBoxProduct from "../FormBox/Product/FormBoxProduct";
@@ -9,13 +9,20 @@ import FormBoxNote from "../FormBox/Note/FormBoxNote";
 import FormBoxOrderInfo from "../FormBox/OrderInfo/FormBoxOrderInfo";
 import FormBoxCustomer from "../FormBox/Customer/FormBoxCustomer";
 import FormBoxReceive from "../FormBox/Receive/FormBoxReceive";
+import FormBoxShopPartner from "@/components/FormBox/FormBoxShopPartner";
 import { AppDispatch, RootState } from "@/store";
 import { connect } from "react-redux";
-import { calcOrderDebt, calcTotalOrderPrice, formatNumber } from "@/utils/tools";
-import { useEffect, useState } from "react";
+import {
+  calcOrderDebt,
+  calcTotalOrderPriceOriginal,
+  formatNumber,
+  calcTotalOrderPrice,
+} from "@/utils/tools";
+import { Fragment, useEffect, useState } from "react";
 import { createOrder } from "@/reducer/order.reducer";
 import apiClient from "@/service/auth";
 import { isEmpty } from "lodash";
+import moment from "moment";
 
 const { Content, Footer } = Layout;
 
@@ -30,14 +37,16 @@ function Sale(props: SaleProps) {
   const [isAtCounter, setIsAtCounter] = useState(false);
   const [promotionsCanBeActive, setPromotionsCanBeActive] = useState<any>([]);
 
-  // useEffect(() => {
-  //   if (orderParams.add_customer) {
-  //     createOrder({ ...orderParams, add_customer: null });
-  //   }
-  // }, []);
+  useEffect(() => {
+    const { createdAt, shopuser_id, ...res } = orderParams;
+    createOrder({
+      createdAt,
+      shopuser_id,
+    });
+  }, []);
 
   const handleCreateOrder = async () => {
-    // setIsLoading(true);
+    setIsLoading(true);
     const url = `/shop/${currentShop.id}/order/create`;
 
     const params = {
@@ -53,12 +62,12 @@ function Sale(props: SaleProps) {
       })),
       delivery_cost_shop: orderParams.delivery_cost_shop,
       at_counter: isAtCounter,
-      total_cost: calcTotalOrderPrice(orderParams),
+      total_cost: calcTotalOrderPriceOriginal(orderParams),
     };
 
     delete params.orderitems;
     delete params.prepaid;
-    delete params.delivery_cost;
+    delete params.promotion;
     return apiClient
       .post(url, params)
       .then((res) => {
@@ -76,7 +85,7 @@ function Sale(props: SaleProps) {
         setIsLoading(false);
         notification.error({
           message: "Tạo hoá đơn thất bại",
-          description: err.response.data.message,
+          description: errorMessage,
         });
       });
   };
@@ -87,7 +96,7 @@ function Sale(props: SaleProps) {
       return await apiClient
         .get(url, {
           params: {
-            total_price: calcOrderDebt(orderParams) + (orderParams.delivery_cost || 0),
+            total_price: calcTotalOrderPrice(orderParams),
             order_total: orderParams.orderitems?.length || 0,
             type: 2,
           },
@@ -99,7 +108,7 @@ function Sale(props: SaleProps) {
           notification.error({
             message: "Lỗi",
             description: "Lỗi không xác định",
-          })
+          });
         });
     } catch (error) {
       console.log(error);
@@ -109,57 +118,65 @@ function Sale(props: SaleProps) {
   return (
     <Layout className="h-screen">
       <HeaderAction isShowSearch={false} title="Tạo hóa đơn" />
-      <Content className="bg-gray-200 rounded-xl overflow-auto overflow-x-hidden flex p-5 gap-5 w-full">
-        <Row justify="space-between" className="w-full" gutter={16}>
-          <Col span={15}>
-            <Row>
-              <FormBoxProduct
-                setIsAtCounter={setIsAtCounter}
-                isAtCounter={isAtCounter}
-                findDiscountCanBeActice={findDiscountCanBeActice}
-                promotionsCanBeActive={promotionsCanBeActive}
-              />
-            </Row>
-            <Row justify="space-between" className="mt-4" gutter={16}>
-              <Col span={12}>
-                <FormBoxPayment />
-              </Col>
-              <Col span={12}>
-                <FormBoxNote />
-              </Col>
-            </Row>
-          </Col>
-          <Col span={9} className="flex flex-col gap-4">
-            <Row>
-              <FormBoxOrderInfo />
-            </Row>
-            <Row>
-              <FormBoxCustomer customer={orderParams?.add_customer} />
-            </Row>
-            <Row>
-              <FormBoxReceive />
-            </Row>
-          </Col>
-        </Row>
-      </Content>
-      <Footer className="bg-white flex justify-between items-center mt-4 shadow-2xl rounded-tr-2xl rounded-tl-2xl">
-        <div className="text-xl font-medium">
-          Cần thanh toán:{" "}
-          {formatNumber(
-            calcOrderDebt(orderParams)
-          )}{" "}
-          đ
+      {isLoading ? (
+        <div className="w-full h-screen flex justify-center items-center">
+          <p className="font-[600] mr-4">Chờ chút xíu bạn nhé...</p>
+          <Spin />
         </div>
-        <Button
-          onClick={handleCreateOrder}
-          icon={<SaveOutlined />}
-          type="primary"
-          className="text-[20px] font-medium pt-5 pb-5 pl-6 pr-6"
-          loading={isLoading}
-        >
-          Lưu
-        </Button>
-      </Footer>
+      ) : (
+        <Fragment>
+          <Content className="bg-gray-200 rounded-xl overflow-auto overflow-x-hidden flex p-5 gap-5 w-full">
+            <Row justify="space-between" className="w-full" gutter={16}>
+              <Col span={15}>
+                <Row>
+                  <FormBoxProduct
+                    setIsAtCounter={setIsAtCounter}
+                    isAtCounter={isAtCounter}
+                    findDiscountCanBeActice={findDiscountCanBeActice}
+                    promotionsCanBeActive={promotionsCanBeActive}
+                  />
+                </Row>
+                <Row justify="space-between" className="mt-4" gutter={16}>
+                  <Col span={12}>
+                    <FormBoxPayment />
+                  </Col>
+                  <Col span={12}>
+                    <FormBoxNote />
+                  </Col>
+                </Row>
+              </Col>
+              <Col span={9} className="flex flex-col gap-4">
+                <Row>
+                  <FormBoxOrderInfo />
+                </Row>
+                <Row>
+                  <FormBoxCustomer customer={orderParams?.add_customer} />
+                </Row>
+                <Row>
+                  <FormBoxReceive />
+                </Row>
+                <Row>
+                  <FormBoxShopPartner />
+                </Row>
+              </Col>
+            </Row>
+          </Content>
+          <Footer className="bg-white flex justify-between items-center mt-4 shadow-2xl rounded-tr-2xl rounded-tl-2xl">
+            <div className="text-xl font-medium">
+              Cần thanh toán: {formatNumber(calcTotalOrderPrice(orderParams))} đ
+            </div>
+            <Button
+              onClick={handleCreateOrder}
+              icon={<SaveOutlined />}
+              type="primary"
+              className="text-[20px] font-medium pt-5 pb-5 pl-6 pr-6"
+              loading={isLoading}
+            >
+              Lưu
+            </Button>
+          </Footer>
+        </Fragment>
+      )}
     </Layout>
   );
 }

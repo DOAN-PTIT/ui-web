@@ -204,6 +204,7 @@ function Order(props: OrderProps) {
       shop_id: currentShop.id,
       id: selectedRowKey,
       status: value,
+      is_update_status: true,
     };
     await updateOrder(params)
       .then((res) => {
@@ -237,7 +238,7 @@ function Order(props: OrderProps) {
         status: order.status || 1,
         totalPrice: `${formatNumber(order.total_cost)} đ`,
         insertedAt: moment(order.createdAt).format("DD/MM/YYYY HH:mm"),
-        updatedAt: moment(order.createdAt).format("DD/MM/YYYY HH:mm"),
+        updatedAt: moment(order.updatedAt).format("DD/MM/YYYY HH:mm"),
         total_discount: order.total_discount || 0,
       };
     });

@@ -18,10 +18,12 @@ import FormBoxPayment from "../FormBox/Payment/FormBoxPayment";
 import FormBoxProduct from "../FormBox/Product/FormBoxProduct";
 import FormBoxReceive from "../FormBox/Receive/FormBoxReceive";
 import "@/styles/order_detail.css";
-import { calcOrderDebt, calcTotalOrderPrice, formatNumber, orderStatus } from "@/utils/tools";
+import { calcOrderDebt, calcTotalOrderPrice, calcTotalOrderPriceOriginal, formatNumber, orderStatus } from "@/utils/tools";
 import { createOrder } from "@/reducer/order.reducer";
 import Avatar from "react-avatar";
 import { updateOrder } from "@/action/order.action";
+import FormBoxShopPartner from "../FormBox/FormBoxShopPartner";
+import { cloneDeep } from "lodash";
 
 interface OrderDetailProps
   extends ReturnType<typeof mapStateToProps>,
@@ -58,12 +60,17 @@ function OrderDetail(props: OrderDetailProps) {
   const [orderDetail, setOrderDetail] = useState<OrderDetail>({});
   const [isAtCounter, setIsAtCounter] = useState(false);
   const [promotionsCanBeActive, setPromotionsCanBeActive] = useState<any>([]);
+  const [totalCost, setTotalCost] = useState(calcTotalOrderPrice(orderParams));
 
   useEffect(() => {
     if(selectedRowKey) {
       getOrderDetail();
     }
   }, [selectedRowKey]);
+
+  useEffect(() => {
+    setTotalCost(calcTotalOrderPrice(orderParams));
+  }, [orderParams]);
 
   const getOrderDetail = async () => {
     setIsLoading(true);
@@ -121,7 +128,7 @@ function OrderDetail(props: OrderDetailProps) {
       return await apiClient
         .get(url, {
           params: {
-            total_price: calcOrderDebt(orderParams) + (orderParams.delivery_cost || 0),
+            total_price: calcTotalOrderPrice(orderParams),
             order_total: orderParams.orderitems?.length || 0,
             type: 2,
           },
@@ -142,7 +149,12 @@ function OrderDetail(props: OrderDetailProps) {
 
   const handleUpdateOrder = () => {
     setIsLoading(true);
-    updateOrder(orderParams)
+    let cloneOrderParams = cloneDeep(orderParams);
+    if(!cloneOrderParams.promotion) {
+      delete cloneOrderParams.promotion;
+    }
+    cloneOrderParams.updatedAt = new Date();
+    updateOrder(cloneOrderParams)
       .then((res) => {
         notification.success({
           message: "Cập nhật đơn hàng thành công",
@@ -165,7 +177,6 @@ function OrderDetail(props: OrderDetailProps) {
 
   const renderFooter = () => {
     const status = orderDetail.status !== undefined ? orderStatus[orderDetail.status] : undefined;
-    const totalCost = calcTotalOrderPrice(orderDetail);
     return (
       <div className="flex justify-between items-center">
         <div className="text-[18px]">
@@ -254,6 +265,9 @@ function OrderDetail(props: OrderDetailProps) {
               </Row>
               <Row>
                 <FormBoxReceive order={orderDetail} />
+              </Row>
+              <Row>
+                <FormBoxShopPartner order={orderDetail} />
               </Row>
             </Col>
           </Row>

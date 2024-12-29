@@ -1,10 +1,10 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
   calcOrderDebt,
-  calcPromotionProduct,
+  calcPromotionEachProduct,
   calcTotalDiscountOrder,
   calcTotalDiscountProduct,
-  calcTotalOrderPrice,
+  calcTotalOrderPriceOriginal,
   formatNumber,
 } from "@/utils/tools";
 import { DeleteOutlined, LoadingOutlined } from "@ant-design/icons";
@@ -71,7 +71,7 @@ function FormBoxProduct(props: FormBoxProductProps) {
     createOrder({
       ...orderParams,
       orderitems: updatedOrderItems,
-      total_cost: calcTotalOrderPrice({ ...orderParams, orderitems: updatedOrderItems }),
+      total_cost: calcTotalOrderPriceOriginal({ ...orderParams, orderitems: updatedOrderItems }),
       total_discount: calcTotalDiscountOrder({ ...orderParams, orderitems: updatedOrderItems }),
     });
   }, [note, selectedProduct]);
@@ -180,7 +180,7 @@ function FormBoxProduct(props: FormBoxProductProps) {
       const discount = promotionOrderRange?.discount;
       const isDiscountPercent = promotionOrderRange?.is_discount_percent;
       const maxDiscount = promotionOrderRange?.max_discount;
-      const totalOrder = calcTotalOrderPrice(orderParams);
+      const totalOrder = calcTotalOrderPriceOriginal(orderParams);
       const discountValue = isDiscountPercent
         ? (totalOrder * discount) / 100
         : discount;
@@ -189,13 +189,13 @@ function FormBoxProduct(props: FormBoxProductProps) {
         createOrder({
           ...orderParams,
           total_discount: orderParams.total_discount + discountValueWithMax,
-          promotion,
+          promotion_id: promotion?.id,
         });
       } else {
         createOrder({
           ...orderParams,
           total_discount: orderParams.total_discount - discountValueWithMax,
-          promotion: null,
+          promotion_id: null,
         });
       }
     }
@@ -232,7 +232,6 @@ function FormBoxProduct(props: FormBoxProductProps) {
         {selectedProduct?.length > 0 ? (
           <div className="flex flex-col gap-3">
             {selectedProduct?.map((variation: any, index: number) => {
-              console.log(variation);
               return (
                 <div
                   key={variation?.id}
@@ -300,7 +299,7 @@ function FormBoxProduct(props: FormBoxProductProps) {
                       KM:{" "}
                       <a className="font-medium text-blue-500">
                         {formatNumber(
-                          calcPromotionProduct(
+                          calcPromotionEachProduct(
                             variation,
                             variation?.orderAmount || 1
                           ),
