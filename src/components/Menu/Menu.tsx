@@ -44,7 +44,7 @@ const listItem = [
   },
   {
     key: "order",
-    label: "Hóa đơn",
+    label: "Đơn hàng",
     icon: <ReconciliationOutlined />,
   },
   {
