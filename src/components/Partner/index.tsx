@@ -14,7 +14,7 @@ import {
   Spin,
 } from "antd";
 import HeaderAction from "../HeaderAction/HeaderAction";
-import { RootState } from "@/store";
+import { AppDispatch, RootState } from "@/store";
 import { connect } from "react-redux";
 import { LayoutStyled } from "@/styles/layoutStyle";
 import { useEffect, useState } from "react";
@@ -22,11 +22,12 @@ import apiClient from "@/service/auth";
 import Image from "next/image";
 import Link from "next/link";
 import { SettingOutlined } from "@ant-design/icons";
+import { getCurrentShop } from "@/action/shop.action";
 
-interface PartnerProps extends ReturnType<typeof mapStateToProps> {}
+interface PartnerProps extends ReturnType<typeof mapStateToProps>,ReturnType<typeof mapDispatchToProps>  {}
 
 const Partner = (props: PartnerProps) => {
-  const { currentShop } = props;
+  const { currentShop, getCurrentShop } = props;
 
   const [partersNonActive, setPartersNonActive] = useState([]);
   const [partersActive, setPartersActive] = useState([]);
@@ -79,6 +80,7 @@ const Partner = (props: PartnerProps) => {
           message: "Kích hoạt đơn vị vận chuyển thành công",
         });
         getListShopParter();
+        getCurrentShop({ shopId: currentShop.id });
         setVisible(false);
       })
       .catch(() => {
@@ -227,6 +229,7 @@ const Partner = (props: PartnerProps) => {
   };
 
   const handleNonActiveParter = async (id: number) => {
+    setLoading(true);
     const url = `/shop/${currentShop.id}/shop-partner/${id}/non-active`;
     return await apiClient
       .post(url)
@@ -235,11 +238,14 @@ const Partner = (props: PartnerProps) => {
           message: "Huỷ kết nối đơn vị vận chuyển thành công",
         });
         getListShopParter();
+        getCurrentShop({ shopId: currentShop.id });
+        setLoading(false);
       })
       .catch(() => {
         notification.error({
           message: "Huỷ kết nối đơn vị vận chuyển thất bại",
         });
+        setLoading(false);
       });
   };
 
@@ -365,4 +371,10 @@ const mapStateToProps = (state: RootState) => {
   };
 };
 
-export default connect(mapStateToProps, {})(Partner);
+const mapDispatchToProps = (dispatch: AppDispatch) => {
+  return {
+    getCurrentShop: (data: any) => dispatch(getCurrentShop(data)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Partner);
