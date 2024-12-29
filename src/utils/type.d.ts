@@ -42,12 +42,12 @@ export type Customer = {
   email: string;
   address?: string;
   date_of_birth?: string;
-  total_order?: number;
+  order_count?: number;
   tota: number;
   lastOrder: string;
   last_purchase: string;
   gender: "MALE" | "FEMALE";
-  total_purchase?: number;
+  total_spent?: number;
 };
 
 export type DisplayChart = "year" | "month";

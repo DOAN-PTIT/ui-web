@@ -182,7 +182,7 @@ export const calcTotalPriceProductAfterDiscount = (order: Order) => {
   if (order?.orderitems) {
     order?.orderitems.forEach((item: any) => {
       const variation_info = item.variation_info || item.variation;
-      const discount = calcPromotionProduct(variation_info, item.quantity);
+      const discount = calcPromotionEachProduct(variation_info, item.quantity);
       totalPrice += item.quantity * variation_info?.retail_price - discount;
     });
   }
@@ -191,7 +191,7 @@ export const calcTotalPriceProductAfterDiscount = (order: Order) => {
 };
 
 export const calcOrderDebt = (order: any) => {
-  let totalPriceOrder = calcTotalOrderPrice(order);
+  let totalPriceOrder = calcTotalOrderPriceOriginal(order);
   return totalPriceOrder - (order.total_discount || 0);
 };
 
@@ -200,7 +200,7 @@ export const calcTotalDiscountProduct = (order: Order) => {
   if (order?.orderitems) {
     order?.orderitems.forEach((item: any) => {
       const variation_info = item.variation_info || item.variation;
-      totalDiscount += calcPromotionProduct(variation_info, item.quantity);
+      totalDiscount += calcPromotionEachProduct(variation_info, item.quantity);
     });
   }
 
@@ -216,7 +216,7 @@ export const calcTotalDiscountOrder = (orderParams: any) => {
     const discount = promotionOrderRange?.discount;
     const isDiscountPercent = promotionOrderRange?.is_discount_percent;
     const maxDiscount = promotionOrderRange?.max_discount;
-    const totalOrder = calcTotalOrderPrice(orderParams);
+    const totalOrder = calcTotalOrderPriceOriginal(orderParams);
     const discountValue = isDiscountPercent
       ? (totalOrder * discount) / 100
       : discount;
@@ -226,7 +226,7 @@ export const calcTotalDiscountOrder = (orderParams: any) => {
   return discountValueWithMax + calcTotalDiscountProduct(orderParams);
 };
 
-export const calcPromotionProduct = (variation: any, quantity = 1) => {
+export const calcPromotionEachProduct = (variation: any, quantity = 1) => {
   const promotionItem = variation?.promotion_item;
   let discountPromotion = 0;
 
@@ -244,7 +244,7 @@ export const calcPromotionProduct = (variation: any, quantity = 1) => {
   return discountPromotion * quantity;
 };
 
-export const calcTotalOrderPrice = (order: any) => {
+export const calcTotalOrderPriceOriginal = (order: any) => {
   let total_price = 0;
   if (order) {
     total_price =
@@ -255,6 +255,14 @@ export const calcTotalOrderPrice = (order: any) => {
   }
   return total_price;
 };
+
+export const calcTotalOrderPrice = (order: any) => {
+  let total_price = 0;
+  if (order) {
+    total_price = calcTotalOrderPriceOriginal(order) + (order.delivery_cost || 0);
+  }
+  return total_price;
+}
 
 export const fuzzySearch = (pattern: string, string: string) =>
   fuzzyMatch(pattern, string) !== null;

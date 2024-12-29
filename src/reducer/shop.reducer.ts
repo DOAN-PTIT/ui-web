@@ -10,7 +10,8 @@ const reducer = createSlice({
             id: 0,
             name: "",
             avatar: "",
-            suppliers: [] as Supplier[]
+            suppliers: [] as Supplier[],
+            shop_delivery_company: [],
         },
         user: {
             employees: [{
