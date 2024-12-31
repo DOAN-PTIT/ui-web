@@ -14,6 +14,7 @@ import TitleH from "../Custom/TitleH";
 import HeaderAction from "../HeaderAction/HeaderAction";
 import AuthCard from "./components/Card";
 import ModalAddCustomer from "./components/ModalAddCustomer";
+import classNames from "classnames";
 
 const { Search } = Input;
 interface User {
@@ -26,20 +27,54 @@ interface User {
     createdAt: string;
 }
 interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> { }
- function Personnel(props: PesonnelProps) {
-    const {employeeShop,getEmployeeShop,shop} = props
+function Personnel(props: PesonnelProps) {
+    const { employeeShop, getEmployeeShop, shop } = props
     const dataRow = [
         {
             id: '1',
-            name: 'Xem báo cáo'
+            name: 'Quản lý đơn hàng'
         },
         {
             id: '2',
-            name: 'Gộp shop'
+            name: 'Quản lý khách hàng'
         },
         {
             id: '3',
-            name: 'Gộp shop'
+            name: 'Quản lý khuyến mãi'
+        },
+        {
+            id: '4',
+            name: 'Quản lý nhập hàng'
+        },
+        {
+            id: '5',
+            name: 'Quản lý nhà cung cấp'
+        }
+    ]
+    const dataRowAdmin = [
+        {
+            id: '1',
+            name: 'Quản lý cửa hàng'
+        },
+        {
+            id: '2',
+            name: 'Quản lý sản phẩm'
+        },
+        {
+            id: '3',
+            name: 'Quản lý công nợ'
+        },
+        {
+            id: '4',
+            name: 'Quản lý nhân viên'
+        },
+        {
+            id: '5',
+            name: 'Quản lý đơn vị vận chuyển'
+        },
+        {
+            id: '6',
+            name: 'Xem báo cáo'
         }
     ]
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -47,8 +82,9 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
     const [checkId, setCheckId] = useState()
     const [role, setRole] = useState()
     const [searchKey, setSearchKey] = useState("");
-     const [searchResults, setSearchResults] = useState<User[]>([]);
-     const [isSearching, setIsSearching] = useState(false);
+    const [searchResults, setSearchResults] = useState<User[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const isDisabled = role === "employee";
     const handleOpenActor = (id: any) => {
         setOpenActor(true);
         setCheckId(id)
@@ -58,42 +94,42 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
     };
     const handleOk = () => {
         setIsModalOpen(false);
-        getEmployeeShop({shopId})
+        getEmployeeShop({ shopId })
     }
     const handleCancel = () => {
         setIsModalOpen(false);
     };
     const shopId = shop.id
-     const searchEmployee = async (shopId: number, value: string) => {
-         const response = await apiClient.get(`/shop/${shopId}/employee/${value}`);
-         return response.data;
-     };
-     const handleSearch = async (value: string) => {
-         if (!value.trim()) {
-             setSearchResults([]);
-             return;
-         }
+    const searchEmployee = async (shopId: number, value: string) => {
+        const response = await apiClient.get(`/shop/${shopId}/employee/${value}`);
+        return response.data;
+    };
+    const handleSearch = async (value: string) => {
+        if (!value.trim()) {
+            setSearchResults([]);
+            return;
+        }
 
-         setIsSearching(true);
-         try {
-             const data = await searchEmployee(shopId, value);
-             setSearchResults(data);
-         } catch (error) {
-             message.error("Lỗi khi tìm kiếm nhân viên");
-         } finally {
-             setIsSearching(false);
-         }
-     };
+        setIsSearching(true);
+        try {
+            const data = await searchEmployee(shopId, value);
+            setSearchResults(data);
+        } catch (error) {
+            message.error("Lỗi khi tìm kiếm nhân viên");
+        } finally {
+            setIsSearching(false);
+        }
+    };
     const handleRemove = async (id: any) => {
         try {
             await apiClient.post(`/shop/${shopId}/employee/${id}/remove`)
             message.success('Xóa nhân viên thành công')
-            getEmployeeShop({shopId})
+            getEmployeeShop({ shopId })
         } catch (error) {
             console.log(error)
         }
     }
-    const changeRoleUser = async (value:string)=> {
+    const changeRoleUser = async (value: string) => {
         try {
             await apiClient.get(`shop/${shopId}/employee/${checkId}/role?role=${value}`)
             message.success('Thay đổi chức vụ thành công!')
@@ -103,7 +139,7 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
         }
     }
     useEffect(() => {
-        getEmployeeShop({shopId})
+        getEmployeeShop({ shopId })
     }, [])
 
     return (
@@ -111,7 +147,7 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
             <HeaderAction
                 title="Cấu hình"
                 isShowSearch={false}
-                inputPlaholder="Tìm kiếm cấu hình" 
+                inputPlaholder="Tìm kiếm cấu hình"
             />
             <Breadcrumb style={{ margin: '16px 0' }}>
                 <Breadcrumb.Item href={`/shop/${shopId}/settings`}>Cấu hình</Breadcrumb.Item>
@@ -119,8 +155,8 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                 <Breadcrumb.Item className="mt-3 text-sm text-[#0050b3] font-medium">Danh sách nhân viên</Breadcrumb.Item>
             </Breadcrumb>
             <LayoutStyled className="p-0">
-                <div className="grid grid-cols-10 w-full gap-4">
-                    <div className="col-span-3 rounded-lg bg-white min-h-screen">
+                <div className="grid grid-cols-10 w-full gap-4 min-h-[calc(100vh-7.5rem)]">
+                    <div className="col-span-3 rounded-lg bg-white ">
                         <div className="p-4 text-base font-semibold">Danh sách nhân viên</div>
                         <div className="flex px-4">
                             <Search
@@ -141,7 +177,10 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                             {(searchResults.length > 0 ? searchResults : employeeShop?.employees)?.map(i => (
                                 <div aria-disabled key={i.id} >
                                     <div className={`${checkId == i.id && openActor && 'bg-cyan-100'} rounded-lg flex items-center justify-between text-sm px-2 py-1 mb-1 hover:bg-cyan-100 cursor-pointer`}>
-                                        <div onClick={() => handleOpenActor(i.id)} className="flex w-full">
+                                        <div onClick={() => {
+                                            handleOpenActor(i.id)
+                                            setRole(i?.shopusers && i.shopusers[0]?.role)
+                                        }} className="flex w-full">
                                             <Tooltip className={`flex items-center`} placement="topLeft" title={checkRole(i?.shopusers && i.shopusers[0]?.role)} >
                                                 <Avatar src={i.avatar} icon={<UserOutlined />} alt="avt" className="mr-2 size-6" />
                                                 <div>{i.name}</div>
@@ -162,9 +201,9 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
 
 
                                     </div>
-                                    <Divider className="my-1"/>
+                                    <Divider className="my-1" />
                                 </div>
-                                
+
                             ))}
 
                         </div>
@@ -182,17 +221,17 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                                                     <div className="text-base font-semibold">{i.name}</div>
                                                     {i?.shopusers && i.shopusers[0]?.role !== 'owner' && (
                                                         <Popconfirm
-                                                        title="Lưu chức vụ"
-                                                        placement="bottomLeft"
-                                                        description="Bạn chắc chắn muốn lưu chức vụ nhân viên shop?"
-                                                        onConfirm={() => role && changeRoleUser(role)}
-                                                        okText="Lưu"
-                                                        cancelText="Hủy"
-                                                    >
-                                                        <Button type="primary">Lưu</Button>
-                                                    </Popconfirm>
+                                                            title="Lưu chức vụ"
+                                                            placement="bottomLeft"
+                                                            description="Bạn chắc chắn muốn lưu chức vụ nhân viên shop?"
+                                                            onConfirm={() => role && changeRoleUser(role)}
+                                                            okText="Lưu"
+                                                            cancelText="Hủy"
+                                                        >
+                                                            <Button type="primary">Lưu</Button>
+                                                        </Popconfirm>
                                                     )}
-                                                    
+
                                                 </div>
                                                 <div className="flex items-center">
                                                     <div className="flex">
@@ -215,27 +254,25 @@ interface PesonnelProps extends ReturnType<typeof mapStateToProps>, ReturnType<t
                                                     disabled={i?.shopusers && i.shopusers[0]?.role === 'owner' ? true : false}
                                                     onChange={(value) => setRole(value)}
                                                     options={
-                                                        i?.shopusers && i.shopusers[0]?.role === 'owner' ? [{ value: 'owner', label: 'Chủ cửa hàng', disabled: true }] 
-                                                        :[
-                                                        { value: 'admin', label: 'Quản lý' },
-                                                        { value: 'employee', label: 'Nhân viên' }  
-                                                    ]}
+                                                        i?.shopusers && i.shopusers[0]?.role === 'owner' ? [{ value: 'owner', label: 'Chủ cửa hàng', disabled: true }]
+                                                            : [
+                                                                { value: 'admin', label: 'Quản lý' },
+                                                                { value: 'employee', label: 'Nhân viên' }
+                                                            ]}
                                                 />
                                             </div>
                                             <div className="flex-1">
 
                                                 <div className="text-sm font-medium mb-1">Bắt đầu làm việc</div>
-                                                <DatePicker className="w-full" defaultValue={moment(i?.shopusers[0]?.createdAt, 'YYYY/MM/DD')} format={'YYYY/MM/DD'}  disabled/>
+                                                <DatePicker className="w-full" defaultValue={moment(i?.shopusers[0]?.createdAt, 'YYYY/MM/DD')} format={'YYYY/MM/DD'} disabled />
                                             </div>
                                         </div>
                                         <div>
                                             <TitleH title='Quyền trên cửa hàng' className="text-base mt-4" />
                                         </div>
                                         <div className="grid grid-cols-2 gap-4 mt-2 ">
-                                            <AuthCard title="Cấu hình" dataRow={dataRow} />
-                                            <AuthCard title="Sản phẩm" dataRow={dataRow} />
-                                            <AuthCard title="Bán hàng" dataRow={dataRow} />
-                                            <AuthCard title="Ứng dụng" dataRow={dataRow} />
+                                            <AuthCard title="Quyền chung" dataRow={dataRow}/>
+                                            <AuthCard title="Quyền quản lý" dataRow={dataRowAdmin} role={isDisabled} />
                                         </div>
                                     </div>
                                 ))}
@@ -251,14 +288,14 @@ const mapStateToProps = (state: RootState) => {
     return {
         employeeShop: state.shopReducer.user,
         shop: state.shopReducer.shop,
-        loading:state.shopReducer.isLoading
+        loading: state.shopReducer.isLoading
     }
 }
 
 const mapDispatchToProps = (dispatch: AppDispatch) => {
     return {
-        getEmployeeShop: (shopId:any) => dispatch(getListShopUser(shopId))
-        
+        getEmployeeShop: (shopId: any) => dispatch(getListShopUser(shopId))
+
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(Personnel)
