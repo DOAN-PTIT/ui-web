@@ -15,6 +15,7 @@ import {
   Layout,
   Modal,
   notification,
+  Popover,
   Row,
   Select,
   Spin,
@@ -26,6 +27,7 @@ import {
 import {
   ChangeEvent,
   Dispatch,
+  Fragment,
   SetStateAction,
   useEffect,
   useState,
@@ -37,6 +39,7 @@ import axios from "axios";
 import apiClient from "@/service/auth";
 import UploadFile from "./UploadFile";
 import { RcFile } from "antd/es/upload";
+import { unionBy } from "lodash";
 
 interface VariationProps {
   id: string;
@@ -70,6 +73,7 @@ function ProductDetail(props: ProductDetailProps) {
     currentUser,
     selectedRowKeys,
     setSelectedRowKeys,
+    suppliers,
   } = props;
 
   const [createProductParams, setCreateProductParams] = useState<any>({});
@@ -83,6 +87,8 @@ function ProductDetail(props: ProductDetailProps) {
   const [selectedProduct, setSelectedProduct] = useState<any>();
   const [selectedVariation, setSelectedVariation] = useState<any>();
   const [isLoading, setIsLoading] = useState(false);
+  const [deleteVariationIds, setDeleteVariationIds] = useState<any[]>([]);
+  const [uploadImageLoading, setUploadImageLoading] = useState(false);
 
   interface VariationParam {
     index?: number;
@@ -106,6 +112,12 @@ function ProductDetail(props: ProductDetailProps) {
     );
 
     const newVariationData = [...variationData];
+    const deleteVariation = newVariationData[indexSelectedColumn];
+    if (deleteVariation.id) {
+      setDeleteVariationIds((prev) => {
+        return [...prev, deleteVariation.id];
+      });
+    }
     newVariationData.splice(indexSelectedColumn, 1);
     setVariationData(newVariationData);
   };
@@ -118,8 +130,12 @@ function ProductDetail(props: ProductDetailProps) {
         .get(url)
         .then((res) => {
           const data = res.data;
+          const suppliers_products_ids =
+            data.suppliers_products.length > 0
+              ? data.suppliers_products.map((item: any) => item.supplier_id)
+              : [];
           setSelectedProduct(data);
-          setCreateProductParams(data);
+          setCreateProductParams({ suppliers_products_ids, ...data });
           setVariationData(data.variations);
           setIsLoading(false);
         })
@@ -159,25 +175,17 @@ function ProductDetail(props: ProductDetailProps) {
       width: 120,
       fixed: "left",
       render: (text, record) => {
-        const cac = new FormData
-        
-        const handleUploadChange = (file: RcFile | null) => {
-          if (file) {
-            cac.append("image", file);
-            onInputVariationChange("image", file);
-          }
-        };
         return (
-          <>
-            <UploadFile onChange={handleUploadChange}/>
-            {/* <Image
-              alt=""
-              // onClick={() => setIsOpenModal(true)}
-              src={url}
-              preview={false}
-              className="cursor-pointer"
-            /> */}
-          </>
+          <div>
+            <Popover content={<UploadFile onChange={handleUploadChange} />}>
+              <Image
+                alt=""
+                src={text ? text : defaultImage}
+                preview={false}
+                className="cursor-pointer"
+              />
+            </Popover>
+          </div>
         );
       },
     },
@@ -207,7 +215,10 @@ function ProductDetail(props: ProductDetailProps) {
             defaultValue={text}
             value={record.last_imported_price}
             onChange={(e) =>
-              onInputVariationChange("last_imported_price", e.target.value)
+              onInputVariationChange(
+                "last_imported_price",
+                parseInt(e.target.value)
+              )
             }
           />
         );
@@ -224,7 +235,7 @@ function ProductDetail(props: ProductDetailProps) {
             defaultValue={text}
             value={record.retail_price}
             onChange={(e) =>
-              onInputVariationChange("retail_price", e.target.value)
+              onInputVariationChange("retail_price", parseInt(e.target.value))
             }
           />
         );
@@ -241,7 +252,10 @@ function ProductDetail(props: ProductDetailProps) {
             defaultValue={text}
             value={record.price_at_counter}
             onChange={(e) =>
-              onInputVariationChange("price_at_counter", e.target.value)
+              onInputVariationChange(
+                "price_at_counter",
+                parseInt(e.target.value)
+              )
             }
           />
         );
@@ -257,7 +271,9 @@ function ProductDetail(props: ProductDetailProps) {
             name="amount"
             defaultValue={text}
             value={record.amount}
-            onChange={(e) => onInputVariationChange("amount", e.target.value)}
+            onChange={(e) =>
+              onInputVariationChange("amount", parseInt(e.target.value))
+            }
           />
         );
       },
@@ -281,6 +297,37 @@ function ProductDetail(props: ProductDetailProps) {
     },
   });
 
+  const handleUploadChange = async (file: RcFile | null) => {
+    if (file) {
+      setUploadImageLoading(true);
+      const url = `cloudinary/upload-image`;
+      return await apiClient
+        .post(
+          url,
+          { image: file },
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        )
+        .then((res) => {
+          setUploadImageLoading(false);
+          if (res.data) {
+            onInputVariationChange("image", res.data);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          setUploadImageLoading(false);
+          notification.error({
+            message: "Đã xảy ra lỗi khi tải ảnh",
+            description: "Tải ảnh không thành công. Vui lòng thử lại",
+          });
+        });
+    }
+  };
+
   const getDataVariation: () => TableProps<VariationProps>["dataSource"] =
     () => {
       return variationData.map((item: any) => ({
@@ -290,52 +337,81 @@ function ProductDetail(props: ProductDetailProps) {
     };
 
   const handleCreateProduct = async () => {
+    setIsLoading(true);
     try {
-      const res = await createProduct({
+      return await createProduct({
         ...createProductParams,
         shopId: currentShop.id,
-      });
+      })
+        .then(async (res) => {
+          if (res.payload) {
+            const { id: product_id } = res.payload;
 
-      if (res.payload) {
-        const { id: product_id } = res.payload;
+            const resultArr: any = [];
+            for (const variation of variationData) {
+              if (variation.index !== undefined) {
+                if (variation.index !== undefined) {
+                  delete variation.index;
+                }
+              }
+              await createVariation({
+                ...variation,
+                shop_id: currentShop.id,
+                product_id,
+              })
+                .then((result) => {
+                  if (result.payload) {
+                    resultArr.push(result.payload);
+                    setModalVisiable(false);
+                    notification.success({
+                      message: "Tạo sản phẩm thành công",
+                      description: "Tạo sản phẩm thành công",
+                    });
+                    setIsLoading(false);
+                  }
+                })
+                .catch(() => {
+                  setModalVisiable(false);
+                  notification.error({
+                    message: "Đã xảy ra lỗi khi tạo mẫu mã",
+                    description:
+                      "Tạo mẫu mã không thành công. Vui lòng thử lại",
+                  });
+                });
+            }
 
-        const resultArr: any = [];
-        for (const variation of createVariationParams) {
-          if (variation.index !== undefined) {
-            if (variation.index !== undefined) {
-              delete variation.index;
+            const variations = resultArr.filter((item: { id: any }) => item.id);
+            const product = res.payload;
+
+            if (variations.length > 0 && selectedCatalog) {
+              handleSyncProductToFacebook({ ...product, variations });
             }
           }
-          const result = await createVariation({
-            ...variation,
-            shop_id: currentShop.id,
-            product_id,
+        })
+        .catch(() => {
+          setModalVisiable(false);
+          setIsLoading(false);
+          notification.error({
+            message: "Đã xảy ra lỗi khi tạo sản phẩm",
+            description: "Tạo sản phẩm không thành công. Vui lòng thử lại",
           });
-
-          if (result.payload) resultArr.push(result.payload);
-        }
-
-        const variations = resultArr.filter((item: { id: any; }) => item.id);
-        const product = res.payload;
-
-        if (variations.length > 0 && selectedCatalog) {
-          handleSyncProductToFacebook({ ...product, variations });
-        }
-      }
+        });
     } catch (error) {
+      setIsLoading(false);
       console.error(error);
     }
   };
 
   const handleUpdateProduct = async () => {
+    delete createProductParams.suppliers_products;
     setIsLoading(true);
     try {
-      const url = `/shop/${currentShop.id}/product/${createProductParams.id}/update`;
+      const url = `/shop/${currentShop.id}/product/update`;
       return await apiClient
-        .post(url, { ...createProductParams, variations: variationData, }, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+        .post(url, {
+          ...createProductParams,
+          variations: variationData,
+          delete_variation_ids: deleteVariationIds,
         })
         .then((res) => {
           setModalVisiable(false);
@@ -375,7 +451,8 @@ function ProductDetail(props: ProductDetailProps) {
     const newVariationData = [...variationData];
     const newVariation = {
       variation_code: "",
-      image: "",
+      image:
+        "https://res.cloudinary.com/dzu5qbyzq/image/upload/v1732203781/product_avatar_default.webp?fbclid=IwY2xjawGsjapleHRuA2FlbQIxMAABHf18-FMV5iWxBn5H4jGAUiRGvOAp6fOLYfNBFwGzJr3_hQfp7Kbutp1JbQ_aem_Kqm41MSZ_WUiveMINit8Iw",
       price_at_counter: "",
       barcode: "",
       retail_price: "",
@@ -532,6 +609,7 @@ function ProductDetail(props: ProductDetailProps) {
           }}
           className="mr-2"
           loading={isLoading}
+          disabled={isLoading}
         >
           Lưu
         </Button>
@@ -577,7 +655,7 @@ function ProductDetail(props: ProductDetailProps) {
             <Spin />
           </div>
         ) : (
-          <>
+          <Fragment>
             <Row justify="space-between" className="mb-5">
               <Col span={12} className="bg-white rounded-lg shadow-sm">
                 <Form
@@ -622,19 +700,32 @@ function ProductDetail(props: ProductDetailProps) {
                   layout="vertical"
                   className="p-6 bg-white rounded-lg shadow-sm"
                 >
-                  <Form.Item name="product_tag" label="Thẻ">
+                  <Form.Item name="product_categories" label="Danh mục">
                     <Select
                       options={[]}
-                      placeholder="Thẻ"
-                      onChange={(value) => onInputChange("product_tag", value)}
+                      placeholder="Danh mục"
+                      onChange={(value) =>
+                        onInputChange("product_categories", value)
+                      }
                     />
                   </Form.Item>
                   <Form.Item label="Nhà cung cấp">
                     <Select
-                      options={[]}
                       placeholder="Nhà cung cấp"
-                      onChange={(value) => onInputChange("supplier", value)}
-                    />
+                      onChange={(value) =>
+                        onInputChange("suppliers_products_ids", value)
+                      }
+                      mode="multiple"
+                      value={createProductParams.suppliers_products_ids}
+                    >
+                      {suppliers.map((supplier) => {
+                        return (
+                          <Select.Option key={supplier.id} value={supplier.id}>
+                            {supplier.name}
+                          </Select.Option>
+                        );
+                      })}
+                    </Select>
                   </Form.Item>
                 </Form>
                 <div className="mt-4">
@@ -695,7 +786,7 @@ function ProductDetail(props: ProductDetailProps) {
                 };
               }}
             />
-          </>
+          </Fragment>
         )}
       </Layout>
     </Modal>
@@ -710,6 +801,7 @@ const mapStateToProps = (state: RootState) => {
     currentShop: state.shopReducer.shop,
     currentUser: state.userReducer.user,
     createProductState: state.productReducer.createProduct,
+    suppliers: state.shopReducer.shop.suppliers,
   };
 };
 

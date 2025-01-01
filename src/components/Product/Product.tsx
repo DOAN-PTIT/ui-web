@@ -75,6 +75,7 @@ function Product(props: ProductProps) {
       fixed: "left",
       width: "8%",
       render: (text, record) => {
+        console.log(text);
         return (
           <Text
             copyable={{
@@ -83,10 +84,9 @@ function Product(props: ProductProps) {
                 message.success(`Sao chép thành công mã sản phẩm: ${text}`);
               },
               tooltips: "Click để sao chép mã sản phẩm",
-              icon: <div className="font-medium">{text}</div>,
             }}
-            className="font-bold"
-          />
+            className="font-[600] text-sky-600"
+          >{text}</Text>
         );
       },
     },
@@ -107,7 +107,9 @@ function Product(props: ProductProps) {
       fixed: "left",
       width: "8%",
       render: (text, record) => {
-        return <Image src={text} width={80} />;
+        return <div onClick={(e) => {
+          e.stopPropagation();
+        }}><Image src={text} width={80} /></div>
       },
     },
     {
