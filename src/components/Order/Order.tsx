@@ -203,7 +203,15 @@ function Order(props: OrderProps) {
     },
   });
 
-  const handleUpdateOrderStatus = async (value: any) => {
+  const handleUpdateOrderStatus = async (value: any, prevStatus: any) => {
+    if (prevStatus == "-1") {
+      notification.warning({
+        message: "Cập nhật đơn hàng thất bại",
+        description: "Đơn hàng đã bị hủy, không thể cập nhật trạng thái",
+      });
+      return;
+    }
+    
     const params = {
       shop_id: currentShop.id,
       id: selectedRowKey,

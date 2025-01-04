@@ -1,10 +1,10 @@
-import { ConfigProvider, Select } from "antd";
+import { ConfigProvider, notification, Select } from "antd";
 import "@/styles/global.css";
 import { MouseEventHandler } from "react";
 
 interface CustomSelectProps {
   data: any;
-  handleSelect?: (value: any) => any;
+  handleSelect?: (value: any, prevStatus: any) => any;
   currentStatus?: string;
   handleClick?: (e: any) => void;
 }
@@ -17,7 +17,9 @@ const CustomSelect = (props: CustomSelectProps) => {
       value: value,
     };
   });
-  const statusItem: any = listStatus.find((item: any) => item.key == currentStatus);
+  const statusItem: any = listStatus.find(
+    (item: any) => item.key == currentStatus
+  );
 
   return (
     <div
@@ -33,7 +35,13 @@ const CustomSelect = (props: CustomSelectProps) => {
           },
         }}
       >
-        <Select className="w-full" onSelect={handleSelect} value={statusItem?.key}>
+        <Select
+          className="w-full"
+          onSelect={(value) => {
+            handleSelect?.(value, statusItem.key);
+          }}
+          value={statusItem?.key}
+        >
           {listStatus.map((item: any) => {
             return (
               <Select.Option key={item.key} value={item.key}>
