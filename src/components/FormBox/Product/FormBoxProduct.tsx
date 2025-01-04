@@ -24,6 +24,7 @@ import Image from "next/image";
 import { AppDispatch, RootState } from "@/store";
 import { createOrder } from "@/reducer/order.reducer";
 import { connect } from "react-redux";
+import CustomInputNumber from "@/container/CustomInputNumber";
 
 const currency = "VND";
 
@@ -71,8 +72,14 @@ function FormBoxProduct(props: FormBoxProductProps) {
     createOrder({
       ...orderParams,
       orderitems: updatedOrderItems,
-      total_cost: calcTotalOrderPriceOriginal({ ...orderParams, orderitems: updatedOrderItems }),
-      total_discount: calcTotalDiscountOrder({ ...orderParams, orderitems: updatedOrderItems }),
+      total_cost: calcTotalOrderPriceOriginal({
+        ...orderParams,
+        orderitems: updatedOrderItems,
+      }),
+      total_discount: calcTotalDiscountOrder({
+        ...orderParams,
+        orderitems: updatedOrderItems,
+      }),
     });
   }, [note, selectedProduct]);
 
@@ -221,7 +228,6 @@ function FormBoxProduct(props: FormBoxProductProps) {
       <ProductSearchBar
         setSelectedProduct={setSelectedProduct}
         selectedProduct={selectedProduct}
-
       />
       <div className="bg-gray-100 p-5 rounded-lg">
         <div className="gap-6 font-medium text-md mb-4">
@@ -268,17 +274,19 @@ function FormBoxProduct(props: FormBoxProductProps) {
                     </div>
                     <div className="flex gap-4 items-center mt-12">
                       <span className="text-green-500 font-medium">
-                        {formatNumber(isAtCounter ? variation.price_at_counter : variation.retail_price)} ₫
+                        {formatNumber(
+                          isAtCounter
+                            ? variation.price_at_counter
+                            : variation.retail_price
+                        )}{" "}
+                        ₫
                       </span>
                       x
-                      <Input
-                        type="number"
+                      <CustomInputNumber
+                        type="quantity"
                         variant="filled"
-                        onChange={(e) => {
-                          const orderAmount = Math.max(
-                            1,
-                            parseInt(e.target.value)
-                          );
+                        onChange={(value) => {
+                          const orderAmount = Math.max(1, value || 1);
                           onChangeAmountCurrentProduct(variation, orderAmount);
                         }}
                         value={variation?.orderAmount}

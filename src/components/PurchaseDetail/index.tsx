@@ -11,6 +11,7 @@ import {
   Tag,
   Divider,
   Spin,
+  InputNumber,
 } from "antd";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { connect } from "react-redux";
@@ -19,13 +20,17 @@ import ProductSearchBar from "../ProductSearchBar/ProductSearchBar";
 import CustomDatePicker from "../CustomDatePicker";
 import { DeleteOutlined } from "@ant-design/icons";
 import SupplierSearchBar from "../SupplierSearchBar";
-import { Purchase, PurchaseItem } from "@/utils/type";
-import { formatInputNumber, formatNumber } from "@/utils/tools";
+import { Debt, Purchase, PurchaseItem } from "@/utils/type";
+import {
+  formatInputNumber,
+  formatNumber,
+} from "@/utils/tools";
 import moment from "moment";
 import { cloneDeep } from "lodash";
 import { createPurchase, updatePurchase } from "@/action/purchase.action";
 import { createDebt } from "@/action/debt.action";
 import apiClient from "@/service/auth";
+import CustomInputNumber from "@/container/CustomInputNumber";
 
 interface PurchaseDetailProps
   extends ReturnType<typeof mapStateToProps>,
@@ -35,7 +40,7 @@ interface PurchaseDetailProps
   title: string;
   purchaseId?: number;
   setPurchaseId: Dispatch<SetStateAction<number | undefined>>;
-  fetchDebts: () => Promise<void>
+  fetchPurchases: () => Promise<void>;
 }
 
 const PurchaseDetail = (props: PurchaseDetailProps) => {
@@ -49,6 +54,8 @@ const PurchaseDetail = (props: PurchaseDetailProps) => {
     currentUser,
     currentShop,
     setPurchaseId,
+    createDebt,
+    fetchPurchases,
   } = props;
 
   const [loading, setLoading] = useState(false);
@@ -105,11 +112,14 @@ const PurchaseDetail = (props: PurchaseDetailProps) => {
       width: "25%",
       render: (text, record) => {
         return (
-          <Input
+          <CustomInputNumber
             value={text}
-            onChange={(e) =>
-              onChangeInputItem(e.target.value, "imported_price", record.key)
+            onChange={(value) =>
+              onChangeInputItem(value, "imported_price", record.key)
             }
+            placeholder="Giá nhập"
+            type="price"
+            className="w-full"
           />
         );
       },
@@ -144,7 +154,7 @@ const PurchaseDetail = (props: PurchaseDetailProps) => {
       .get(url)
       .then((res) => {
         const data = res.data;
-        if (data.status == 1) {
+        if (data.status == 1 || data.status == 2) {
           setDisabled(true);
         }
         setPurchase(data);
@@ -157,7 +167,7 @@ const PurchaseDetail = (props: PurchaseDetailProps) => {
   };
 
   const onChangeInputItem = (value: any, key: string, vId: number) => {
-    let clontItems: PurchaseItem[] = cloneDeep(purchase.items) || [];
+    let clontItems: any[] = cloneDeep(purchase.items) || [];
     const index = clontItems.findIndex((item) => item.variation.id == vId);
     clontItems[index][key] = value;
     setPurchase((prevState) => {
@@ -244,18 +254,31 @@ const PurchaseDetail = (props: PurchaseDetailProps) => {
     if (purchase && !purchaseId) {
       await createPurchase(params)
         .then((res) => {
-          setLoading(false);
-          setOpen(false);
-          if (res) {
-            notification.success({
-              message: "Thành công",
-              description: "Tạo phiếu nhập hàng thành công",
-            });
-            setOpen(false);
-            props.fetchDebts();
+          if (res.payload) {
+            const data = res.payload;
+            const debtParams: Debt = {
+              name: `Nợ hàng #${data.id}`,
+              money_must_pay: data.total_price,
+              status: 0,
+              supplier_id: data.supplier_id,
+              purchase_id: data.id,
+              shop_id: currentShop.id,
+            };
+            createDebt({ data: debtParams, shop_id: currentShop.id }).then(
+              () => {
+                setLoading(false);
+                setOpen(false);
+                notification.success({
+                  message: "Thành công",
+                  description: "Tạo phiếu nhập hàng thành công",
+                });
+                fetchPurchases();
+              }
+            );
           }
         })
         .catch((error) => {
+          console.log(error);
           notification.error({
             message: "Thất bại",
             description: "Tạo phiếu nhập hàng thất bại",
@@ -272,7 +295,7 @@ const PurchaseDetail = (props: PurchaseDetailProps) => {
               description: "Cập nhật phiếu nhập hàng thành công",
             });
             setOpen(false);
-            props.fetchDebts();
+            fetchPurchases();
           }
         })
         .catch((error) => {
@@ -307,18 +330,22 @@ const PurchaseDetail = (props: PurchaseDetailProps) => {
       <div className="p-3 bg-white rounded-lg">
         <div className="flex justify-between flex-col mb-2">
           <h1 className="font-medium mb-2">Phí vận chuyển</h1>
-          <Input
-            placeholder="Phí vận chuyển"
-            onChange={(e) => onChangeInput(e.target.value, "shipping_fee")}
+          <CustomInputNumber
             value={purchase.shipping_fee}
+            onChange={(value) => onChangeInput(value, "shipping_fee")}
+            placeholder="Phí vận chuyển"
+            type="price"
+            className="w-full"
           />
         </div>
         <div className="flex justify-between flex-col mb-2">
           <h1 className="font-medium mb-2">Chiết khấu</h1>
-          <Input
-            placeholder="Chiết khấu"
-            onChange={(e) => onChangeInput(e.target.value, "discount")}
+          <CustomInputNumber
             value={purchase.discount}
+            onChange={(value) => onChangeInput(value, "discount")}
+            placeholder="Chiết khấu"
+            type="price"
+            className="w-full"
           />
         </div>
         <div className="flex justify-between flex-col mb-2">
@@ -519,6 +546,7 @@ const mapDispatchToProps = (dispatch: AppDispatch) => {
   return {
     createPurchase: (params: any) => dispatch(createPurchase(params)),
     updatePurchase: (params: any) => dispatch(updatePurchase(params)),
+    createDebt: (params: any) => dispatch(createDebt(params)),
   };
 };
 

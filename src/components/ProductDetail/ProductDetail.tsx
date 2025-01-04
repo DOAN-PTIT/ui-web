@@ -40,6 +40,7 @@ import apiClient from "@/service/auth";
 import UploadFile from "./UploadFile";
 import { RcFile } from "antd/es/upload";
 import { unionBy } from "lodash";
+import CustomInputNumber from "@/container/CustomInputNumber";
 
 interface VariationProps {
   id: string;
@@ -210,16 +211,15 @@ function ProductDetail(props: ProductDetailProps) {
       title: "Giá nhập cuối",
       render: (text, record) => {
         return (
-          <Input
+          <CustomInputNumber
             name="last_imported_price"
             defaultValue={text}
             value={record.last_imported_price}
-            onChange={(e) =>
-              onInputVariationChange(
-                "last_imported_price",
-                parseInt(e.target.value)
-              )
+            onChange={(value) =>
+              onInputVariationChange("last_imported_price", value || 0)
             }
+            type="price"
+            className="w-full"
           />
         );
       },
@@ -230,13 +230,15 @@ function ProductDetail(props: ProductDetailProps) {
       title: "Giá bán",
       render: (text, record) => {
         return (
-          <Input
+          <CustomInputNumber
             name="retail_price"
             defaultValue={text}
             value={record.retail_price}
-            onChange={(e) =>
-              onInputVariationChange("retail_price", parseInt(e.target.value))
+            onChange={(value) =>
+              onInputVariationChange("retail_price", value || 0)
             }
+            type="price"
+            className="w-full"
           />
         );
       },
@@ -247,16 +249,15 @@ function ProductDetail(props: ProductDetailProps) {
       title: "Giá bán tại quầy",
       render: (text, record) => {
         return (
-          <Input
+          <CustomInputNumber
             name="price_at_counter"
             defaultValue={text}
             value={record.price_at_counter}
-            onChange={(e) =>
-              onInputVariationChange(
-                "price_at_counter",
-                parseInt(e.target.value)
-              )
+            onChange={(value) =>
+              onInputVariationChange("price_at_counter", value || 0)
             }
+            type="price"
+            className="w-full"
           />
         );
       },
@@ -267,13 +268,13 @@ function ProductDetail(props: ProductDetailProps) {
       title: "Số lượng",
       render: (text, record) => {
         return (
-          <Input
+          <CustomInputNumber
             name="amount"
             defaultValue={text}
             value={record.amount}
-            onChange={(e) =>
-              onInputVariationChange("amount", parseInt(e.target.value))
-            }
+            onChange={(value) => onInputVariationChange("amount", value)}
+            type="quantity"
+            className="w-full"
           />
         );
       },

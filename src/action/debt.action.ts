@@ -22,6 +22,7 @@ export const createDebt = createAsyncThunk(
   "debt/createDebt",
   async (params: any) => {
     const { shop_id, data } = params;
+    console.log(params);
     const url = `shop/${shop_id}/debt/create`;
     return await apiClient
       .post(url, data)
