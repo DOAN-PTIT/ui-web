@@ -36,7 +36,7 @@ function Purchase(props: PurchaseProps) {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    getListDebts();
+    getListPurchases();
   }, []);
 
   const columns: TableProps<any>["columns"] = [
@@ -133,7 +133,7 @@ function Purchase(props: PurchaseProps) {
     },
   });
 
-  const getListDebts = async (params = {} as any) => {
+  const getListPurchases = async (params = {} as any) => {
     setLoading(true);
     try {
       const url = `/shop/${props.currentShop.id}/purchases`;
@@ -155,7 +155,15 @@ function Purchase(props: PurchaseProps) {
     }
   };
 
-  const handleUpdatePurchaseStatus = async (status: number) => {
+  const handleUpdatePurchaseStatus = async (status: number, prevStatus: any) => {
+    if ((parseInt(prevStatus) == 1 && status == 0) || parseInt(prevStatus) == -1) {
+      notification.warning({
+        message: "Cập nhật trạng thái phiếu nhập thất bại",
+        description: "Phiếu nhập đã được xử lý hoặc hủy",
+      })
+
+      return;
+    }
     setLoading(true);
     await updatePurchase({
       id: selectedPurchase,
@@ -172,7 +180,7 @@ function Purchase(props: PurchaseProps) {
             message: "Thành công",
             description: "Cập nhật trạng thái thành công",
           });
-          getListDebts();
+          getListPurchases();
         }
       })
       .catch((err) => {
@@ -216,7 +224,7 @@ function Purchase(props: PurchaseProps) {
       <Content className="p-5 h-screen bg-gray-200 rounded-tl-xl order__table__container">
         <ActionTools
           callBack={() => setModalVisiable(true)}
-          reloadCallBack={getListDebts}
+          reloadCallBack={getListPurchases}
         />
         <Table
           columns={columns}
@@ -227,7 +235,7 @@ function Purchase(props: PurchaseProps) {
             total: totalPage,
             onChange: (page, pageSize) => {
               setCurrentPage(page);
-              getListDebts({ page: page });
+              getListPurchases({ page: page });
             },
           }}
           scroll={{ y: 500, x: 2000 }}
@@ -236,7 +244,7 @@ function Purchase(props: PurchaseProps) {
             return {
               onClick: (event) => {
                 setModalVisiable(true);
-                setTitle(`Chi tiết phiếu nhập hàng ${record.id}`);
+                setTitle(`Chi tiết phiếu nhập hàng #${record.id}`);
                 setSelectedPurchase(record.key);
               },
               style: { cursor: "pointer" },
@@ -250,7 +258,7 @@ function Purchase(props: PurchaseProps) {
             title={title}
             purchaseId={selectedPurchase}
             setPurchaseId={setSelectedPurchase}
-            fetchDebts={getListDebts}
+            fetchPurchases={getListPurchases}
           />
         )}
       </Content>

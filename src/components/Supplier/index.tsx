@@ -11,6 +11,7 @@ import SupplierDetail from "../SupplierDetail";
 import { getListSupplier, updateSupplier } from "@/action/supplier.action";
 import { Supplier as SupplierType } from "@/utils/type";
 import { debounce } from "lodash";
+import { formatNumber } from "@/utils/tools";
 
 const { Content } = Layout;
 const defaultParams = {
@@ -68,11 +69,17 @@ function Supplier(props: SupplierProps) {
       key: "debt",
       dataIndex: "debt",
       title: "Nợ cần trả",
+      render: (price) => {
+        return <span>{formatNumber(price)} đ</span>
+      }
     },
     {
       key: "total_purchase",
       dataIndex: "total_purchase",
       title: "Tổng mua",
+      render: (price) => {
+        return <span>{formatNumber(price)} đ</span>
+      }
     },
   ];
 
@@ -119,8 +126,15 @@ function Supplier(props: SupplierProps) {
               </span>
             ),
             description: supplier.description,
-            debt: 0,
-            total_purchase: 0,
+            debt: supplier.debt.reduce((acc, debt) => {
+              if (debt.status === 1) {
+                return acc;
+              }
+              return acc + debt.money_must_pay;
+            }, 0),
+            total_purchase: supplier.purchases.reduce((acc, purchase) => {
+              return acc + purchase.total_price;
+            }, 0),
           };
         })
       : [];

@@ -28,6 +28,7 @@ import { formatNumber } from "@/utils/tools";
 import apiClient from "@/service/auth";
 import { connect } from "react-redux";
 import CustomDatePicker from "../CustomDatePicker";
+import CustomInputNumber from "@/container/CustomInputNumber";
 
 interface PromotionDetailProps
   extends ReturnType<typeof mapStateToProps>,
@@ -350,11 +351,11 @@ const PromotionDetail = (props: PromotionDetailProps) => {
           return (
             <div>
               {is_discount_percent && (
-                <Input
-                  suffix="%"
+                <CustomInputNumber
+                  type="percent"
                   variant="filled"
                   value={discount}
-                  className="mb-3"
+                  className="mb-3 w-full"
                   onChange={(e) =>
                     setPromotionParams((prevState: any) => {
                       return {
@@ -364,7 +365,7 @@ const PromotionDetail = (props: PromotionDetailProps) => {
                             if (idx === index) {
                               return {
                                 ...item,
-                                discount: e.target.value,
+                                discount: e || 0,
                               };
                             }
                             return item;
@@ -375,10 +376,10 @@ const PromotionDetail = (props: PromotionDetailProps) => {
                   }
                 />
               )}
-              <Input
-                suffix="đ"
+              <CustomInputNumber
                 variant="filled"
-                addonBefore={addonBefore ? addonBefore : null}
+                type="price"
+                className="w-full"
                 value={is_discount_percent ? max_discount : discount}
                 onChange={(e) =>
                   setPromotionParams((prevState: any) => {
@@ -392,7 +393,7 @@ const PromotionDetail = (props: PromotionDetailProps) => {
                               : "discount";
                             return {
                               ...item,
-                              [field]: e.target.value,
+                              [field]: e || 0,
                             };
                           }
                           return item;
@@ -508,40 +509,40 @@ const PromotionDetail = (props: PromotionDetailProps) => {
         </div>
         <div className="flex items-center justify-between">
           <p className="font-medium">Giá trị tối thiểu: </p>
-          <Input
-            suffix="đ"
+          <CustomInputNumber
             value={promotionParams?.order_range?.min_value}
             className="w-1/2"
-            onChange={(e) => onChangeOrderRange("min_value", e.target.value)}
+            onChange={(e) => onChangeOrderRange("min_value", e || 0)}
+            type="price"
           />
         </div>
         <div className="flex items-center justify-between">
           <p className="font-medium">Giá trị tối đa: </p>
-          <Input
-            suffix="đ"
+          <CustomInputNumber
+            type="price"
             value={promotionParams?.order_range?.max_value}
             className="w-1/2"
-            onChange={(e) => onChangeOrderRange("max_value", e.target.value)}
+            onChange={(e) => onChangeOrderRange("max_value", e || 0)}
           />
         </div>
         <div className="flex items-center justify-between">
           <p className="font-medium">Chiết khấu: </p>
-          <Input
-            suffix={
-              promotionParams?.order_range?.is_discount_percent ? "%" : "đ"
+          <CustomInputNumber
+            type={
+              promotionParams?.order_range?.is_discount_percent ? "percent" : "price"
             }
             className="w-1/2"
             value={promotionParams?.order_range?.discount}
-            onChange={(e) => onChangeOrderRange("discount", e.target.value)}
+            onChange={(e) => onChangeOrderRange("discount", e || 0)}
           />
         </div>
         <div className="flex items-center justify-between">
           <p className="font-medium">Giảm tối đa: </p>
-          <Input
-            suffix="đ"
+          <CustomInputNumber
+            type="price"
             value={promotionParams?.order_range?.max_discount}
             className="w-1/2"
-            onChange={(e) => onChangeOrderRange("max_discount", e.target.value)}
+            onChange={(e) => onChangeOrderRange("max_discount", e || 0)}
           />
         </div>
       </div>

@@ -60,6 +60,8 @@ export interface Supplier {
   address?: string;
   description?: string;
   is_active?: boolean;
+  debt: Debt[];
+  purchases: Purchase[];
 }
 export interface Debt {
   id?: number;

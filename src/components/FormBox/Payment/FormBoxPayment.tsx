@@ -3,7 +3,6 @@ import { createOrder } from "@/reducer/order.reducer";
 import { AppDispatch, RootState } from "@/store";
 import {
   calcOrderDebt,
-  calcPromotionProduct,
   calculateTotalPriceProduct,
   formatInputNumber,
   formatNumber,
@@ -12,6 +11,7 @@ import { Input, notification } from "antd";
 import { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import apiClient from "@/service/auth";
+import CustomInputNumber from "@/container/CustomInputNumber";
 
 const listFee = [
   {
@@ -82,7 +82,7 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
     });
   }, 500);
 
-  const onChangePrice = (key: string, value: string) => {
+  const onChangePrice = (key: string, value: any) => {
     if (!orderParams.orderitems?.length) {
       setChangePrice(defaultPrice);
       notifyNoItems();
@@ -180,18 +180,19 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
           return (
             <div key={fee.key} className="flex justify-between">
               <p className="w-1/2">{fee.label}</p>
-              <Input
+              <CustomInputNumber
                 defaultValue={0}
                 value={orderParams[fee.key] || 0}
-                suffix="đ"
+                type="price"
                 variant="filled"
-                onChange={(e) => {
+                onChange={(value) => {
                   setChangePrice({
                     ...changePrice,
-                    [fee.key]: e.target.value,
+                    [fee.key]: value || 0,
                   });
-                  onChangePrice(fee.key, e.target.value);
+                  onChangePrice(fee.key, value || 0);
                 }}
+                className="w-full"
               />
             </div>
           );
