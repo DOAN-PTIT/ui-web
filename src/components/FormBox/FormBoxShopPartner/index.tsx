@@ -1,3 +1,4 @@
+import CustomInputNumber from "@/container/CustomInputNumber";
 import { createOrder } from "@/reducer/order.reducer";
 import { AppDispatch, RootState } from "@/store";
 import { calcTotalOrderPrice } from "@/utils/tools";
@@ -55,9 +56,16 @@ function FormBoxShopPartner(props: ShopParterProps) {
         </div>
         <div className="flex">
           <p className="w-1/2">Phí vận chuyển</p>
-          <Input
+          <CustomInputNumber
             className="w-1/2"
-            value={order?.delivery_cost || orderParams?.delivery_cost}
+            value={orderParams?.delivery_cost || order?.delivery_cost}
+            onChange={(value) =>
+              createOrder({
+                ...orderParams,
+                delivery_cost: value,
+              })
+            }
+            type="price"
             variant="filled"
             placeholder="Phí vận chuyển"
           />

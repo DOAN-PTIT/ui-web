@@ -18,7 +18,7 @@ function FormBoxReceive(props: FormBoxReceiveProps) {
     ? moment(order?.estimated_delivery).utc()
     : null;
 
-  const handleDateChange = (date, dateString) => {
+  const handleDateChange = (date: any, dateString: any) => {
     createOrder({
       ...orderParams,
       estimated_delivery: date ? date.toISOString() : null,

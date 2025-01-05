@@ -69,7 +69,7 @@ function OrderDetail(props: OrderDetailProps) {
   }, [selectedRowKey]);
 
   useEffect(() => {
-    setTotalCost(calcTotalOrderPrice(orderParams));
+    setTotalCost(calcTotalOrderPrice(orderParams))
   }, [orderParams]);
 
   const getOrderDetail = async () => {

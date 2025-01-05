@@ -2,7 +2,19 @@ import { createOrder } from "@/reducer/order.reducer";
 import apiClient from "@/service/auth";
 import { AppDispatch, RootState } from "@/store";
 import { CopyOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, DatePicker, Divider, Empty, Input, message, Modal, Select, Spin, Table, TableProps } from "antd";
+import {
+  Button,
+  DatePicker,
+  Divider,
+  Empty,
+  Input,
+  message,
+  Modal,
+  Select,
+  Spin,
+  Table,
+  TableProps,
+} from "antd";
 import dayjs from "dayjs";
 import moment from "moment";
 import { useRouter } from "next/navigation";
@@ -12,7 +24,7 @@ import { connect, useSelector } from "react-redux";
 
 interface CustomerDetailProps
   extends ReturnType<typeof mapStateToProps>,
-  ReturnType<typeof mapDispatchToProps> {
+    ReturnType<typeof mapDispatchToProps> {
   open: boolean;
   onCancel: () => void;
   data: any;
@@ -27,9 +39,8 @@ function CustomerDetail({
   createOrder,
   currentShop,
 }: CustomerDetailProps) {
-
   const router = useRouter();
-  const {id} = currentShop
+  const { id } = currentShop;
   const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
   const [profileCustomer, setProfileCustomer] = useState({
     name: "",
@@ -70,19 +81,34 @@ function CustomerDetail({
     <Table
       columns={[
         {
-          title: 'ID sản phẩm',
-          dataIndex: 'id',
-          key: 'id',
+          title: "ID sản phẩm",
+          dataIndex: "id",
+          key: "id",
           render: (_: any, __: any, index: number) => index + 1,
         },
-        { title: 'Tên sản phẩm', dataIndex: 'product', key: 'product', render: (product) => product?.name || "N/A" },
-        { title: 'Giá', dataIndex: 'retail_price', key: 'retail_price', render: (_, item) => formatCurrency(item?.variation?.retail_price || 0) },
-        { title: 'Số lượng', dataIndex: 'quantity', key: 'quantity' },
-        { title: 'Tổng tiền', key: 'cost', render: (_, item) => formatCurrency(item?.quantity * item?.variation?.retail_price || 0) },
+        {
+          title: "Tên sản phẩm",
+          dataIndex: "product",
+          key: "product",
+          render: (product) => product?.name || "N/A",
+        },
+        {
+          title: "Giá",
+          dataIndex: "retail_price",
+          key: "retail_price",
+          render: (_, item) =>
+            formatCurrency(item?.variation?.retail_price || 0),
+        },
+        { title: "Số lượng", dataIndex: "quantity", key: "quantity" },
+        {
+          title: "Tổng tiền",
+          key: "cost",
+          render: (_, item) =>
+            formatCurrency(item?.quantity * item?.variation?.retail_price || 0),
+        },
       ]}
       dataSource={record?.orderitems || []}
       pagination={false}
-
     />
   );
 
@@ -102,13 +128,18 @@ function CustomerDetail({
       fixed: "left",
       width: 180,
       render: (_, record) => {
-        const productNames = record?.orderitems?.map((item: any) => item?.product?.name).join(", ");
+        const productNames = record?.orderitems
+          ?.map((item: any) => item?.product?.name)
+          .join(", ");
         const maxLength = 25;
-        const shortenedNames = productNames?.length > maxLength
-          ? productNames.substring(0, maxLength) + "..."
-          : productNames;
+        const shortenedNames =
+          productNames?.length > maxLength
+            ? productNames.substring(0, maxLength) + "..."
+            : productNames;
 
-        return <div title={productNames || "N/A"}>{shortenedNames || "N/A"}</div>;
+        return (
+          <div title={productNames || "N/A"}>{shortenedNames || "N/A"}</div>
+        );
       },
     },
 
@@ -116,29 +147,33 @@ function CustomerDetail({
       key: "TOTAL COST",
       dataIndex: "total_cost",
       title: "Tổng tiền",
-      render: (_, i) => (
-        <div>
-          {formatCurrency(i?.total_cost)}
-        </div>
-      )
+      render: (_, i) => <div>{formatCurrency(i?.total_cost)}</div>,
     },
     {
       key: "CREATED",
       dataIndex: "createdAt",
       title: "Mua lúc",
       render: (_, i) => (
-        <div className="text-gray-500 italic">{i?.createdAt ? moment(i.createdAt).format("HH:mm DD/MM/YYYY") : "N/A"}</div>
-      )
+        <div className="text-gray-500 italic">
+          {i?.createdAt
+            ? moment(i.createdAt).format("HH:mm DD/MM/YYYY")
+            : "N/A"}
+        </div>
+      ),
     },
     {
       key: "EMAIL",
       dataIndex: "at_counter",
       title: "Hình thức mua hàng",
       render: (_, i) => (
-        <div className={`${checkColorCounter(i?.at_counter)} border py-1 rounded-lg flex items-center justify-center`}>
+        <div
+          className={`${checkColorCounter(
+            i?.at_counter
+          )} border py-1 rounded-lg flex items-center justify-center`}
+        >
           {checkCounter(i?.at_counter)}
         </div>
-      )
+      ),
     },
     {
       key: "EMAIL",
@@ -148,9 +183,8 @@ function CustomerDetail({
         <div className={`${colorStatus(i?.status)}`}>
           {checkStatus(i?.status)}
         </div>
-      )
+      ),
     },
-
   ];
   const statusLabels: any = {
     1: "Đang xử lý",
@@ -169,18 +203,17 @@ function CustomerDetail({
   };
   const checkColorCounter = (data: any) => {
     if (data === true) {
-      return 'text-[#E67E22] border-[#E67E22]'
+      return "text-[#E67E22] border-[#E67E22]";
     } else {
-      return 'text-[#3498DB] border-[#3498DB]'
+      return "text-[#3498DB] border-[#3498DB]";
     }
-  }
+  };
   const checkCounter = (data: any) => {
     if (data === true) {
-      return 'Office'
+      return "Office";
     } else {
-      return 'Online'
+      return "Online";
     }
-
   };
   const checkStatus = (status: number) =>
     statusLabels[status] || "Không xác định";
@@ -208,13 +241,18 @@ function CustomerDetail({
     if (typeof amount !== "number") {
       return "0 đ";
     }
-    return `${new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount)}`;
+    return `${new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount)}`;
   };
   const handleCopy = () => {
-    navigator.clipboard.writeText(data?.customer?.referral_code || "Không có mã").then(
-      () => message.success("Đã sao chép!"),
-      () => message.error("Sao chép thất bại!")
-    );
+    navigator.clipboard
+      .writeText(data?.customer?.referral_code || "Không có mã")
+      .then(
+        () => message.success("Đã sao chép!"),
+        () => message.error("Sao chép thất bại!")
+      );
   };
   const options = [
     { label: "Nam", value: "MALE" },
@@ -313,8 +351,14 @@ function CustomerDetail({
                         dayjs(value).format("YYYY-MM-DD")
                       );
                     }}
-                    value={dayjs(profileCustomer.date_of_birth)}
-                    placeholder="Chọn ngày sinh"
+                    value={
+                      profileCustomer.date_of_birth
+                        ? dayjs(profileCustomer.date_of_birth)
+                        : null
+                    }
+                    placeholder={
+                      profileCustomer.date_of_birth || "Chưa có thông tin"
+                    }
                     className="w-1/2"
                   />
                 </div>
@@ -369,9 +413,13 @@ function CustomerDetail({
                   <div className="w-1/2">Lần mua cuối</div>
                   <Input
                     className="w-1/2"
-                    value={data?.customer.last_purchase ?moment(data?.customer.last_purchase).format(
-                      "HH:mm DD/MM/YYYY"
-                    ) : moment().format("DD/MM/YYYY")}
+                    value={
+                      data?.customer.last_purchase
+                        ? moment(data?.customer.last_purchase).format(
+                            "HH:mm DD/MM/YYYY"
+                          )
+                        : moment().format("DD/MM/YYYY")
+                    }
                   />
                 </div>
               </div>
@@ -387,7 +435,7 @@ function CustomerDetail({
               title={() => (
                 <div className="text-base font-medium">Lịch sử mua hàng</div>
               )}
-              pagination={{ pageSize: 30 }}
+              pagination={{ pageSize: 30, size: "small" }}
               dataSource={data?.orders?.orders || []}
               expandable={{
                 expandedRowRender,
@@ -422,7 +470,7 @@ function CustomerDetail({
         </div>
       </Spin>
     </Modal>
-  )
+  );
 }
 const mapStateToProps = (state: RootState) => {
   return {

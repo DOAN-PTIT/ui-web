@@ -1,5 +1,6 @@
 import apiClient from "@/service/auth";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { notification } from "antd";
 
 let accessToken: any;
 if (typeof window !== "undefined") {
@@ -32,7 +33,13 @@ export const createProduct = createAsyncThunk(
         },
       })
       .then((res) => res.data)
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        console.log(error);
+        notification.error({
+          message: "Thất bại",
+          description: error?.response?.data?.message || "Lỗi không xác định",
+        })
+      });
   }
 )
 

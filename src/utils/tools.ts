@@ -191,8 +191,8 @@ export const calcTotalPriceProductAfterDiscount = (order: Order) => {
 };
 
 export const calcOrderDebt = (order: any) => {
-  let totalPriceOrder = calcTotalOrderPriceOriginal(order);
-  return totalPriceOrder - (order.total_discount || 0);
+  let totalPriceOrder = calcTotalOrderPriceOriginal(order) || 0
+  return totalPriceOrder
 };
 
 export const calcTotalDiscountProduct = (order: Order) => {
@@ -251,7 +251,8 @@ export const calcTotalOrderPriceOriginal = (order: any) => {
       calculateTotalPriceProduct(order) +
       (order.delivery_cost_shop || 0) +
       (order.surcharge || 0) -
-      (order.paid || 0);
+      (order.paid || 0) - 
+      (order.total_discount || 0)
   }
   return total_price;
 };
