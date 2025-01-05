@@ -293,7 +293,7 @@ function Order(props: OrderProps) {
         inputPlaholder="Tìm kiếm đơn hàng theo id, khách hàng, số điện thoại, sản phẩm"
         handleSearch={debouncedSearch}
       />
-      <Content className="content bg-gray-200 rounded-tl-xl p-5 order__table__container">
+      <Content className="content bg-gray-200 rounded-tl-xl p-5 orders__table__container">
         <ActionTools
           callBack={() => route.push("sale")}
           reloadCallBack={() => getListOrders(params)}

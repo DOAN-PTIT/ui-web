@@ -3,6 +3,7 @@ import { createOrder } from "@/reducer/order.reducer";
 import { AppDispatch, RootState } from "@/store";
 import {
   calcOrderDebt,
+  calcTotalOrderPrice,
   calculateTotalPriceProduct,
   formatInputNumber,
   formatNumber,
@@ -99,6 +100,9 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
       // createOrder({});
       return 0;
     } else {
+      const afterDiscount = calculateTotalPriceProduct(orderParams) - (orderParams?.total_discount || 0) + (orderParams?.delivery_cost_shop || 0);
+      const needToPay = afterDiscount + (orderParams?.surcharge || 0);
+
       switch (field) {
         case "TOTAL PRICE":
           const total_price_product =
@@ -111,24 +115,13 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
         case "DISCOUNT":
           return orderParams?.total_discount || 0;
         case "AFTER DISCOUNT":
-          return orderParams?.total_cost - orderParams?.total_discount || 0;
+          return afterDiscount
         case "NEED TO PAY":
-
-          return (
-            orderParams?.total_cost -
-              orderParams?.total_discount -
-              orderParams?.paid +
-              orderParams?.surcharge || 0
-          );
+          return needToPay;
         case "PAID":
           return orderParams?.paid || 0;
         case "DEBT":
-          return (
-            orderParams?.total_cost -
-              orderParams?.total_discount -
-              orderParams?.paid +
-              orderParams?.surcharge || 0
-          );
+          return calcOrderDebt(orderParams);
         default:
           return 0;
       }
@@ -157,7 +150,7 @@ function FormBoxPayment(props: FormBoxPaymentProps) {
     {
       key: "NEED TO PAY",
       label: "Cần thanh toán",
-      value: calcOrderDebt(orderParams) + (orderParams?.paid || 0),
+      value: afterDiscount + (orderParams?.surcharge || 0),
     },
     {
       key: "PAID",

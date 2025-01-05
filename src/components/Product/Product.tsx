@@ -75,7 +75,6 @@ function Product(props: ProductProps) {
       fixed: "left",
       width: "8%",
       render: (text, record) => {
-        console.log(text);
         return (
           <Text
             copyable={{
@@ -116,6 +115,7 @@ function Product(props: ProductProps) {
       key: "TOTAL AMOUNT",
       dataIndex: "totalAmount",
       title: "Tổng số lượng",
+      width: "8%",
       render: (text, record) => {
         return <span className="font-medium">{text}</span>;
       },
@@ -124,6 +124,7 @@ function Product(props: ProductProps) {
       key: "TOTAL VARIATION",
       dataIndex: "totalVariation",
       title: "Tổng số mẫu mã",
+      width: "8%",
       render: (text, record) => {
         return <span className="font-medium">{text}</span>;
       },
@@ -132,6 +133,7 @@ function Product(props: ProductProps) {
       key: "SALE  PRICE",
       dataIndex: "salePrice",
       title: "Giá bán",
+      width: "10%",
       render: (text, record) => {
         return <span className="font-medium">{text}</span>;
       },
@@ -140,8 +142,9 @@ function Product(props: ProductProps) {
       key: "IMPORTED PRICE",
       dataIndex: "importedPrice",
       title: "Giá nhập",
+      width: "10%",
       render: (text, record) => {
-        return <span className="font-medium">{text}</span>;
+        return <span className="font-medium">{text} đ</span>;
       },
     },
     {

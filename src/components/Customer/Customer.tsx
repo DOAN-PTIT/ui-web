@@ -32,7 +32,7 @@ import apiClient from "@/service/auth";
 import "../../styles/global.css";
 import CustomerDetail from "./CustomerDetailModal";
 import { debounce } from "lodash";
-import { autoAddZero } from "@/utils/tools";
+import { autoAddZero, formatNumber } from "@/utils/tools";
 import CustomerExportExcel from "../CustomerExportExcel";
 
 interface CustomerType {
@@ -40,7 +40,7 @@ interface CustomerType {
   customerName: string;
   dateOfBirth: string;
   totalOrder: number;
-  totalPurchasePrice: number;
+  total_spent: number;
   insertedAt: string;
   email: string;
   address: string;
@@ -110,6 +110,9 @@ function Customer(props: CustomerProps) {
       key: "DATE OF BIRTH",
       dataIndex: "dateOfBirth",
       title: "Ngày sinh",
+      render: (text: string, record: any) => {
+        return <div>{text ? moment(text).format("DD/MM/YYYY") : <span className="text-red-500">Chưa có thông tin</span>}</div>
+      }
     },
     {
       key: "ADDRESS",
@@ -165,14 +168,14 @@ function Customer(props: CustomerProps) {
     setModalVisiable(true);
   };
 
-  const getData: () => TableProps<CustomerType>["dataSource"] = () => {
+  const getData: () => TableProps<any>["dataSource"] = () => {
     return listCustomer.length > 0
       ? listCustomer.map((customer: any) => ({
           id: customer.id,
           customerName: customer.name,
-          dateOfBirth: moment(customer.date_of_birth).format("DD/MM/YYYY"),
-          totalOrder: customer.total_order,
-          totalPurchasePrice: customer.total_purchase_price,
+          dateOfBirth: customer.date_of_birth,
+          totalOrder: customer.order_count,
+          totalPurchasePrice: `${formatNumber(customer.total_spent)} đ`,
           insertedAt: moment(customer.createdAt).format("DD/MM/YYYY"),
           email: customer.email,
           address: customer.address,
@@ -271,7 +274,7 @@ function Customer(props: CustomerProps) {
     }
   };
   return (
-    <Layout>
+    <Layout className="h-full">
       <HeaderAction
         title="Khách hàng"
         isShowSearch={true}
@@ -287,14 +290,14 @@ function Customer(props: CustomerProps) {
           handleClickExportExcel={() => setIsExportExcel(true)}
         />
         <Table
-          className="cursor-pointer"
           columns={columns}
           onRow={(record: any) => ({
             onClick: () => handleOpen(record.id),
+            style: { cursor: "pointer" },
           })}
           dataSource={getData()}
           virtual
-          scroll={{ x: 2500, y: 500 }}
+          scroll={{ x: 2880 }}
           pagination={{
             pageSize: 30,
             defaultPageSize: 30,

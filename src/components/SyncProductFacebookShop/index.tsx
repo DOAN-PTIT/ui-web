@@ -25,6 +25,7 @@ function SyncProductFacebookShop(props: SyncProductFacebookShopProps) {
   } = props;
 
   const [isSyncing, setIsSyncing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState([]);
 
   const fetchListProductFBShop = async () => {
     return await getListProductFBShop({
@@ -61,12 +62,18 @@ function SyncProductFacebookShop(props: SyncProductFacebookShopProps) {
                     product_id,
                     shop_id: currentShop.id,
                   })
-                    .then((res) => {})
-                    .catch((error) => {});
+                    .then((res) => {
+                      console.log(res);
+                    })
+                    .catch((error) => {
+                      console.log(error);
+                    });
                 });
               }
             })
-            .catch((error) => {});
+            .catch((error) => {
+              console.log(error);
+            });
         });
       } else {
         setIsSyncing(false);

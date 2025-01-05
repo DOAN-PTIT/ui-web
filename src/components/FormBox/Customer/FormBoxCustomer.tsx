@@ -156,11 +156,12 @@ function FormBoxCustomer(props: FormBoxCustomerProps) {
           variant="filled"
         />
         <CustomDatePicker
-          placeholder="Ngày sinh"
+          placeholder={selectedCustomer?.date_of_birth ? "Ngày sinh" : "Chưa có ngày sinh"}
           format="DD/MM/YYYY"
-          value={selectedCustomer && moment(selectedCustomer?.date_of_birth)}
+          value={selectedCustomer?.date_of_birth ? moment(selectedCustomer.date_of_birth) : null}
           variant="filled"
         />
+        
       </div>
       {selectedCustomer && (
         <div className="mt-3 border border-blue-600 bg-sky-100 p-4 rounded-md shadow-sm relative">
@@ -177,7 +178,7 @@ function FormBoxCustomer(props: FormBoxCustomerProps) {
               </div>
             </div>
             <div>
-              {moment(selectedCustomer?.date_of_birth).format("DD/MM/YYYY")}
+              {selectedCustomer?.date_of_birth ? moment(selectedCustomer?.date_of_birth).format("DD/MM/YYYY") : <span className="text-red-500">Chưa có ngày sinh</span>}
             </div>
           </div>
           <Divider />

@@ -2,10 +2,17 @@
     border: none !important;
 }
 
-.order__table__container .ant-table-container {
+
+.orders__table__container .ant-table-container {
   height: calc(100vh - 228px) !important;
   overflow: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
+}
+
+.order__table__container .ant-table-container {
+  height: calc(100vh - 180px) !important;
+  overflow: hidden;
+  overflow-y: auto;
 }
 
 .order__table__container .ant-table-container .ant-table-tbody-virtual {
