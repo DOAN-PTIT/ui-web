@@ -23,16 +23,9 @@ export default function PassModel({ open, onOk, onCancel }: { open: boolean, onO
     return (
         <div className='change-passwword'>
             <Modal
-                
                 title="Thay đổi mật khẩu"
                 open={open}
-                // onOk={handleOk}
-                // onCancel={() => {
-                //     form.resetFields();
-                //     onCancel();
-                // }}
-                // okText="Đổi"
-                // cancelText="Hủy"
+                onCancel={onCancel}
                 footer={false}
             >
                 <Form form={form} layout="vertical" requiredMark={false} onFinish={onFinish}>
@@ -45,8 +38,7 @@ export default function PassModel({ open, onOk, onCancel }: { open: boolean, onO
                                 message: 'Xin hãy nhập mật khẩu hiện tại!',
                             },
                         ]}
-                    // hasFeedback
-                    // labelCol={{ required: false }} 
+
                     >
                         <Input.Password />
                     </Form.Item>
@@ -59,8 +51,6 @@ export default function PassModel({ open, onOk, onCancel }: { open: boolean, onO
                                 message: 'Xin hãy nhập mật khẩu!',
                             },
                         ]}
-                    // hasFeedback
-                    // labelCol={{ required: false }} // Removes individual asterisks
                     >
                         <Input.Password />
                     </Form.Item>
@@ -84,7 +74,6 @@ export default function PassModel({ open, onOk, onCancel }: { open: boolean, onO
                                 },
                             }),
                         ]}
-                    // labelCol={{ required: false }} // Removes individual asterisks
                     >
                         <Input.Password />
                     </Form.Item>

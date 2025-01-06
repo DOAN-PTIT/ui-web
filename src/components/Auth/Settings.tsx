@@ -15,6 +15,7 @@ import PassModel from './Modal/ModelPass';
 import dayjs from 'dayjs';
 import { AppstoreOutlined, UserOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
 
 const { Content, Sider } = Layout;
 const backItem = {
@@ -141,6 +142,41 @@ function Settings() {
             setLoadingUpdate(false)
         }
     }
+    const router = useRouter();
+    async function logout() {
+        try {
+            const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken) {
+                console.log('Người dùng chưa đăng nhập.');
+                return;
+            }
+            const expirationTime = localStorage.getItem('tokenExpiration');
+            if (expirationTime && Date.now() >= parseInt(expirationTime)) {
+                console.log("Token đã hết hạn, không thể đăng xuất.");
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('tokenExpiration');
+                router.push('/login');
+                return;
+            }
+            const response = await axios.post(`http://localhost:8000/auth/logout`);
+
+            if (response.status === 200) {
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('tokenExpiration');
+                console.log('Đăng xuất thành công.');
+                router.push('/login');
+            } else {
+                console.error('Đăng xuất thất bại:', response.statusText);
+            }
+
+        }
+        catch (error: any) {
+            console.error('Lỗi khi gọi API đăng xuất:', error.response?.data || error.message);
+        }
+        finally {
+            message.success('Đăng xuất thành công');
+        }
+    }
     return (
         <Layout className="bg-[#f2f4f7] min-h-screen">
             <Sider
@@ -221,10 +257,7 @@ function Settings() {
                                 <TitleH className='mb-4' title='Ngôn ngữ & Múi giờ' />
                                 <TitleLabel title='Ngôn ngữ:' />
                                 <Select className='w-full mb-4' defaultValue="Tiếng việt" options={options} />
-                                {/* <TitleLabel title='Múi giờ:' />
-                                <Select className='w-full' defaultValue="(GMT +7:00) Bangkok, Hanoi, Jakarta" options={optionsTime} /> */}
-                                <Button className='w-full mt-4' type="primary" danger>Đăng xuất</Button>
-
+                                <Button className='w-full mt-4' type="primary" danger onClick={() => logout()}>Đăng xuất</Button>
                             </div>
                         </div>
                         <div className="col-span-2 rounded-lg p-5 bg-white">
@@ -236,7 +269,6 @@ function Settings() {
                                 </div>
                                 <div className='col-span-full lg:col-span-6'>
                                     <div className='mb-4'>
-                                        {/* <div className='col-span-5'> */}
                                         <TitleLabel title='Họ và tên:' />
                                         <Form.Item name={'name'}>
                                             <Input placeholder="Nhập họ và tên đầy đủ" value={dataProfile?.name} />
