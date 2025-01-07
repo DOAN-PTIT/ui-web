@@ -33,10 +33,7 @@ function FormBoxReceive(props: FormBoxReceiveProps) {
           <p>Dự kiến nhận hàng</p>
           <CustomDatePicker 
             defaultValue={defaultValue}
-            format={"DD/MM/YYYY HH:mm"}
-            showHour
-            showMinute
-            showTime
+            format={"DD/MM/YYYY"}
             onChange={handleDateChange}
             variant="filled"
           />

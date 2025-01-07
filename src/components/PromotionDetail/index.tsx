@@ -29,6 +29,7 @@ import apiClient from "@/service/auth";
 import { connect } from "react-redux";
 import CustomDatePicker from "../CustomDatePicker";
 import CustomInputNumber from "@/container/CustomInputNumber";
+import { cloneDeep, isEmpty } from "lodash";
 
 interface PromotionDetailProps
   extends ReturnType<typeof mapStateToProps>,
@@ -36,6 +37,7 @@ interface PromotionDetailProps
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   selectedRowKey?: number;
+  setSelectedRowKey?: Dispatch<SetStateAction<number>>;
 }
 
 const PromotionDetail = (props: PromotionDetailProps) => {
@@ -81,6 +83,7 @@ const PromotionDetail = (props: PromotionDetailProps) => {
         .get(url)
         .then((res) => {
           setPromotionParams(res.data);
+          setTypePromotion(res.data.type);
           setLoading(false);
         })
         .catch((error) => {
@@ -130,8 +133,10 @@ const PromotionDetail = (props: PromotionDetailProps) => {
     setLoading(true);
     try {
       const url = `/shop/${currentShop.id}/promotion/create`;
+      const cloneParams = cloneDeep(promotionParams);
+      cloneParams.type = typePromotion;
       return apiClient
-        .post(url, promotionParams)
+        .post(url, cloneParams)
         .then((res) => {
           setLoading(false);
           notification.success({
@@ -175,6 +180,22 @@ const PromotionDetail = (props: PromotionDetailProps) => {
                   type="primary"
                   onClick={() => {
                     setTypePromotion(type.key);
+                    console.log(type.key);
+                    setPromotionParams({
+                      type: type.key,
+                      condition: {
+                        order_type: 1,
+                        order_quantity: 0,
+                      },
+                      order_range: {
+                        min_value: 0,
+                        max_value: 0,
+                        discount: 0,
+                        max_discount: 0,
+                        is_discount_percent: false,
+                      },
+                      promotion_items: [],
+                    })
                     setModalTitle(
                       `Thêm mới chương trình khuyến mãi: ${type.label}`
                     );
@@ -355,6 +376,7 @@ const PromotionDetail = (props: PromotionDetailProps) => {
                   type="percent"
                   variant="filled"
                   value={discount}
+                  min={0}
                   className="mb-3 w-full"
                   onChange={(e) =>
                     setPromotionParams((prevState: any) => {
@@ -380,6 +402,7 @@ const PromotionDetail = (props: PromotionDetailProps) => {
                 variant="filled"
                 type="price"
                 className="w-full"
+                min={0}
                 value={is_discount_percent ? max_discount : discount}
                 onChange={(e) =>
                   setPromotionParams((prevState: any) => {
@@ -514,12 +537,14 @@ const PromotionDetail = (props: PromotionDetailProps) => {
             className="w-1/2"
             onChange={(e) => onChangeOrderRange("min_value", e || 0)}
             type="price"
+            min={0}
           />
         </div>
         <div className="flex items-center justify-between">
           <p className="font-medium">Giá trị tối đa: </p>
           <CustomInputNumber
             type="price"
+            min={0}
             value={promotionParams?.order_range?.max_value}
             className="w-1/2"
             onChange={(e) => onChangeOrderRange("max_value", e || 0)}
@@ -532,6 +557,7 @@ const PromotionDetail = (props: PromotionDetailProps) => {
               promotionParams?.order_range?.is_discount_percent ? "percent" : "price"
             }
             className="w-1/2"
+            min={0}
             value={promotionParams?.order_range?.discount}
             onChange={(e) => onChangeOrderRange("discount", e || 0)}
           />
@@ -540,6 +566,7 @@ const PromotionDetail = (props: PromotionDetailProps) => {
           <p className="font-medium">Giảm tối đa: </p>
           <CustomInputNumber
             type="price"
+            min={0}
             value={promotionParams?.order_range?.max_discount}
             className="w-1/2"
             onChange={(e) => onChangeOrderRange("max_discount", e || 0)}
@@ -562,7 +589,7 @@ const PromotionDetail = (props: PromotionDetailProps) => {
   };
 
   const renderContent = () => {
-    if (promotionParams) {
+    if (typePromotion) {
       return renderCommonsPromotionContent();
     }
 
@@ -580,7 +607,13 @@ const PromotionDetail = (props: PromotionDetailProps) => {
           padding: "0px",
         },
       }}
-      onCancel={() => setOpen(false)}
+      onCancel={() => {
+        console.log("ok");
+        setOpen(false);
+        setPromotionParams({});
+        setTypePromotion(0);
+        props.setSelectedRowKey && props.setSelectedRowKey(0);
+      }}
     >
       {loading ? (
         <div className="flex items-center justify-center h-[600px]">

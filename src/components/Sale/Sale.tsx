@@ -41,7 +41,13 @@ function Sale(props: SaleProps) {
     const { createdAt, shopuser_id, ...res } = orderParams;
     createOrder({
       createdAt,
-      shopuser_id,
+      shopuser_id: null,
+      delivery_company: "",
+      total_discount: 0,
+      tracking_number: "",
+      delivery_cost: 0,
+      total_cost: 0,
+      surcharge: 0,
     });
   }, []);
 
@@ -155,9 +161,11 @@ function Sale(props: SaleProps) {
                 <Row>
                   <FormBoxReceive />
                 </Row>
-                <Row>
-                  <FormBoxShopPartner />
-                </Row>
+                {!orderParams.at_counter && (
+                  <Row>
+                    <FormBoxShopPartner />
+                  </Row>
+                )}
               </Col>
             </Row>
           </Content>

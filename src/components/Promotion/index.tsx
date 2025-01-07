@@ -167,7 +167,7 @@ function Promition(props: PromitionProps) {
             };
           }}
         />
-        {open && <PromotionDetail open={open} setOpen={setOpen} selectedRowKey={selectedRowKeys} />}
+        {open && <PromotionDetail open={open} setOpen={setOpen} selectedRowKey={selectedRowKeys} setSelectedRowKey={setSelectedRowKeys} />}
       </Content>
     </Layout>
   );

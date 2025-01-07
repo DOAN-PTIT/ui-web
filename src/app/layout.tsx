@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import './global.css'
 import { Inter } from 'next/font/google'
+import ReduxProvider from "@/components/ReduxProvider";
  
 const inter = Inter({
   subsets: ['latin'],
@@ -22,7 +23,7 @@ export default function RootLayout({
       <body
         className={`antialiased ${inter.className}`}
       >
-        {children}
+        <ReduxProvider>{children}</ReduxProvider>
       </body>
     </html>
   );

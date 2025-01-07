@@ -58,6 +58,13 @@ const defaultParams = {
   sortBy: "CREATED_AT_DESC",
 };
 
+const defaultCreateCustomerParams = {
+  name: "",
+  phone_number: "",
+  email: "",
+  gender: "MALE",
+}
+
 function Customer(props: CustomerProps) {
   const { currentShop } = props;
   const [modalVisiable, setModalVisiable] = useState(false);
@@ -69,12 +76,7 @@ function Customer(props: CustomerProps) {
   const [isLoadingCustomer, setIsLoadingCustomer] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [dataCustomer, setDataCustomer] = useState();
-  const [createCustomerParams, setCreateCustomerParams] = useState({
-    name: "",
-    phone_number: "",
-    email: "",
-    gender: "MALE",
-  });
+  const [createCustomerParams, setCreateCustomerParams] = useState(defaultCreateCustomerParams);
   const [searchTerm, setSearchTerm] = useState("");
   const [isExportExcel, setIsExportExcel] = useState(false);
 
@@ -144,7 +146,7 @@ function Customer(props: CustomerProps) {
     {
       key: "TOTAL ORDER",
       dataIndex: "totalOrder",
-      title: "Tổng đơn hàng",
+      title: "Đơn đã giao",
       render: (text: string, record: any) => {
         return <div>{text || 0}</div>;
       },
@@ -223,8 +225,14 @@ function Customer(props: CustomerProps) {
       .then((res) => {
         setIsLoading(false);
         setModalVisiable(false);
+        setCreateCustomerParams(defaultCreateCustomerParams);
         getListCustomer(defaultParams);
-        return res.data;
+        // return res.data;
+        notification.success({
+          message: "Tạo khách hàng thành công",
+          description: "Tạo khách hàng thành công",
+          duration: 5,
+        });
       })
       .catch((error) => {
         console.log(error);

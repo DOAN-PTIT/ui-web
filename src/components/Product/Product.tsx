@@ -144,7 +144,7 @@ function Product(props: ProductProps) {
       title: "Giá nhập",
       width: "10%",
       render: (text, record) => {
-        return <span className="font-medium">{text} đ</span>;
+        return <span className="font-medium">{text}</span>;
       },
     },
     {
@@ -180,32 +180,26 @@ function Product(props: ProductProps) {
           );
           const totalVariation = product?.variations?.length || 0;
           // sale Price will get about variation min - max
-          const maxSalePrice = Math.max(
-            ...product?.variations?.map(
-              (variation: any) => variation?.retail_price
-            )
-          );
-          const minSalePrice = Math.min(
-            ...product?.variations?.map(
-              (variation: any) => variation?.retail_price
-            )
-          );
-          let salePrice;
-          if (maxSalePrice == minSalePrice) {
-            salePrice = `${formatNumber(maxSalePrice, "VND")} đ`;
-          } else {
-            salePrice = `${formatNumber(
-              minSalePrice,
-              "VND"
-            )} đ - ${formatNumber(maxSalePrice, "VND")} đ`;
-          }
+          const formatPriceRange = (variations: any[], priceKey: string) => {
+            const prices = variations.map((variation: any) => variation[priceKey]);
+            const maxPrice = Math.max(...prices);
+            const minPrice = Math.min(...prices);
+            if (maxPrice === minPrice) {
+              return `${formatNumber(maxPrice || 0, "VND")} đ`;
+            } else {
+              return `${formatNumber(minPrice || 0, "VND")} đ - ${formatNumber(maxPrice || 0, "VND")} đ`;
+            }
+          };
+
+          const salePrice = formatPriceRange(product?.variations, "retail_price");
+          const importedPrice = formatPriceRange(product?.variations, "last_imported_price");
 
           return {
             id: product.product_code || product.id,
             name: product.name,
             totalAmount,
             salePrice,
-            importedPrice: formatNumber(3213912, "VND"),
+            importedPrice: importedPrice,
             note: product.description,
             totalVariation,
             image: firstVariation?.image,

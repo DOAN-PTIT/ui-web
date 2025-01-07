@@ -101,7 +101,7 @@ function Order(props: OrderProps) {
     {
       key: "ID",
       dataIndex: "id",
-      title: "ID",
+      title: "Mã đơn hàng",
       fixed: "left",
       width: 120,
       render: (text) => {
@@ -168,6 +168,7 @@ function Order(props: OrderProps) {
       key: "DISCOUNT",
       dataIndex: "total_discount",
       title: "Giảm giá",
+
     },
     {
       key: "INSERTED AT",
@@ -251,7 +252,7 @@ function Order(props: OrderProps) {
         totalPrice: `${formatNumber(order.total_cost)} đ`,
         insertedAt: moment(order.createdAt).format("DD/MM/YYYY HH:mm"),
         updatedAt: moment(order.updatedAt).format("DD/MM/YYYY HH:mm"),
-        total_discount: order.total_discount || 0,
+        total_discount: `${formatNumber(order.total_discount || 0)} đ`,
       };
     });
   };

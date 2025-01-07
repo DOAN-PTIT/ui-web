@@ -1,9 +1,10 @@
 import apiClient from "@/service/auth";
 import { AppDispatch, RootState } from "@/store";
 import { formatNumber } from "@/utils/tools";
-import { Table } from "antd";
+import { Table, Tooltip } from "antd";
 import { useEffect, useState } from "react";
 import { connect } from "react-redux";
+import type { TableProps } from "antd";
 
 interface ChartShopUserProps
   extends ReturnType<typeof mapStateToProps>,
@@ -19,7 +20,7 @@ const ChartShopUser = (props: ChartShopUserProps) => {
     getData();
   }, []);
 
-  const columns = [
+  const columns: TableProps<any>["columns"] = [
     {
       title: "Nhân viên",
       dataIndex: "shopuser_name",
@@ -29,6 +30,12 @@ const ChartShopUser = (props: ChartShopUserProps) => {
       title: "Email",
       dataIndex: "email",
       key: "email",
+      width: "15%",
+      render: (text: string) => (
+        <Tooltip title={text}>
+          <div className="truncate w-[150px]">{text}</div>
+        </Tooltip>
+      ),
     },
     {
       title: "Doanh thu",
@@ -63,16 +70,18 @@ const ChartShopUser = (props: ChartShopUserProps) => {
   };
 
   const getDataSource = () => {
-    return dataSource.length > 0 ? dataSource.map((user: any) => {
-        return {
+    return dataSource.length > 0
+      ? dataSource.map((user: any) => {
+          return {
             key: user.id,
             shopuser_name: user.name,
             email: user.email,
             total_revenue: `${formatNumber(user.total_revenue)} đ`,
             total_orders: user.total_orders,
-        }
-    }) : []
-  }
+          };
+        })
+      : [];
+  };
 
   return (
     <div className="w-1/2">
