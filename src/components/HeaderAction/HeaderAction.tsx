@@ -25,7 +25,6 @@ function HeaderAction(props: HeaderActionProps) {
   const [loading, setLoading] = useState(false)
 
   async function logout() {
-    setLoading(true)
     try {
       const accessToken = localStorage.getItem('accessToken');
       if (!accessToken) {
@@ -56,7 +55,6 @@ function HeaderAction(props: HeaderActionProps) {
       console.error('Lỗi khi gọi API đăng xuất:', error.response?.data || error.message);
     }
     finally {
-      setLoading(false)
       message.success('Đăng xuất thành công');
     }
   }

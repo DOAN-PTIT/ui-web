@@ -14,6 +14,7 @@ import {
   Spin,
   Table,
   TableProps,
+  Tooltip,
 } from "antd";
 import dayjs from "dayjs";
 import moment from "moment";
@@ -25,7 +26,7 @@ import CustomDatePicker from "../CustomDatePicker";
 
 interface CustomerDetailProps
   extends ReturnType<typeof mapStateToProps>,
-    ReturnType<typeof mapDispatchToProps> {
+  ReturnType<typeof mapDispatchToProps> {
   open: boolean;
   onCancel: () => void;
   data: any;
@@ -284,36 +285,38 @@ function CustomerDetail({
     >
       <Spin spinning={loading}>
         <div className="flex p-4 justify-between">
-          <div className="flex items-center">
-            <Avatar name={profileCustomer.name} round size={"40"} />
-            {editing ? (
-              <Input
-                className="ml-3"
-                value={profileCustomer.name}
-                onChange={(e) =>
-                  setProfileCustomer((prev) => ({
-                    ...prev,
-                    name: e.target.value,
-                  }))
-                }
-                onBlur={() => {
-                  setEditing(false);
-                  handleSingleFieldUpdate("name", profileCustomer.name);
-                }}
-                onPressEnter={() => {
-                  setEditing(false);
-                  handleSingleFieldUpdate("name", profileCustomer.name);
-                }}
-              />
-            ) : (
-              <div
-                onClick={() => setEditing(true)}
-                className="ml-2 text-base font-medium"
-              >
-                {profileCustomer.name}
-              </div>
-            )}
-          </div>
+          <Tooltip title="Click để thay đổi tên khách hàng!">
+            <div className="flex items-center">
+              <Avatar name={profileCustomer.name} round size={"40"} />
+              {editing ? (
+                <Input
+                  className="ml-3"
+                  value={profileCustomer?.name}
+                  onChange={(e) =>
+                    setProfileCustomer((prev) => ({
+                      ...prev,
+                      name: e.target.value,
+                    }))
+                  }
+                  onBlur={() => {
+                    setEditing(false);
+                    handleSingleFieldUpdate("name", profileCustomer?.name);
+                  }}
+                  onPressEnter={() => {
+                    setEditing(false);
+                    handleSingleFieldUpdate("name", profileCustomer?.name);
+                  }}
+                />
+              ) : (
+                <div
+                  onClick={() => setEditing(true)}
+                  className="ml-2 text-base font-medium"
+                >
+                  {profileCustomer.name}
+                </div>
+              )}
+            </div>
+          </Tooltip>
           <div className="flex items-end  ">
             <Button
               type="primary"
@@ -353,12 +356,12 @@ function CustomerDetail({
                       );
                     }}
                     value={
-                      profileCustomer.date_of_birth
-                        ? dayjs(profileCustomer.date_of_birth)
+                      profileCustomer?.date_of_birth
+                        ? dayjs(profileCustomer?.date_of_birth)
                         : null
                     }
                     placeholder={
-                      profileCustomer.date_of_birth || "Chưa có thông tin"
+                      profileCustomer?.date_of_birth || "Chưa có thông tin"
                     }
                     className="w-1/2"
                   />
@@ -368,7 +371,7 @@ function CustomerDetail({
                   <Select
                     className="w-1/2"
                     placeholder="Chọn giới tính"
-                    value={profileCustomer.gender}
+                    value={profileCustomer?.gender}
                     options={options}
                     onChange={(value) =>
                       handleSingleFieldUpdate("gender", value)
@@ -377,9 +380,15 @@ function CustomerDetail({
                 </div>
                 <div className="flex justify-between items-center text-sm mb-2">
                   <div className="w-1/2">Số điện thoại</div>
-                  <div className="text-blue-800 font-medium">
-                    {data?.customer.phone_number}
-                  </div>
+                  <Input value={profileCustomer?.phone_number}
+                    onChange={(e) => setProfileCustomer((prev) => ({
+                      ...prev,
+                      phone_number: e.target.value
+                    }))}
+                    onBlur={() => handleSingleFieldUpdate('phone_number', profileCustomer?.phone_number)}
+                    onPressEnter={() => handleSingleFieldUpdate('phone_number', profileCustomer?.phone_number)}
+                    className="text-blue-800 font-medium w-1/2" />
+
                 </div>
                 <div className="flex justify-between items-center text-sm mb-2">
                   <div className="w-1/2">Email</div>
@@ -412,16 +421,6 @@ function CustomerDetail({
                 </div>
                 <div className="flex justify-between items-center text-sm mb-2">
                   <div className="w-1/2">Lần mua cuối</div>
-                  {/* <Input
-                    className="w-1/2"
-                    value={
-                      data?.customer.last_purchase
-                        ? moment(data?.customer.last_purchase).format(
-                            "HH:mm DD/MM/YYYY"
-                          )
-                        : null
-                    }
-                  /> */}
                   <CustomDatePicker 
                   value={data?.customer.last_purchase ? moment(data?.customer.last_purchase) : null}
                   className="w-1/2"
