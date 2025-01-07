@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Avatar from "react-avatar";
 import { connect, useSelector } from "react-redux";
+import CustomDatePicker from "../CustomDatePicker";
 
 interface CustomerDetailProps
   extends ReturnType<typeof mapStateToProps>,
@@ -420,15 +421,10 @@ function CustomerDetail({
                 </div>
                 <div className="flex justify-between items-center text-sm mb-2">
                   <div className="w-1/2">Lần mua cuối</div>
-                  <Input
-                    className="w-1/2"
-                    value={
-                      data?.customer.last_purchase
-                        ? moment(data?.customer.last_purchase).format(
-                          "HH:mm DD/MM/YYYY"
-                        )
-                        : moment().format("DD/MM/YYYY")
-                    }
+                  <CustomDatePicker 
+                  value={data?.customer.last_purchase ? moment(data?.customer.last_purchase) : null}
+                  className="w-1/2"
+                  placeholder="Chưa có thông tin"
                   />
                 </div>
               </div>

@@ -26,10 +26,14 @@ function FormBoxOrderInfo(props: FormBoxOrderInfoProps) {
     order,
   } = props;
 
-  const [createdAt, setCreatedAt] = useState<any>(orderParams.createdAt ? moment(orderParams.createdAt) : moment());
+  const [createdAt, setCreatedAt] = useState<any>(orderParams?.id ? moment(orderParams.createdAt) : moment());
 
   useEffect(() => {
-    createOrder({ ...orderParams, createdAt: moment(createdAt).format("YYYY-MM-DD HH:mm") });
+    if (createdAt && orderParams) {
+      const createdParams = orderParams?.id ? moment(orderParams.createdAt) : moment()
+      console.log(createdParams.format("YYYY-MM-DD HH:mm"));
+      createOrder({ ...orderParams, createdAt: createdParams.format("YYYY-MM-DD HH:mm") });
+    }
   }, [createdAt]);
 
   const onFocusSelect = async () => {

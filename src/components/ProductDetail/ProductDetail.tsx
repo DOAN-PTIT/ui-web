@@ -9,6 +9,7 @@ import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   Button,
   Col,
+  Divider,
   Form,
   Image,
   Input,
@@ -18,6 +19,7 @@ import {
   Popover,
   Row,
   Select,
+  Space,
   Spin,
   Switch,
   Table,
@@ -30,6 +32,7 @@ import {
   Fragment,
   SetStateAction,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { connect } from "react-redux";
@@ -41,6 +44,8 @@ import UploadFile from "./UploadFile";
 import { RcFile } from "antd/es/upload";
 import { unionBy } from "lodash";
 import CustomInputNumber from "@/container/CustomInputNumber";
+import type { InputRef } from "antd";
+import { fuzzySearch } from "@/utils/tools";
 
 interface VariationProps {
   id: string;
@@ -90,6 +95,8 @@ function ProductDetail(props: ProductDetailProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [deleteVariationIds, setDeleteVariationIds] = useState<any[]>([]);
   const [uploadImageLoading, setUploadImageLoading] = useState(false);
+  const [categoryName, setCategoryName] = useState<string>("");
+  const [listCategories, setListCategories] = useState<any[]>([]);
 
   interface VariationParam {
     index?: number;
@@ -105,6 +112,7 @@ function ProductDetail(props: ProductDetailProps) {
       setIsFacebookShop(true);
     }
     selectedRowKeys && handleGetProduct();
+    getCategories();
   }, [currentShop.fb_shop_id, selectedRowKeys]);
 
   const handleDeleteVariationColumn = (index: any) => {
@@ -122,6 +130,8 @@ function ProductDetail(props: ProductDetailProps) {
     newVariationData.splice(indexSelectedColumn, 1);
     setVariationData(newVariationData);
   };
+
+  const inputRef = useRef<InputRef>(null);
 
   const handleGetProduct = async () => {
     setIsLoading(true);
@@ -369,10 +379,15 @@ function ProductDetail(props: ProductDetailProps) {
                       description: "Tạo sản phẩm thành công",
                     });
                     setIsLoading(false);
+                    getListProduct({
+                      shopId: currentShop.id,
+                      page: currentPage,
+                    });
                   }
                 })
                 .catch(() => {
                   setModalVisiable(false);
+                  getListProduct({ shopId: currentShop.id, page: currentPage });
                   notification.error({
                     message: "Đã xảy ra lỗi khi tạo mẫu mã",
                     description:
@@ -408,6 +423,13 @@ function ProductDetail(props: ProductDetailProps) {
     setIsLoading(true);
     try {
       const url = `/shop/${currentShop.id}/product/update`;
+
+      if (selectedCatalog) {
+        handleSyncProductToFacebook({
+          ...createProductParams,
+          variations: variationData,
+        });
+      }
       return await apiClient
         .post(url, {
           ...createProductParams,
@@ -571,6 +593,35 @@ function ProductDetail(props: ProductDetailProps) {
     setIsOpenModal(false);
   };
 
+  const handleAddCategories = async () => {
+    if (categoryName) {
+      const url = `/shop/${currentShop.id}/category/create`;
+      return await apiClient
+        .post(url, {
+          name: categoryName,
+          description: "",
+          product_code: createProductParams?.product_code,
+        })
+        .then((res) => {
+          if (res.data) {
+            setCreateProductParams((prev: any) => ({
+              ...prev,
+              categories_id: res.data.id,
+            }));
+            setCategoryName("");
+            inputRef.current?.focus();
+          }
+        });
+    }
+  };
+
+  const getCategories = async () => {
+    const url = `/shop/${currentShop.id}/categories`;
+    return await apiClient.get(url).then((res) => {
+      setListCategories(res.data);
+    });
+  };
+
   const renderModalCatalog = () => {
     return (
       <Modal
@@ -701,14 +752,49 @@ function ProductDetail(props: ProductDetailProps) {
                   layout="vertical"
                   className="p-6 bg-white rounded-lg shadow-sm"
                 >
-                  <Form.Item name="product_categories" label="Danh mục">
+                  <Form.Item name="categories_id" label="Danh mục">
                     <Select
-                      options={[]}
+                      showSearch
+                      filterOption={(input, option) =>
+                        fuzzySearch(input, option?.children)
+                      }
                       placeholder="Danh mục"
                       onChange={(value) =>
-                        onInputChange("product_categories", value)
+                        onInputChange("categories_id", value)
                       }
-                    />
+                      value={createProductParams.categories_id}
+                      defaultValue={createProductParams.categories_id}
+                      dropdownRender={(menu) => (
+                        <>
+                          {menu}
+                          <Divider style={{ margin: "8px 0" }} />
+                          <Space style={{ padding: "0 8px 4px" }}>
+                            <Input
+                              placeholder="Thêm danh mục"
+                              ref={inputRef}
+                              value={categoryName}
+                              onChange={(e) => setCategoryName(e.target.value)}
+                              onKeyDown={(e) => e.stopPropagation()}
+                            />
+                            <Button
+                              type="text"
+                              icon={<PlusOutlined />}
+                              onClick={handleAddCategories}
+                            >
+                              Thêm danh mục
+                            </Button>
+                          </Space>
+                        </>
+                      )}
+                    >
+                      {listCategories.map((category) => {
+                        return (
+                          <Select.Option key={category.id} value={category.id}>
+                            {category.name}
+                          </Select.Option>
+                        );
+                      })}
+                    </Select>
                   </Form.Item>
                   <Form.Item label="Nhà cung cấp">
                     <Select

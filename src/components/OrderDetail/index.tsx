@@ -266,9 +266,9 @@ function OrderDetail(props: OrderDetailProps) {
               <Row>
                 <FormBoxReceive order={orderDetail} />
               </Row>
-              <Row>
+              {!orderParams.at_counter && <Row>
                 <FormBoxShopPartner order={orderDetail} />
-              </Row>
+              </Row>}
             </Col>
           </Row>
         </div>

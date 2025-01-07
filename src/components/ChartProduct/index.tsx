@@ -1,7 +1,7 @@
 import apiClient from "@/service/auth";
 import { RootState, AppDispatch } from "@/store";
 import { formatNumber } from "@/utils/tools";
-import { Table } from "antd";
+import { Table, Tooltip } from "antd";
 import { useState, useEffect } from "react";
 import { connect } from "react-redux";
 
@@ -33,6 +33,12 @@ const ChartProduct = (props: ChartProductProps) => {
       title: "Tên sản phẩm",
       dataIndex: "product",
       key: "product",
+      width: "15%",
+      render: (text: string) => {
+        return <Tooltip title={text}>
+          <div className="truncate w-[150px]">{text}</div>
+        </Tooltip>
+      }
     },
     {
       title: "Doanh thu",

@@ -9,6 +9,9 @@ interface CustomInputNumberProps {
   variant?: "outlined" | "filled";
   defaultValue?: number;
   name?: string;
+  min?: number;
+  max?: number;
+  disabled?: boolean;
 }
 
 export default function CustomInputNumber(props: CustomInputNumberProps) {
@@ -21,6 +24,9 @@ export default function CustomInputNumber(props: CustomInputNumberProps) {
     variant,
     defaultValue,
     name,
+    min,
+    max,
+    disabled,
   } = props;
   return (
     <InputNumber
@@ -43,6 +49,9 @@ export default function CustomInputNumber(props: CustomInputNumberProps) {
       variant={variant}
       defaultValue={defaultValue}
       name={name}
+      min={min ? min : type == "price" || type == "percent" ? 0 : 1}
+      max={max}
+      disabled={disabled}
     />
   );
 }

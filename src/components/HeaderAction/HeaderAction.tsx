@@ -1,4 +1,5 @@
 "use client";
+import { RootState } from "@/store";
 import {
   LogoutOutlined,
   SettingOutlined,
@@ -9,8 +10,9 @@ import { Avatar, Dropdown, Input, Layout, Menu, message } from "antd";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { connect } from "react-redux";
 
-interface HeaderActionProps {
+interface HeaderActionProps  extends ReturnType<typeof mapStateToProps> {
   title: string;
   isShowSearch: boolean;
   inputPlaholder?: string;
@@ -18,8 +20,10 @@ interface HeaderActionProps {
 }
 
 function HeaderAction(props: HeaderActionProps) {
-  const { isShowSearch, title, inputPlaholder, handleSearch } = props;
+  const { isShowSearch, title, inputPlaholder, handleSearch, currentUser } = props;
   const router = useRouter();
+  const [loading, setLoading] = useState(false)
+
   async function logout() {
     try {
       const accessToken = localStorage.getItem('accessToken');
@@ -93,11 +97,17 @@ function HeaderAction(props: HeaderActionProps) {
         </div>
 
         <Dropdown overlay={<Menu items={items} />} trigger={['click']}>
-        <Avatar className="cursor-pointer mr-2" icon={<UserOutlined />} />
+        <Avatar className="cursor-pointer mr-2" icon={<UserOutlined />} src={currentUser.avatar ? currentUser.avatar : null} />
         </Dropdown>
       </Layout.Header>
 
   );
 }
 
-export default HeaderAction;
+const mapStateToProps = (state: RootState) => {
+  return {
+    currentUser: state.userReducer.user,
+  };
+}
+
+export default connect(mapStateToProps, {})(HeaderAction);

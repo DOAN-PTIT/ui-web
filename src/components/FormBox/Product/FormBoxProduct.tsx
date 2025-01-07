@@ -76,10 +76,10 @@ function FormBoxProduct(props: FormBoxProductProps) {
         ...orderParams,
         orderitems: updatedOrderItems,
       }),
-      total_discount: calcTotalDiscountOrder({
-        ...orderParams,
-        orderitems: updatedOrderItems,
-      }),
+      // total_discount: calcTotalDiscountOrder({
+      //   ...orderParams,
+      //   orderitems: updatedOrderItems,
+      // }),
     });
   }, [note, selectedProduct]);
 
@@ -179,29 +179,34 @@ function FormBoxProduct(props: FormBoxProductProps) {
 
   const handleActicePromotion = (promotion: any) => {
     const existPromotion =
-      orderParams && orderParams?.promotion?.id === promotion?.id;
+      orderParams && (orderParams?.promotion?.id == promotion?.id || orderParams?.promotion_id == promotion?.id);
 
     let discountValueWithMax = 0;
     const promotionOrderRange = promotion?.order_range;
     if (promotionOrderRange) {
-      const discount = promotionOrderRange?.discount;
-      const isDiscountPercent = promotionOrderRange?.is_discount_percent;
-      const maxDiscount = promotionOrderRange?.max_discount;
+      const discount = promotionOrderRange?.discount || 0;
+      console.log(discount);
+      const isDiscountPercent = promotionOrderRange?.is_discount_percent || false;
+      const maxDiscount = promotionOrderRange?.max_discount || 0;
       const totalOrder = calcTotalOrderPriceOriginal(orderParams);
       const discountValue = isDiscountPercent
         ? (totalOrder * discount) / 100
         : discount;
-      discountValueWithMax = Math.min(discountValue, maxDiscount);
+      discountValueWithMax = isDiscountPercent ? Math.min(discountValue, maxDiscount) : discountValue;
       if (!existPromotion) {
+        console.log("asdads");
         createOrder({
           ...orderParams,
-          total_discount: orderParams.total_discount + discountValueWithMax,
+          total_discount: (orderParams.total_discount || 0) + discountValueWithMax,
+          promotion,
           promotion_id: promotion?.id,
         });
       } else {
+        console.log("asdasdssda");
         createOrder({
           ...orderParams,
           total_discount: orderParams.total_discount - discountValueWithMax,
+          promotion: null,
           promotion_id: null,
         });
       }
@@ -217,8 +222,16 @@ function FormBoxProduct(props: FormBoxProductProps) {
             defaultValue={false}
             defaultActiveFirstOption
             className="w-[130px]"
-            onChange={(value) => setIsAtCounter(value)}
-            value={isAtCounter}
+            onChange={(value) => {
+              setIsAtCounter(value);
+              createOrder({
+                ...orderParams,
+                at_counter: value,
+                delivery_cost: value ? 0 : orderParams.delivery_cost,
+                shop_delivery_company_id: value ? null : orderParams.shop_delivery_company_id,
+              });
+            }}
+            value={orderParams.at_counter || isAtCounter}
           >
             <Select.Option value={false}>Online</Select.Option>
             <Select.Option value={true}>Bán tại quầy</Select.Option>
@@ -251,48 +264,59 @@ function FormBoxProduct(props: FormBoxProductProps) {
                       icon={<DeleteOutlined />}
                     />
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex gap-5">
+                  <div className="flex justify-between">
+                    <div className="w-1/5">
                       <Image
                         quality={100}
-                        width={80}
-                        height={80}
+                        width={120}
+                        height={120}
                         alt=""
                         src={variation.image}
                       />
-                      <p>
-                        <Tag className="bg-[#fff0f6] border-[#ffadd2] text-[#c41d7f] font-bold">
-                          {variation.product?.id}
-                        </Tag>
-                        <Tag className="bg-[#d6ebcb] border-[#72ca45] text-[#52c41a] font-bold">
-                          {variation?.variation_code}
-                        </Tag>
-                        <span className="font-bold">
-                          {variation.product?.name}
-                        </span>
-                      </p>
                     </div>
-                    <div className="flex gap-4 items-center mt-12">
-                      <span className="text-green-500 font-medium">
-                        {formatNumber(
-                          isAtCounter
-                            ? variation.price_at_counter
-                            : variation.retail_price
-                        )}{" "}
-                        ₫
-                      </span>
-                      x
-                      <CustomInputNumber
-                        type="quantity"
-                        variant="filled"
-                        onChange={(value) => {
-                          const orderAmount = Math.max(1, value || 1);
-                          onChangeAmountCurrentProduct(variation, orderAmount);
-                        }}
-                        value={variation?.orderAmount}
-                        className="w-[80px]"
-                        defaultValue={1}
-                      />
+                    <div className="w-4/5 flex flex-col justify-center">
+                      <div className="flex gap-5">
+                        <p className="w-4/5 flex h-fit">
+                          <Tag className="bg-[#fff0f6] border-[#ffadd2] text-[#c41d7f] font-bold">
+                            {variation.product?.id}
+                          </Tag>
+                          <Tag className="bg-[#d6ebcb] border-[#72ca45] text-[#52c41a] font-bold">
+                            {variation?.variation_code}
+                          </Tag>
+                          <Tooltip title={variation.product?.name}>
+                            <p className="truncate w-[300px] font-bold">
+                              {variation.product?.name}
+                            </p>
+                          </Tooltip>
+                        </p>
+                      </div>
+                      <div className="flex justify-end gap-4 items-center mt-12">
+                        <span className="">
+                          {formatNumber(
+                            isAtCounter
+                              ? variation.price_at_counter
+                              : variation.retail_price
+                          )}{" "}
+                          ₫
+                        </span>
+                        x
+                        <CustomInputNumber
+                          type="quantity"
+                          variant="filled"
+                          onChange={(value) => {
+                            const orderAmount = Math.max(1, value || 1);
+                            onChangeAmountCurrentProduct(
+                              variation,
+                              orderAmount
+                            );
+                          }}
+                          value={variation?.orderAmount}
+                          className="w-[80px]"
+                          defaultValue={1}
+                          min={1}
+                          disabled={orderParams?.status == 4 || orderParams?.status == -1}
+                        />
+                      </div>
                     </div>
                   </div>
                   <div className="flex flex-row-reverse justify-between items-center mt-3">

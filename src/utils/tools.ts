@@ -165,12 +165,14 @@ export const purchaseStatus = {
   }
 }
 
-export const calculateTotalPriceProduct = (order: Order) => {
+export const calculateTotalPriceProduct = (order: any) => {
   let totalPrice = 0;
+  const atCounter = order?.at_counter ? order.at_counter : false;
   if (order?.orderitems) {
     order?.orderitems.forEach((item: any) => {
       const variation_info = item.variation_info || item.variation;
-      totalPrice += item.quantity * variation_info?.retail_price;
+      const price = atCounter ? (variation_info?.price_at_counter || variation_info?.retail_price) : variation_info?.retail_price;
+      totalPrice += item.quantity * price;
     });
   }
 
