@@ -186,7 +186,11 @@ function OrderDetail(props: OrderDetailProps) {
         <div className="flex gap-4 items-center">
           {status && (
             <div
-              className={`text-${status?.color}-500 border p-3 rounded-md text-[16px] cursor-default bg-${status?.color}-300 border-${status?.color}-600`}
+              className={`text-white border p-3 rounded-md text-[16px] cursor-default`}
+              style={{
+                backgroundColor: status?.color,
+                borderColor: status?.color,
+              }}
             >
               Trang thái: <span className="font-bold">{status?.label}</span>
             </div>

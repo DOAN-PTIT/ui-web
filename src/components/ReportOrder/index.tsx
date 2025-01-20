@@ -64,7 +64,8 @@ function ReportOrder(props: ReportOrderProps) {
       key: "orderRate",
       align: "right",
       render: (text) => {
-        const rate = (text.received_orders / text.total_orders) * 100 || 0
+        console.log(text);
+        const rate = text.total_orders ? (parseInt(text.received_orders) / parseInt(text.total_orders)) * 100 : 0
         return (
           <div>
             <span className="font-medium">
@@ -81,7 +82,7 @@ function ReportOrder(props: ReportOrderProps) {
       align: "right",
       showSorterTooltip: false,
       render: (text) => {
-        const rate = (text.returned_orders / text.total_orders) * 100 || 0
+        const rate = text.total_orders ? (parseInt(text.returned_orders) / parseInt(text.total_orders)) * 100 : 0
         return (
           <div>
             <span className="font-medium">

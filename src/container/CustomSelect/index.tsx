@@ -24,7 +24,10 @@ const CustomSelect = (props: CustomSelectProps) => {
   return (
     <div
       onClick={handleClick}
-      className={`custom_select custom_select_antd text-white bg-${statusItem?.value.color}-500  w-[150px] rounded-lg`}
+      className={`custom_select custom_select_antd text-white  w-[150px] rounded-lg`}
+      style={{
+        backgroundColor: statusItem?.value?.color,
+      }}
     >
       <ConfigProvider
         theme={{

@@ -30,8 +30,7 @@ function FormBoxOrderInfo(props: FormBoxOrderInfoProps) {
 
   useEffect(() => {
     if (createdAt && orderParams) {
-      const createdParams = orderParams?.id ? moment(orderParams.createdAt) : moment()
-      console.log(createdParams.format("YYYY-MM-DD HH:mm"));
+      const createdParams = moment(createdAt)
       createOrder({ ...orderParams, createdAt: createdParams.format("YYYY-MM-DD HH:mm") });
     }
   }, [createdAt]);
@@ -57,6 +56,8 @@ function FormBoxOrderInfo(props: FormBoxOrderInfoProps) {
             className="w-[180px]"
             onChange={(date, datetime) => {
               setCreatedAt(date);
+              console.log(datetime);
+              createOrder({ ...orderParams, createdAt: datetime });
             }}
             format="DD/MM/YYYY HH:mm"
             showHour

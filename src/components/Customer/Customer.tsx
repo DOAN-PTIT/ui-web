@@ -98,7 +98,7 @@ function Customer(props: CustomerProps) {
       dataIndex: "customerName",
       title: "Khách hàng",
       fixed: "left",
-      width: 200,
+      width: 320,
       render: (text: string, record: any) => {
         return (
           <div>

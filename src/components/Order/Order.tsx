@@ -51,7 +51,7 @@ interface OrderProps
     ReturnType<typeof mapDispatchToProps> {}
 
 function Order(props: OrderProps) {
-  const { currentShop, updateOrder } = props;
+  const { currentShop, updateOrder, orderParams } = props;
   const defaultParams = {
     page: 1,
     page_size: 30,
@@ -108,16 +108,17 @@ function Order(props: OrderProps) {
         return (
           <div onClick={(e) => e.stopPropagation()}>
             <Text
-              copyable={{
-                icon: <div className="font-bold">{autoAddZero(text, 0)}</div>,
-                onCopy(event) {
-                  message.success(
-                    `Sao chép thành công mã đơn hàng: ${autoAddZero(text, 0)}`
-                  );
-                },
-                tooltips: "Click để sao chép mã đơn hàng",
-              }}
-            />
+              // copyable={{
+              //   icon: <div className="font-bold">{autoAddZero(text, 0)}</div>,
+              //   onCopy(event) {
+              //     message.success(
+              //       `Sao chép thành công mã đơn hàng: ${autoAddZero(text, 0)}`
+              //     );
+              //   },
+              //   tooltips: "Click để sao chép mã đơn hàng",
+              // }}
+              className="font-[600] text-sky-500"
+            >{text}</Text>
           </div>
         );
       },
@@ -218,6 +219,7 @@ function Order(props: OrderProps) {
       id: selectedRowKey,
       status: value,
       is_update_status: true,
+      orderitems: orders.find((order) => order.id === selectedRowKey)?.orderitems,
     };
     await updateOrder(params)
       .then((res) => {
@@ -269,7 +271,7 @@ function Order(props: OrderProps) {
     return (
       <Row>
         <Col span={4}>
-          Tổng tiền:{" "}
+          <span className="font-bold">Tổng tiền:{" "}</span>
           <span className="font-bold text-green-500">
             {formatNumber(totalPrice)} đ
           </span>
@@ -291,7 +293,7 @@ function Order(props: OrderProps) {
       <HeaderAction
         title="Đơn hàng"
         isShowSearch={true}
-        inputPlaholder="Tìm kiếm đơn hàng theo id, khách hàng, số điện thoại, sản phẩm"
+        inputPlaholder="Tìm kiếm đơn hàng theo mã đơn hàng, khách hàng, số điện thoại, sản phẩm"
         handleSearch={debouncedSearch}
       />
       <Content className="content bg-gray-200 rounded-tl-xl p-5 orders__table__container">
@@ -321,7 +323,7 @@ function Order(props: OrderProps) {
             onChange: (page) => {
               if (page !== params.page) {
                 setParams({ ...params, page });
-                getListOrders(params);
+                getListOrders({ ...params, page, page_size: params.page_size });
               }
             },
           }}
@@ -347,6 +349,7 @@ const mapStateToProps = (state: RootState) => {
   return {
     isLoading: state.orderReducer.isLoading,
     currentShop: state.shopReducer.shop,
+    orderParams: state.orderReducer.createOrder,
   };
 };
 

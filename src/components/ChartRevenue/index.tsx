@@ -234,69 +234,91 @@ const ChartRevenue = (props: ChartRevenueProps) => {
         )}
       </div>
       <div className="w-1/3 bg-white p-4 rounded-md ml-3">
-        <div className="text-[18px] font-bold">
-          Thông tin kinh doanh hôm nay
-        </div>
-        <div className="mb-4">
-          <div className="flex justify-between mt-4">
-            <div>Doanh thu:</div>
-            <div className="font-bold">{formatNumber(todayData.totalRevenueAtCounter + todayData.totalRevenueOnline)}đ</div>
-          </div>
-          <div className="flex justify-between mt-4">
-            <div>Đơn chốt:</div>
-            <div className="font-bold">{todayData.totalOrdersAtCounter + todayData.totalOrdersOnline}</div>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          {renderBoxToday(
-            "Online",
-            todayData.totalRevenueOnline,
-            todayData.totalOrdersOnline,
-            true,
-            <Globe size={24} color="#06bcea" weight="duotone" />,
-            true
-          )}
-          {renderBoxToday(
-            "Bán tại quầy",
-            todayData.totalRevenueAtCounter,
-            todayData.totalOrdersAtCounter,
-            true,
-            <Storefront size={24} color="#06bcea" weight="duotone" />,
-            true
-          )}
-          {renderBoxToday(
-            "Khách hàng mới",
-            <span>{todayData.newCustomersCount} (khách)</span>,
-            0,
-            false,
-            <IdentificationCard size={24} color="#06bcea" weight="duotone" />,
-            false
-          )}
-          {renderBoxToday(
-            <span className="text-green-500">Đơn mới</span>,
-            <span>{todayData.newOrdersCount} (đơn)</span>,
-            0,
-            false,
-            <CheckSquareOffset size={24} color="green" weight="duotone" />,
-            false
-          )}
-          {renderBoxToday(
-            <span className="text-red-500">Đơn hủy</span>,
-            <span>{todayData.canceledOrdersCount} (đơn)</span>,
-            0,
-            false,
-            <CalendarX size={24} color="#d93030" />,
-            false
-          )}
-          {renderBoxToday(
-            "Số lượng bán",
-            <span>{todayData.totalQuantitySold} (đơn)</span>,
-            0,
-            false,
-            <ListNumbers size={24} color="#06bcea" weight="duotone" />,
-            false
-          )}
-        </div>
+        {loading ? (
+          <>
+            <div className="flex w-full h-full items-center justify-center">
+              <Spin />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="text-[18px] font-bold">
+              Thông tin kinh doanh hôm nay
+            </div>
+            <div className="mb-4">
+              <div className="flex justify-between mt-4">
+                <div>Doanh thu:</div>
+                <div className="font-bold">
+                  {formatNumber(
+                    todayData.totalRevenueAtCounter +
+                      todayData.totalRevenueOnline
+                  )}
+                  đ
+                </div>
+              </div>
+              <div className="flex justify-between mt-4">
+                <div>Đơn chốt:</div>
+                <div className="font-bold">
+                  {todayData.totalOrdersAtCounter + todayData.totalOrdersOnline}
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {renderBoxToday(
+                "Online",
+                todayData.totalRevenueOnline,
+                todayData.totalOrdersOnline,
+                true,
+                <Globe size={24} color="#06bcea" weight="duotone" />,
+                true
+              )}
+              {renderBoxToday(
+                "Bán tại quầy",
+                todayData.totalRevenueAtCounter,
+                todayData.totalOrdersAtCounter,
+                true,
+                <Storefront size={24} color="#06bcea" weight="duotone" />,
+                true
+              )}
+              {renderBoxToday(
+                "Khách hàng mới",
+                <span>{todayData.newCustomersCount} (khách)</span>,
+                0,
+                false,
+                <IdentificationCard
+                  size={24}
+                  color="#06bcea"
+                  weight="duotone"
+                />,
+                false
+              )}
+              {renderBoxToday(
+                <span className="text-green-500">Đơn mới</span>,
+                <span>{todayData.newOrdersCount} (đơn)</span>,
+                0,
+                false,
+                <CheckSquareOffset size={24} color="green" weight="duotone" />,
+                false
+              )}
+              {renderBoxToday(
+                <span className="text-red-500">Đơn hủy</span>,
+                <span>{todayData.canceledOrdersCount} (đơn)</span>,
+                0,
+                false,
+                <CalendarX size={24} color="#d93030" />,
+                false
+              )}
+              {renderBoxToday(
+                "Số lượng bán",
+                <span>{todayData.totalQuantitySold} (đơn)</span>,
+                0,
+                false,
+                <ListNumbers size={24} color="#06bcea" weight="duotone" />,
+                false
+              )}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

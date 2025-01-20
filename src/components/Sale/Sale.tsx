@@ -25,6 +25,15 @@ import { isEmpty } from "lodash";
 import moment from "moment";
 
 const { Content, Footer } = Layout;
+const defaultOrder = {
+  shopuser_id: null,
+  delivery_company: "",
+  total_discount: 0,
+  tracking_number: "",
+  delivery_cost: 0,
+  total_cost: 0,
+  surcharge: 0,
+}
 
 interface SaleProps
   extends ReturnType<typeof mapStateToProps>,
@@ -40,14 +49,8 @@ function Sale(props: SaleProps) {
   useEffect(() => {
     const { createdAt, shopuser_id, ...res } = orderParams;
     createOrder({
-      createdAt,
-      shopuser_id: null,
-      delivery_company: "",
-      total_discount: 0,
-      tracking_number: "",
-      delivery_cost: 0,
-      total_cost: 0,
-      surcharge: 0,
+      ...defaultOrder,
+      createdAt: createdAt || moment().format("YYYY-MM-DD HH:mm"),
     });
   }, []);
 
@@ -81,7 +84,10 @@ function Sale(props: SaleProps) {
           message: "Tạo hoá đơn thành công",
           description: "Tạo hoá đơn thành công",
         });
-        createOrder({});
+        createOrder({
+          ...defaultOrder,
+          createdAt: moment().format("YYYY-MM-DD HH:mm"),
+        });
         setIsLoading(false);
       })
       .catch((err) => {
@@ -89,6 +95,10 @@ function Sale(props: SaleProps) {
           ? err.response.data.message
           : "Lỗi không xác định";
         setIsLoading(false);
+        createOrder({
+          ...defaultOrder,
+          createdAt: moment().format("YYYY-MM-DD HH:mm"),
+        });
         notification.error({
           message: "Tạo hoá đơn thất bại",
           description: errorMessage,

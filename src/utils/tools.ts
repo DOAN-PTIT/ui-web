@@ -130,15 +130,15 @@ export const getHostName = () => {
 export const orderStatus = {
   1: {
     label: "Đang xử lý",
-    color: "blue",
+    color: "#000957",
   },
   2: {
     label: "Đã xác nhận",
-    color: "yellow",
+    color: "#F6C794",
   },
   3: {
     label: "Đang giao hàng",
-    color: "cyan",
+    color: "#577BC1",
   },
   4: {
     label: "Đã giao hàng",
@@ -240,9 +240,10 @@ export const calcPromotionEachProduct = (variation: any, quantity = 1) => {
     const discountValue = isDiscountPercent
       ? (totalOrder * discount) / 100
       : discount;
-    discountPromotion = Math.min(discountValue, maxDiscount);
+    discountPromotion = isDiscountPercent ? Math.min(discountValue, maxDiscount) : discountValue;
   }
 
+  console.log(discountPromotion);
   return discountPromotion * quantity;
 };
 

@@ -281,7 +281,12 @@ const PromotionDetail = (props: PromotionDetailProps) => {
               <Input
                 className="w-1/2"
                 placeholder="Nhập tên chương trình khuyến mãi"
-                onChange={(e) => setPromotionParams({ name: e.target.value })}
+                onChange={(e) => setPromotionParams((prevState: any) => {
+                  return {
+                    ...prevState,
+                    name: e.target.value
+                  }
+                })}
                 value={promotionParams?.name}
               />
             </div>

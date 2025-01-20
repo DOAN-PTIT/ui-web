@@ -96,11 +96,13 @@ const PurchaseDetail = (props: PurchaseDetailProps) => {
       width: "10%",
       render: (text, record) => {
         return (
-          <Input
+          <CustomInputNumber
             value={text}
-            onChange={(e) =>
-              onChangeInputItem(e.target.value, "quantity", record.key)
+            onChange={(value) =>
+              onChangeInputItem(value, "quantity", record.key)
             }
+            type="quantity"
+            min={1}
           />
         );
       },

@@ -62,7 +62,7 @@ export interface ListShop {
 
 interface OverviewProps
   extends ReturnType<typeof mapStateToProps>,
-  ReturnType<typeof mapDispatchToProps> { }
+    ReturnType<typeof mapDispatchToProps> {}
 
 function Overview(props: OverviewProps) {
   const { getCurrentUser, currentUser } = props;
@@ -73,7 +73,7 @@ function Overview(props: OverviewProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [dataEdit, setDataEdit] = useState<any>();
-  
+
   const [dataListShop, setDataListShop] = useState<ListShop[]>([]);
   useEffect(() => {
     getListShop();
@@ -117,7 +117,7 @@ function Overview(props: OverviewProps) {
         });
 
         setIsLoadingFbPage(false);
-      })
+      });
   };
 
   const getListShop = async () => {
@@ -139,7 +139,7 @@ function Overview(props: OverviewProps) {
           message: "Lấy danh sách cửa hàng thất bại",
           description: error.response.data.message,
         });
-      })
+      });
   };
 
   const handleClickAccess = async (shopId: number) => {
@@ -155,10 +155,10 @@ function Overview(props: OverviewProps) {
   };
 
   const handleOk = async (param: { name: string; avatar: any }) => {
-    setIsLoading(true)
+    setIsLoading(true);
 
     const createShopFormData = new FormData();
-    if (param.avatar instanceof File ){
+    if (param.avatar instanceof File) {
       createShopFormData.append("avatar", param.avatar);
     }
     createShopFormData.append("name", param.name);
@@ -167,100 +167,107 @@ function Overview(props: OverviewProps) {
 
     const url = `/user/create-shop`;
     if (isEdit) {
-        try {
-          await apiClient.post(`shop/profile/update/${dataEdit.id}`, createShopFormData, {
+      try {
+        await apiClient.post(
+          `shop/profile/update/${dataEdit.id}`,
+          createShopFormData,
+          {
             headers: {
               Authorization: `Bearer ${accessToken}`,
               "Content-Type": "multipart/form-data",
             },
-          })
-          setOpenModal(false)
-          await message.success("Cập nhật cửa hàng thành công!")
-          await getListShop()
-        } catch (error) {
-          message.error("Cập nhật cửa hàng thất bại!")
-          console.log(error)
-        }
+          }
+        );
+        setOpenModal(false);
+        await message.success("Cập nhật cửa hàng thành công!");
+        await getListShop();
+      } catch (error) {
+        message.error("Cập nhật cửa hàng thất bại!");
+        console.log(error);
+      }
     } else {
       try {
-        await apiClient
-          .post(url, createShopFormData, {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              "Content-Type": "multipart/form-data",
-            },
-          })
-        setOpenModal(false)
-        await message.success("Thêm cửa hàng thành công!")
-        await getListShop()
+        await apiClient.post(url, createShopFormData, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        setOpenModal(false);
+        await message.success("Thêm cửa hàng thành công!");
+        await getListShop();
       } catch (error) {
-        console.log("Error:", error)
+        console.log("Error:", error);
       }
     }
-    
   };
 
-
-  const handleCreateShopFb = async (param: { name: string, avatar: string, fb_shop_id: string }) => {
+  const handleCreateShopFb = async (param: {
+    name: string;
+    avatar: string;
+    fb_shop_id: string;
+  }) => {
     const url = `${getHostName()}/user/integrate-fb-shop`;
 
-    return await apiClient.post(url, param, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      }
-    }).then(res => console.log(res))
-      .catch(error => console.log(error))
-  }
+    return await apiClient
+      .post(url, param, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      .then((res) => console.log(res))
+      .catch((error) => console.log(error));
+  };
 
   const handleCancel = () => {
     setOpenModal(false);
   };
   const handleDeleteShop = async (shopId: any) => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      setIsLoading(false)
-      await apiClient.delete(`/shop/${shopId}`)
-      message.success('Xóa cửa hàng thành công')
-      getListShop()
+      setIsLoading(false);
+      await apiClient.delete(`/shop/${shopId}`);
+      message.success("Xóa cửa hàng thành công");
+      getListShop();
     } catch (error) {
-      console.log(error)
-      message.error('Xóa cửa hàng thất bại')
+      console.log(error);
+      message.error("Xóa cửa hàng thất bại");
     }
-  }
+  };
   const handleLeaveShop = async (shopId: any) => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      setIsLoading(false)
-      await apiClient.get(`/shop/${shopId}/leave`)
-      message.success('Rời khỏi cửa hàng thành công')
-      getListShop()
+      setIsLoading(false);
+      await apiClient.get(`/shop/${shopId}/leave`);
+      message.success("Rời khỏi cửa hàng thành công");
+      getListShop();
     } catch (error) {
-      console.log(error)
-      message.error('Rời khỏi cửa hàng thất bại')
+      console.log(error);
+      message.error("Rời khỏi cửa hàng thất bại");
     }
-  }
+  };
   const colorRole = (role: string) => {
-    if (role === 'owner') {
-      return 'bg-red-500'
+    if (role === "owner") {
+      return "bg-red-500";
     }
-    if (role === 'admin') {
-      return 'bg-blue-500'
+    if (role === "admin") {
+      return "bg-blue-500";
     }
-    if (role === 'employee') {
-      return 'bg-green-500'
+    if (role === "employee") {
+      return "bg-green-500";
     }
-  }
+  };
   const colorBorderRole = (role: string) => {
-    if (role === 'owner') {
-      return 'border-t-red-800'
+    if (role === "owner") {
+      return "border-t-red-800";
     }
-    if (role === 'admin') {
-      return 'border-t-blue-800'
+    if (role === "admin") {
+      return "border-t-blue-800";
     }
-    if (role === 'employee') {
-      return 'border-t-green-800'
+    if (role === "employee") {
+      return "border-t-green-800";
     }
-  }
+  };
   return (
     <Layout className="w-full min-h-screen ">
       <HeaderAction isShowSearch={false} title="Danh sách cửa hàng" />
@@ -281,9 +288,9 @@ function Overview(props: OverviewProps) {
               </Button>
               <Button
                 type="primary"
-                onClick={()=>{
-                  setIsEdit(false)
-                  handleOpenModel()
+                onClick={() => {
+                  setIsEdit(false);
+                  handleOpenModel();
                 }}
                 icon={<PlusCircleOutlined />}
               >
@@ -325,12 +332,18 @@ function Overview(props: OverviewProps) {
                       }
                       actions={[
                         <Tooltip key="edit" title="Cập nhật cửa hàng">
-                          <EditOutlined 
-                            onClick={()=>{
-                              setIsEdit(true)
-                              handleOpenModel()
-                              setDataEdit(shop)
-                            }}
+                          <Button
+                            className="border-none shadow-none opacity-80"
+                            icon={
+                              <EditOutlined
+                                onClick={() => {
+                                  setIsEdit(true);
+                                  handleOpenModel();
+                                  setDataEdit(shop);
+                                }}
+                              />
+                            }
+                            disabled={shop.user_role === "employee"}
                           />
                         </Tooltip>,
                         <Tooltip key="delete" title="Xóa cửa hàng">
@@ -343,9 +356,7 @@ function Overview(props: OverviewProps) {
                             cancelText="Hủy"
                           >
                             <DeleteOutlined />
-
                           </Popconfirm>
-
                         </Tooltip>,
                         <Tooltip key="leave" title="Rời khỏi cửa hàng">
                           <Popconfirm
@@ -360,10 +371,20 @@ function Overview(props: OverviewProps) {
                         </Tooltip>,
                       ]}
                     >
-                      <div className={`tag-role absolute top-2 opacity-90 ${colorRole(shop.user_role)}`}>{checkRole(shop.user_role)}</div>
-                      <div className={`tag-bottom ${colorBorderRole(shop.user_role)}`}></div>
+                      <div
+                        className={`tag-role absolute top-2 opacity-90 ${colorRole(
+                          shop?.user_role
+                        )}`}
+                      >
+                        {checkRole(shop?.user_role)}
+                      </div>
+                      <div
+                        className={`tag-bottom ${colorBorderRole(
+                          shop.user_role
+                        )}`}
+                      ></div>
                       <div className="text-center">
-                        <p className="opacity-80 mb-4">{shop.description}</p>
+                        <p className="opacity-80 mb-4">{"Chưa có mô tả"}</p>
                         <Button
                           onClick={() => handleClickAccess(shop.id)}
                           icon={<LoginOutlined />}
@@ -398,7 +419,12 @@ function Overview(props: OverviewProps) {
                         }
                       >
                         <div className="p-1 text-center">
-                          <div className="absolute text-black" style={{ backgroundColor: 'rgb(233, 76, 101)' }}>Shop</div>
+                          <div
+                            className="absolute text-black"
+                            style={{ backgroundColor: "rgb(233, 76, 101)" }}
+                          >
+                            Shop
+                          </div>
                           <Image
                             src={page.picture.data.url}
                             width={page.picture.data.width}
@@ -429,8 +455,8 @@ const mapStateToProps = (state: RootState) => {
 const mapDispatchToProps = (dispatch: AppDispatch) => {
   return {
     getCurrentUser: () => dispatch(getUserProfile()),
-    getCurrentShop: (data: any) => dispatch(getCurrentShop(data))
-  }
-}
+    getCurrentShop: (data: any) => dispatch(getCurrentShop(data)),
+  };
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Overview);

@@ -54,12 +54,16 @@ function FormBoxProduct(props: FormBoxProductProps) {
   const [note, setNote] = useState<{ note: string; variation_id: any }[]>([]);
 
   useEffect(() => {
+    let totalProductDiscount = 0;
     const updatedOrderItems = selectedProduct.map((item: any) => {
       const { orderAmount, ...variation_info } = item;
       const noteItem = note?.find(
         (note) => note.variation_id === item.id
       )?.note;
-
+      totalProductDiscount += calcPromotionEachProduct(
+        item,
+        orderAmount || 1
+      );
       return {
         variation_id: item.id,
         quantity: orderAmount || 1,
@@ -76,6 +80,7 @@ function FormBoxProduct(props: FormBoxProductProps) {
         ...orderParams,
         orderitems: updatedOrderItems,
       }),
+      total_discount: (orderParams.total_discount || 0) + (totalProductDiscount || 0),
       // total_discount: calcTotalDiscountOrder({
       //   ...orderParams,
       //   orderitems: updatedOrderItems,
@@ -194,7 +199,6 @@ function FormBoxProduct(props: FormBoxProductProps) {
         : discount;
       discountValueWithMax = isDiscountPercent ? Math.min(discountValue, maxDiscount) : discountValue;
       if (!existPromotion) {
-        console.log("asdads");
         createOrder({
           ...orderParams,
           total_discount: (orderParams.total_discount || 0) + discountValueWithMax,
@@ -278,7 +282,7 @@ function FormBoxProduct(props: FormBoxProductProps) {
                       <div className="flex gap-5">
                         <p className="w-4/5 flex h-fit">
                           <Tag className="bg-[#fff0f6] border-[#ffadd2] text-[#c41d7f] font-bold">
-                            {variation.product?.id}
+                            {variation.product?.product_code}
                           </Tag>
                           <Tag className="bg-[#d6ebcb] border-[#72ca45] text-[#52c41a] font-bold">
                             {variation?.variation_code}
